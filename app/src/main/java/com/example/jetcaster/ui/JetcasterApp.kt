@@ -2,7 +2,7 @@ package com.example.jetcaster.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -53,17 +53,17 @@ fun PodcastBottomBar(navController: NavController, tabs: Array<Tabs>) {
         Column {
             PlayerBar(
                 modifier = Modifier.background(
-                    color = MaterialTheme.colors.secondary,
+                    color = MaterialTheme.colorScheme.secondary,
                 ),
                 navController = navController
             )
-            BottomNavigation(
+            NavigationBar(
                 Modifier.windowInsetsBottomHeight(
                     WindowInsets.navigationBars.add(WindowInsets(bottom = 56.dp))
                 )
             ) {
                 tabs.forEach { tab ->
-                    BottomNavigationItem(
+                    NavigationBarItem(
                         icon = { Icon(painterResource(tab.icon), contentDescription = null) },
                         label = { Text(stringResource(tab.title)) },
                         selected = currentRoute == tab.route,
@@ -79,8 +79,6 @@ fun PodcastBottomBar(navController: NavController, tabs: Array<Tabs>) {
                             }
                         },
                         alwaysShowLabel = true,
-                        selectedContentColor = MaterialTheme.colors.secondary,
-                        unselectedContentColor = LocalContentColor.current,
                         modifier = Modifier.navigationBarsPadding()
                     )
                 }

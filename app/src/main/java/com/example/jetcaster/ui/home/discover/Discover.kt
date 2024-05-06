@@ -18,7 +18,7 @@ package com.example.jetcaster.ui.home.discover
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -112,19 +112,19 @@ private fun ChoiceChipContent(
 ) {
     Surface(
         color = when {
-            selected -> MaterialTheme.colors.primary.copy(alpha = 0.08f)
-            else -> MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
+            selected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+            else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
         },
         contentColor = when {
-            selected -> MaterialTheme.colors.primary
-            else -> MaterialTheme.colors.onSurface
+            selected -> MaterialTheme.colorScheme.primary
+            else -> MaterialTheme.colorScheme.onSurface
         },
         shape = MaterialTheme.shapes.small,
         modifier = modifier
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
     }

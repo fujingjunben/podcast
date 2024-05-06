@@ -16,15 +16,14 @@
 
 package com.example.jetcaster.ui.theme
 
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-
 @Composable
 fun JetcasterTheme(
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colors = JetcasterColors,
+        colorScheme = JetcasterColors,
         typography = JetcasterTypography,
         shapes = JetcasterShapes,
         content = content

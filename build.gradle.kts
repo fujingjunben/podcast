@@ -14,43 +14,14 @@
  * limitations under the License.
  */
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-
-        if (!libs.versions.compose.snapshot.get().endsWith("SNAPSHOT")) {
-            maven { url = uri("https://androidx.dev/snapshots/builds/${libs.versions.compose.snapshot.get()}/artifacts/repository/") }
-        }
-    }
-    dependencies {
-        classpath(libs.android.gradlePlugin)
-        classpath(libs.kotlin.gradlePlugin)
-        classpath(libs.spotless.gradlePlugin)
-    }
-}
-
-subprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    pluginManager.apply("com.diffplug.spotless")
-    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
-        kotlin {
-            target("**/*.kt")
-            targetExclude("$buildDir/**/*.kt")
-            targetExclude("bin/**/*.kt")
-
-            licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
-        }
-    }
-}
-
 plugins {
-    id("com.github.ben-manes.versions") version "0.42.0"
-    id("nl.littlerobots.version-catalog-update") version "0.6.0"
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.gradle.versions)
+    alias(libs.plugins.version.catalog.update)
+    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.hilt) apply false
 }
 
 apply("${project.rootDir}/buildscripts/toml-updater-config.gradle")

@@ -17,6 +17,7 @@
 package com.example.jetcaster
 
 import android.content.Context
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.DatabaseProvider
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.room.Room
@@ -27,6 +28,7 @@ import com.example.jetcaster.data.PodcastsFetcher
 import com.example.jetcaster.data.PodcastsRepository
 import com.example.jetcaster.data.room.JetcasterDatabase
 import com.example.jetcaster.data.room.TransactionRunner
+import com.example.jetcaster.download.PodcastDownloader
 import com.example.jetcaster.play.PlayerController
 import com.example.jetcaster.play.PlayerControllerImpl
 import com.rometools.rome.io.SyndFeedInput
@@ -42,11 +44,9 @@ import java.io.File
  *
  * For a real app, you would use something like Hilt/Dagger instead.
  */
+@OptIn(UnstableApi::class)
 object Graph {
     lateinit var okHttpClient: OkHttpClient
-
-    lateinit var databaseProvider: DatabaseProvider
-        private set
 
     lateinit var database: JetcasterDatabase
         private set
@@ -57,6 +57,11 @@ object Graph {
     private val syndFeedInput by lazy { SyndFeedInput() }
 
     lateinit var playerController: PlayerController
+
+    @UnstableApi
+    lateinit var databaseProvider: DatabaseProvider
+
+    lateinit var downloadEpisode: PodcastDownloader
 
     val podcastRepository by lazy {
         PodcastsRepository(
@@ -106,6 +111,7 @@ object Graph {
     private val ioDispatcher: CoroutineDispatcher
         get() = Dispatchers.IO
 
+    @androidx.annotation.OptIn(UnstableApi::class)
     fun provide(context: Context) {
         okHttpClient = OkHttpClient.Builder()
             .cache(Cache(File(context.cacheDir, "http_cache"), (20 * 1024 * 1024).toLong()))
@@ -123,6 +129,8 @@ object Graph {
         playerController = PlayerControllerImpl()
 
         databaseProvider = StandaloneDatabaseProvider(context)
+
+        downloadEpisode = PodcastDownloader(context)
 
     }
 }

@@ -9,10 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlaylistAdd
 import androidx.compose.material.icons.rounded.PauseCircleFilled
@@ -66,6 +66,7 @@ fun EpisodeList(
                 podcast = item.podcast,
                 onClick = navigateToEpisode,
                 onPlay = { episodeViewModel.play(item) },
+                onToggleDownload = {episodeViewModel.download(item)},
                 showPodcastImage = showPodcastImage,
                 modifier = Modifier.fillParentMaxWidth()
             )
@@ -79,13 +80,14 @@ fun EpisodeListItem(
     podcast: Podcast,
     onClick: (String, String) -> Unit,
     onPlay: () -> Unit,
+    onToggleDownload: () -> Unit,
     showPodcastImage: Boolean,
     modifier: Modifier = Modifier
 ) {
     ConstraintLayout(modifier = modifier.clickable { onClick(podcast.uri, episode.uri) }) {
         val (
             divider, publishDate, episodeTitle, podcastTitle, image, playIcon,
-            date, addPlaylist, overflow
+            date, downloadIcon, addPlaylist, overflow
         ) = createRefs()
 
         Divider(
@@ -96,12 +98,12 @@ fun EpisodeListItem(
             }
         )
 
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                 text = MediumDateFormatter.format(episode.published),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.constrainAs(publishDate) {
                     linkTo(
                         start = parent.start,
@@ -140,7 +142,7 @@ fun EpisodeListItem(
             text = episode.title,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.constrainAs(episodeTitle) {
                 linkTo(
                     start = parent.start,
@@ -157,12 +159,12 @@ fun EpisodeListItem(
 
         val titleImageBarrier = createBottomBarrier(podcastTitle, image)
 
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
                 text = podcast.title,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.subtitle2,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.constrainAs(podcastTitle) {
                     linkTo(
                         start = parent.start,
@@ -199,7 +201,7 @@ fun EpisodeListItem(
                 }
         )
 
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             if (episode.duration != null) {
                 Text(
                     text = if (episode.playbackPosition == 0L) {
@@ -217,19 +219,28 @@ fun EpisodeListItem(
                     },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.caption,
+                    style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.constrainAs(date) {
                         centerVerticallyTo(playIcon)
                         linkTo(
                             start = playIcon.end,
                             startMargin = 12.dp,
-                            end = addPlaylist.start,
+                            end = downloadIcon.start,
                             endMargin = 16.dp,
                             bias = 0f // float this towards the start
                         )
 //                        width = Dimension.preferredWrapContent
                     }
                 )
+            }
+
+            IconButton(onClick = { onToggleDownload() },
+                modifier = Modifier.constrainAs(downloadIcon) {
+                    end.linkTo(addPlaylist.start)
+                    centerVerticallyTo(playIcon)
+                }
+            ){
+                Icon(imageVector = Icons.Default.Download, contentDescription = null)
             }
 
             IconButton(

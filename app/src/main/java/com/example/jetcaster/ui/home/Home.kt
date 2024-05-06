@@ -18,7 +18,7 @@ package com.example.jetcaster.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Refresh
@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetcaster.R
 import com.example.jetcaster.ui.home.discover.Discover
-import com.google.accompanist.pager.ExperimentalPagerApi
 
 @Composable
 fun Home(
@@ -62,7 +61,7 @@ fun HomeContent(
     Column(
         modifier = modifier
     ) {
-        val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
+        val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
         HomeAppBar(
             backgroundColor = appBarColor,
             modifier = Modifier.fillMaxWidth(),
@@ -79,6 +78,7 @@ fun HomeContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeAppBar(
     backgroundColor: Color,
@@ -101,9 +101,8 @@ fun HomeAppBar(
                 )
             }
         },
-        backgroundColor = backgroundColor,
         actions = {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                 IconButton(
                     onClick = { refresh() }
                 ) {

@@ -1,9 +1,11 @@
 package com.example.jetcaster.play
 
+import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultHttpDataSource
@@ -26,9 +28,9 @@ class PlaybackService : MediaSessionService() {
     private var mediaSession: MediaSession? = null
     private lateinit var player: Player
 
+    @OptIn(UnstableApi::class)
     override fun onCreate() {
         super.onCreate()
-        // Note: This should be a singleton in your app.
         val cacheDirectory = File(this.cacheDir, "media_cache")
         // An on-the-fly cache should evict media when reaching a maximum disk space limit.
         val cache =

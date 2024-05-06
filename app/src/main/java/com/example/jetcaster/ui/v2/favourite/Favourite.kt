@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -42,7 +44,7 @@ fun Favourite(
         modifier = modifier
             .systemBarsPadding()
     ) {
-        val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
+        val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
         FavouriteAppBar(
             backgroundColor = appBarColor,
             modifier = Modifier.fillMaxWidth(),
@@ -75,6 +77,7 @@ fun Favourite(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavouriteAppBar(
     backgroundColor: Color,
@@ -96,9 +99,8 @@ fun FavouriteAppBar(
                 )
             }
         },
-        backgroundColor = backgroundColor,
         actions = {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
                 IconButton(
                     onClick = { }
                 ) {

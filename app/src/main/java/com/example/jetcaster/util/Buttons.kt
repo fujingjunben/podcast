@@ -20,11 +20,10 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
@@ -64,7 +63,7 @@ fun ToggleFollowPodcastIconButton(
             tint = animateColorAsState(
                 when {
                     isFollowed -> LocalContentColor.current
-                    else -> Color.Black.copy(alpha = ContentAlpha.high)
+                    else -> Color.Black.copy(alpha = MaterialTheme.colorScheme.onSurface.alpha)
                 }
             ).value,
             modifier = Modifier
@@ -75,7 +74,7 @@ fun ToggleFollowPodcastIconButton(
                 .background(
                     color = animateColorAsState(
                         when {
-                            isFollowed -> MaterialTheme.colors.surface.copy(0.38f)
+                            isFollowed -> MaterialTheme.colorScheme.surface.copy(0.38f)
                             else -> Color.White
                         }
                     ).value,

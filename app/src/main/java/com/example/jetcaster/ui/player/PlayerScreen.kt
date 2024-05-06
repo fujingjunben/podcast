@@ -19,7 +19,7 @@ package com.example.jetcaster.ui.player
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.PauseCircleFilled
@@ -105,7 +105,7 @@ private fun PlayerContentRegular(
         modifier = Modifier
             .fillMaxSize()
             .verticalGradientScrim(
-                color = MaterialTheme.colors.primary.copy(alpha = 0.50f),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.50f),
                 startYPercentage = 1f,
                 endYPercentage = 0f
             )
@@ -190,7 +190,7 @@ private fun PlayerImage(
 private fun PodcastDescription(
     title: String,
     podcastName: String,
-    titleTextStyle: TextStyle = MaterialTheme.typography.h5
+    titleTextStyle: TextStyle = MaterialTheme.typography.titleSmall
 ) {
     Text(
         text = title,
@@ -198,10 +198,10 @@ private fun PodcastDescription(
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
-    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
         Text(
             text = podcastName,
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.bodyMedium,
             maxLines = 1
         )
     }
@@ -315,9 +315,9 @@ private fun PlayerDynamicTheme(
     podcastImageUrl: String,
     content: @Composable () -> Unit
 ) {
-    val surfaceColor = MaterialTheme.colors.surface
+    val surfaceColor = MaterialTheme.colorScheme.surface
     val dominantColorState = rememberDominantColorState(
-        defaultColor = MaterialTheme.colors.surface
+        defaultColor = MaterialTheme.colorScheme.surface
     ) { color ->
         // We want a color which has sufficient contrast against the surface color
         color.contrastAgainst(surfaceColor) >= MinContrastOfPrimaryVsSurface

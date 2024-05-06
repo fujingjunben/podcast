@@ -22,6 +22,7 @@ import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.util.UnstableApi
 import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker.Companion.getOrCreate
 import com.example.jetcaster.Graph
@@ -76,9 +77,17 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
+    @androidx.annotation.OptIn(UnstableApi::class)
     override fun onStart() {
         super.onStart()
         controller?.init(this)
+
+//        try {
+//            DownloadService.start(this, JetDownloadService::class.java)
+//        } catch (e: IllegalStateException) {
+//            DownloadService.startForeground(this, JetDownloadService::class.java)
+//        }
     }
 
     /* Overrides onStop from Fragment */

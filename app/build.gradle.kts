@@ -15,18 +15,15 @@
  */
 
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    id("kotlin-kapt")
-}
-
-kapt {
-    correctErrorTypes = true
-    useBuildCache = true
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
     compileSdk = libs.versions.compileSdk.get().toInt()
+    namespace = "com.example.jetcaster"
 
     defaultConfig {
         applicationId = "com.example.jetcaster"
@@ -62,19 +59,20 @@ android {
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
 
-    packagingOptions {
+    packaging.resources {
         // The Rome library JARs embed some internal utils libraries in nested JARs.
         // We don't need them so we exclude them in the final package.
         excludes += "/*.jar"
@@ -87,50 +85,63 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.constraintlayout)
+    val composeBom = platform(libs.androidx.compose.bom)
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.palette)
 
+    // Dependency injection
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+
+    // Compose
     implementation(libs.androidx.activity.compose)
-
-    implementation(libs.androidx.constraintlayout.compose)
-
     implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material.iconsExtended)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material3.adaptive)
+    implementation(libs.androidx.compose.material3.adaptive.layout)
+    implementation(libs.androidx.compose.material3.adaptive.navigation)
+    implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.viewModelCompose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.androidx.window)
+    implementation(libs.androidx.window.core)
 
-    implementation(libs.accompanist.pager)
+    implementation(libs.accompanist.adaptive)
 
     implementation(libs.coil.kt.compose)
-
+    // Networking
     implementation(libs.okhttp3)
     implementation(libs.okhttp.logging)
 
-    implementation(libs.rometools.rome)
-    implementation(libs.rometools.modules)
-
+    // Database
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
-    coreLibraryDesugaring(libs.core.jdk.desugaring)
+    ksp(libs.androidx.room.compiler)
 
+    implementation(libs.rometools.rome)
+    implementation(libs.rometools.modules)
     implementation(libs.timber)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.session)
 
-    val media3_version = "1.0.0-beta02"
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
-    implementation("androidx.media3:media3-exoplayer:$media3_version")
-    // For building media playback UIs
-    implementation("androidx.media3:media3-ui:$media3_version")
-    // For exposing and controlling media sessions
-    implementation("androidx.media3:media3-session:$media3_version")
+    coreLibraryDesugaring(libs.core.jdk.desugaring)
 }

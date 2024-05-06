@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -27,7 +27,7 @@ fun PodcastScreen(
 ) {
 
     val uiState = viewModel.uiState
-    val appBarColor = MaterialTheme.colors.surface.copy(alpha = 0.87f)
+    val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
     Column(modifier = modifier.systemBarsPadding()) {
         PodcastAppBar(
             backgroundColor = appBarColor,
@@ -44,6 +44,7 @@ fun PodcastScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PodcastAppBar(
     backgroundColor: Color,
@@ -60,7 +61,6 @@ fun PodcastAppBar(
                 )
             }
         },
-        backgroundColor = backgroundColor
     )
 }
 
