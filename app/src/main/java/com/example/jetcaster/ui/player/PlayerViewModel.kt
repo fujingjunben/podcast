@@ -105,8 +105,6 @@ class PlayerViewModel(
             playbackPosition = episode.playbackPosition,
             playState = episode.playState
         )
-
-        Log.d(TAG, episode.toString())
     }
 
     fun play(playerAction: PlayerAction) {

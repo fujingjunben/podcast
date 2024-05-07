@@ -71,7 +71,7 @@ class PlayerControllerImpl(
     }
 
     override fun release() {
-        Log.d(TAG, "release")
+        Timber.d("release")
         releaseController()
     }
 
@@ -79,17 +79,17 @@ class PlayerControllerImpl(
      * 上一次播放的状态需要保存，不然每次都是ready
      */
     override fun play(episode: Episode) {
-        Log.d(TAG, "$episode")
+        Timber.d("play episode: $episode")
         when (val playerState = episode.playerAction) {
             is Play -> {
                 when (mController?.isPlaying) {
                     true ->
                         if (episodeState.currentMediaId == episode.url) {
-                            Log.d(TAG, "pause")
+                            Timber.d("pause")
                             mController?.pause()
                             pauseEpisode()
                         } else {
-                            Log.d(TAG, "switch")
+                            Timber.d("switch")
                             pauseEpisode()
                             playingEpisode(episodeState.updateMedia(episode))
                             mController?.play(episode, true)
@@ -114,12 +114,12 @@ class PlayerControllerImpl(
     private fun startPlayback(episode: Episode){
         when(episode.url) {
             episodeState.currentMediaId -> {
-                Log.d(TAG, "continue")
+                Timber.d("continue")
                 playingEpisode(episodeState)
                 mController?.continuePlayback()
             }
             else -> {
-                Log.d(TAG, "start")
+                Timber.d("start")
                 resetPlaying()
                 playingEpisode(episodeState.updateMedia(episode))
                 positionState.update { episodeState.playbackPosition }

@@ -39,20 +39,12 @@ class PlaybackService : MediaSessionService() {
     override fun onCreate() {
         super.onCreate()
 
-        val mediaSources = arrayOf(
-            buildOnlineMediaSource(),
-            buildLocalMediaSource(this)
-        )
-
-        val concatenatedSource = ConcatenatingMediaSource()
-
         val exoPlayer: ExoPlayer = ExoPlayer.Builder(this)
             .setAudioAttributes(AudioAttributes.DEFAULT, /* handleAudioFocus= */ true)
             .setHandleAudioBecomingNoisy(true)
             .setSeekBackIncrementMs(Keys.SKIP_BACK_TIME_SPAN)
             .setSeekForwardIncrementMs(Keys.SKIP_FORWARD_TIME_SPAN)
             .build()
-        exoPlayer.setMediaSource(concatenatedSource)
         exoPlayer.addListener(playerListener)
 
         // manually add seek to next and seek to previous since headphones issue them and they are translated to skip 30 sec forward / 10 sec back
@@ -68,7 +60,7 @@ class PlaybackService : MediaSessionService() {
     }
 
     @OptIn(UnstableApi::class)
-    private fun buildOnlineMediaSource(): ProgressiveMediaSource.Factory {
+    private fun buildOnlineMediaSource(): CacheDataSource.Factory {
         val cacheDirectory = File(this.cacheDir, "media_cache")
         // An on-the-fly cache should evict media when reaching a maximum disk space limit.
         val cache =
@@ -81,16 +73,7 @@ class PlaybackService : MediaSessionService() {
             CacheDataSource.Factory()
                 .setCache(cache)
                 .setUpstreamDataSourceFactory(httpDataSourceFactory)
-        return ProgressiveMediaSource.Factory(cacheDataSourceFactory)
-    }
-
-    @OptIn(UnstableApi::class)
-    private fun buildLocalMediaSource(context: Context): ProgressiveMediaSource {
-        val downloadDir = context.getExternalFilesDir("cache")
-
-        val dataSourceFactory = DefaultDataSourceFactory(context, Util.getUserAgent(context, this.applicationInfo.packageName))
-            return ProgressiveMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(MediaItem.fromUri(downloadDir!!.toUri()))
+        return cacheDataSourceFactory
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {
