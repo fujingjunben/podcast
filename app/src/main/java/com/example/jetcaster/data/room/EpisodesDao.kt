@@ -35,7 +35,7 @@ abstract class EpisodesDao {
 
     @Query(
         """
-        SELECT * FROM episodes WHERE uri = :uri
+        SELECT * FROM episodes WHERE uri = :uri OR file_uri =:uri
         """
     )
     abstract fun episode(uri: String): Flow<EpisodeEntity>

@@ -80,7 +80,7 @@ fun MediaController.play(episode: Episode, streaming: Boolean) {
 private fun buildMediaItem(episode: Episode, streaming: Boolean): MediaItem {
     // get the correct source for streaming / local playback
     // put uri in RequestMetadata - credit: https://stackoverflow.com/a/70103460
-    val source = if (episode.downloadState == DownloadState.SUCCESS) episode.fileUrl else episode.url
+    val source = episode.url
     val requestMetadata = MediaItem.RequestMetadata.Builder().apply {
         setMediaUri(source.toUri())
     }.build()

@@ -1,6 +1,8 @@
 package com.example.jetcaster.play
 
+import android.content.Context
 import androidx.annotation.OptIn
+import androidx.core.net.toUri
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.MediaItem
@@ -8,13 +10,18 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.database.StandaloneDatabaseProvider
+import androidx.media3.datasource.DefaultDataSource
+import androidx.media3.datasource.DefaultDataSourceFactory
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.ConcatenatingMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.example.jetcaster.Graph
@@ -31,27 +38,21 @@ class PlaybackService : MediaSessionService() {
     @OptIn(UnstableApi::class)
     override fun onCreate() {
         super.onCreate()
-        val cacheDirectory = File(this.cacheDir, "media_cache")
-        // An on-the-fly cache should evict media when reaching a maximum disk space limit.
-        val cache =
-            SimpleCache(
-                cacheDirectory, LeastRecentlyUsedCacheEvictor(maxBytes), Graph.databaseProvider)
-        val httpDataSourceFactory: HttpDataSource.Factory = DefaultHttpDataSource.Factory()
-            .setUserAgent(Util.getUserAgent(this, this.applicationInfo.packageName))
-        // Configure the DataSource.Factory with the cache and factory for the desired HTTP stack.
-        val cacheDataSourceFactory =
-            CacheDataSource.Factory()
-                .setCache(cache)
-                .setUpstreamDataSourceFactory(httpDataSourceFactory)
+
+        val mediaSources = arrayOf(
+            buildOnlineMediaSource(),
+            buildLocalMediaSource(this)
+        )
+
+        val concatenatedSource = ConcatenatingMediaSource()
 
         val exoPlayer: ExoPlayer = ExoPlayer.Builder(this)
             .setAudioAttributes(AudioAttributes.DEFAULT, /* handleAudioFocus= */ true)
             .setHandleAudioBecomingNoisy(true)
             .setSeekBackIncrementMs(Keys.SKIP_BACK_TIME_SPAN)
             .setSeekForwardIncrementMs(Keys.SKIP_FORWARD_TIME_SPAN)
-            .setMediaSourceFactory(
-                DefaultMediaSourceFactory(this).setDataSourceFactory(cacheDataSourceFactory))
             .build()
+        exoPlayer.setMediaSource(concatenatedSource)
         exoPlayer.addListener(playerListener)
 
         // manually add seek to next and seek to previous since headphones issue them and they are translated to skip 30 sec forward / 10 sec back
@@ -64,6 +65,32 @@ class PlaybackService : MediaSessionService() {
         mediaSession = MediaSession.Builder(this, player)
             .setCallback(CustomSessionCallback())
             .build()
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun buildOnlineMediaSource(): ProgressiveMediaSource.Factory {
+        val cacheDirectory = File(this.cacheDir, "media_cache")
+        // An on-the-fly cache should evict media when reaching a maximum disk space limit.
+        val cache =
+            SimpleCache(
+                cacheDirectory, LeastRecentlyUsedCacheEvictor(maxBytes), Graph.databaseProvider)
+        val httpDataSourceFactory: HttpDataSource.Factory = DefaultHttpDataSource.Factory()
+            .setUserAgent(Util.getUserAgent(this, this.applicationInfo.packageName))
+        // Configure the DataSource.Factory with the cache and factory for the desired HTTP stack.
+        val cacheDataSourceFactory =
+            CacheDataSource.Factory()
+                .setCache(cache)
+                .setUpstreamDataSourceFactory(httpDataSourceFactory)
+        return ProgressiveMediaSource.Factory(cacheDataSourceFactory)
+    }
+
+    @OptIn(UnstableApi::class)
+    private fun buildLocalMediaSource(context: Context): ProgressiveMediaSource {
+        val downloadDir = context.getExternalFilesDir("cache")
+
+        val dataSourceFactory = DefaultDataSourceFactory(context, Util.getUserAgent(context, this.applicationInfo.packageName))
+            return ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(downloadDir!!.toUri()))
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? {

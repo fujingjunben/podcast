@@ -28,9 +28,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.savedstate.SavedStateRegistryOwner
 import com.example.jetcaster.Graph
+import com.example.jetcaster.data.DownloadState
 import com.example.jetcaster.data.Episode
 import com.example.jetcaster.data.EpisodeStore
 import com.example.jetcaster.data.PodcastStore
+import com.example.jetcaster.data.url
 import com.example.jetcaster.play.*
 import com.example.jetcaster.util.LogUtil
 import kotlinx.coroutines.flow.first
@@ -99,7 +101,7 @@ class PlayerViewModel(
             podcastName = podcast.title,
             summary = episode.summary ?: "",
             podcastImageUrl = podcast.imageUrl ?: "",
-            url = episode.uri,
+            url = episode.url(),
             playbackPosition = episode.playbackPosition,
             playState = episode.playState
         )

@@ -16,8 +16,6 @@ data class Episode(
     val podcastName: String,
     val podcastImageUrl: String?,
     val title: String,
-    val downloadState: DownloadState = DownloadState.NONE,
-    val fileUrl: String = ""
 ) {
     fun isFinished(): Boolean {
         return if (duration == null) {

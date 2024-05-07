@@ -59,3 +59,7 @@ data class EpisodeEntity(
     @ColumnInfo(name = "download_state") val downloadState: DownloadState = DownloadState.NONE,
     @ColumnInfo(name = "download_id") val downloadId: Long = -1L
 )
+
+fun EpisodeEntity.url(): String {
+    return if (downloadState == DownloadState.SUCCESS) fileUri else uri
+}

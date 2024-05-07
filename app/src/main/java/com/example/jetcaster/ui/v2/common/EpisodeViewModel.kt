@@ -14,10 +14,10 @@ class EpisodeViewModel(
     }
 
     fun download(episodeOfPodcast: EpisodeOfPodcast) {
-        downloadEpisode.downloadEpisode(episodeOfPodcast.toEpisode())
+        downloadEpisode.downloadEpisode(episodeOfPodcast.episode)
     }
 
     fun cancelDownload(episodeOfPodcast: EpisodeOfPodcast) {
-        downloadEpisode.cancelDownload(episodeOfPodcast.toEpisode())
+        downloadEpisode.cancelDownload(episodeOfPodcast.episode)
     }
 }

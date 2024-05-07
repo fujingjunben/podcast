@@ -35,7 +35,9 @@ import com.example.jetcaster.data.DownloadState
 import com.example.jetcaster.data.EpisodeEntity
 import com.example.jetcaster.data.EpisodeStore
 import com.example.jetcaster.play.PlayerController
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 
 class MainActivity : ComponentActivity() {
@@ -50,9 +52,10 @@ class MainActivity : ComponentActivity() {
         override fun onReceive(context: Context, intent: Intent) {
             //Fetching the download id received with the broadcast
             val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+            Timber.d("onDownloadComplete: $id")
             //Checking if the received broadcast is for our enqueued download by matching download id
             lifecycleScope.launch {
-                episodeStore.episodeWithDownloadId(id).collect {
+                episodeStore.episodeWithDownloadId(id).take(1).collect {
                     updateDownloadStatus(it)
                 }
             }
@@ -72,9 +75,9 @@ class MainActivity : ComponentActivity() {
 
         registerReceiver(
             onDownloadComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
-            RECEIVER_NOT_EXPORTED
         );
 
+        Timber.d("registerReceiver")
 
     }
 
@@ -92,36 +95,46 @@ class MainActivity : ComponentActivity() {
         unregisterReceiver(onDownloadComplete)
     }
 
-    private fun updateDownloadStatus(episodeEntity: EpisodeEntity) {
+    private suspend fun updateDownloadStatus(episodeEntity: EpisodeEntity) {
         val downloadManager = this.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         val query = DownloadManager.Query()
         query.setFilterById(episodeEntity.downloadId)
         val cursor = downloadManager.query(query)
         if (cursor.moveToFirst()) {
             val status = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+            val reason = cursor.getColumnIndex(DownloadManager.COLUMN_REASON).toInt()
+            Timber.d("download status: $status, reason: $reason")
             when (status) {
-                DownloadManager.STATUS_SUCCESSFUL ->
-                    lifecycleScope.launch {
-                        episodeStore.updateEpisode(
-                            episodeEntity.copy(
-                                fileUri = episodeEntity.fileUri,
-                                downloadState = DownloadState.SUCCESS
-                            )
-                        )
-                    }
+                7, DownloadManager.STATUS_SUCCESSFUL -> {
+                    val episode = episodeEntity.copy(
+                    downloadState = DownloadState.SUCCESS
+                    )
+                    Timber.d("download success: ${episode.downloadState}")
+                    episodeStore.updateEpisode(episode)
+                }
 
-                DownloadManager.STATUS_FAILED ->
-                    lifecycleScope.launch {
-                        episodeStore.updateEpisode(
-                            episodeEntity.copy(
-                                downloadState = DownloadState.FAILED,
-                                fileUri = ""
-                            )
+                DownloadManager.STATUS_FAILED -> {
+                    Timber.d("download failed")
+                    episodeStore.updateEpisode(
+                        episodeEntity.copy(
+                            downloadState = DownloadState.FAILED,
+                            fileUri = ""
                         )
-                    }
+                    )
+                }
 
+                else -> {
+                    Timber.d("download unknown")
+                    episodeStore.updateEpisode(
+                        episodeEntity.copy(
+                            downloadState = DownloadState.NONE,
+                            fileUri = ""
+                        )
+                    )
+                }
             }
 
         }
+        cursor.close()
     }
 }
