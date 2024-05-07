@@ -22,6 +22,7 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
+import com.example.jetcaster.data.DownloadState
 import com.example.jetcaster.data.Episode
 import com.example.jetcaster.play.Keys
 import com.example.jetcaster.ui.player.PlayerUiState
@@ -79,7 +80,7 @@ fun MediaController.play(episode: Episode, streaming: Boolean) {
 private fun buildMediaItem(episode: Episode, streaming: Boolean): MediaItem {
     // get the correct source for streaming / local playback
     // put uri in RequestMetadata - credit: https://stackoverflow.com/a/70103460
-    val source = episode.url
+    val source = if (episode.downloadState == DownloadState.SUCCESS) episode.fileUrl else episode.url
     val requestMetadata = MediaItem.RequestMetadata.Builder().apply {
         setMediaUri(source.toUri())
     }.build()

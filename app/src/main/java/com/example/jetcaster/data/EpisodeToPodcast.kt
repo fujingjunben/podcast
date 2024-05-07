@@ -54,6 +54,7 @@ fun EpisodeToPodcast.toEpisode(): Episode {
         url = episode.uri,
         duration = episode.duration,
         podcastName = podcast.title,
-        podcastImageUrl = podcast.imageUrl
+        podcastImageUrl = podcast.imageUrl,
+        fileUrl = episode.fileUri
     )
 }

@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.DownloadDone
+import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlaylistAdd
 import androidx.compose.material.icons.rounded.PauseCircleFilled
@@ -38,10 +40,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.jetcaster.R
+import com.example.jetcaster.data.DownloadState
 import com.example.jetcaster.data.EpisodeEntity
 import com.example.jetcaster.data.Podcast
 import com.example.jetcaster.play.PlayState
 import com.example.jetcaster.ui.theme.Keyline1
+import timber.log.Timber
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
@@ -66,7 +70,8 @@ fun EpisodeList(
                 podcast = item.podcast,
                 onClick = navigateToEpisode,
                 onPlay = { episodeViewModel.play(item) },
-                onToggleDownload = {episodeViewModel.download(item)},
+                onDownload = { episodeViewModel.download(item) },
+                onCancelDownload = { episodeViewModel.cancelDownload(item) },
                 showPodcastImage = showPodcastImage,
                 modifier = Modifier.fillParentMaxWidth()
             )
@@ -80,7 +85,8 @@ fun EpisodeListItem(
     podcast: Podcast,
     onClick: (String, String) -> Unit,
     onPlay: () -> Unit,
-    onToggleDownload: () -> Unit,
+    onDownload: () -> Unit,
+    onCancelDownload: () -> Unit,
     showPodcastImage: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -234,13 +240,26 @@ fun EpisodeListItem(
                 )
             }
 
-            IconButton(onClick = { onToggleDownload() },
+            IconButton(onClick = {
+                when (episode.downloadState) {
+                    DownloadState.DOWNLOADING -> onCancelDownload()
+                    DownloadState.NONE -> onDownload()
+                    else -> Timber.d("download state is ${episode.downloadState}")
+                }
+            },
                 modifier = Modifier.constrainAs(downloadIcon) {
                     end.linkTo(addPlaylist.start)
                     centerVerticallyTo(playIcon)
                 }
-            ){
-                Icon(imageVector = Icons.Default.Download, contentDescription = null)
+            ) {
+                Icon(
+                    imageVector = when (episode.downloadState) {
+                        DownloadState.DOWNLOADING -> Icons.Default.Downloading
+                        DownloadState.FAILED, DownloadState.NONE -> Icons.Default.Download
+                        DownloadState.SUCCESS -> Icons.Default.DownloadDone
+                    },
+                    contentDescription = null
+                )
             }
 
             IconButton(

@@ -54,5 +54,8 @@ data class EpisodeEntity(
     @ColumnInfo(name = "duration") val duration: Duration? = null,
     @ColumnInfo(name = "playback_position") val playbackPosition: Long = 0L,
     @ColumnInfo(name = "is_playing") val isPlaying: Boolean = false,
-    @ColumnInfo(name = "play_state") val playState: PlayState = PlayState.PREPARE
+    @ColumnInfo(name = "play_state") val playState: PlayState = PlayState.PREPARE,
+    @ColumnInfo(name = "file_uri") val fileUri: String,
+    @ColumnInfo(name = "download_state") val downloadState: DownloadState = DownloadState.NONE,
+    @ColumnInfo(name = "download_id") val downloadId: Long = -1L
 )

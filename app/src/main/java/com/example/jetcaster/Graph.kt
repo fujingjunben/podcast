@@ -16,7 +16,9 @@
 
 package com.example.jetcaster
 
+import android.app.DownloadManager
 import android.content.Context
+import androidx.core.net.toUri
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.DatabaseProvider
 import androidx.media3.database.StandaloneDatabaseProvider
@@ -44,7 +46,6 @@ import java.io.File
  *
  * For a real app, you would use something like Hilt/Dagger instead.
  */
-@OptIn(UnstableApi::class)
 object Graph {
     lateinit var okHttpClient: OkHttpClient
 
@@ -130,7 +131,11 @@ object Graph {
 
         databaseProvider = StandaloneDatabaseProvider(context)
 
-        downloadEpisode = PodcastDownloader(context)
+        val downloadManager: DownloadManager =
+            context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+
+        val downloadDir = context.getExternalFilesDir("cache")
+        downloadEpisode = PodcastDownloader(downloadManager, episodeStore, downloadDir, ioDispatcher)
 
     }
 }

@@ -40,7 +40,8 @@ fun EpisodeScreen(
                 podcast = item.podcast,
                 onClick = { podcastUri, episodeUri -> navigateToPodcast(podcastUri)},
                 onPlay = { episodeScreenViewModel.play(item) },
-                onToggleDownload = {},
+                onDownload = {},
+                onCancelDownload = {},
                 showPodcastImage = false,
                 modifier = Modifier.fillMaxWidth(),
             )

@@ -42,6 +42,13 @@ abstract class EpisodesDao {
 
     @Query(
         """
+            SELECT * FROM episodes WHERE download_id = :id
+        """
+    )
+    abstract fun episodeWithDownloadId(id: Long): Flow<EpisodeEntity>
+
+    @Query(
+        """
         SELECT * FROM episodes WHERE podcast_uri = :podcastUri
         ORDER BY datetime(published) DESC
         LIMIT :limit

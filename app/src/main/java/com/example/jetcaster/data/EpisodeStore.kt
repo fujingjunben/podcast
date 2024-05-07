@@ -32,6 +32,10 @@ class EpisodeStore(
         return episodesDao.episode(episodeUri)
     }
 
+    fun episodeWithDownloadId(id: Long): Flow<EpisodeEntity> {
+        return episodesDao.episodeWithDownloadId(id)
+    }
+
     /**
      * Returns a flow containing the list of episodes associated with the podcast with the
      * given [podcastUri].
