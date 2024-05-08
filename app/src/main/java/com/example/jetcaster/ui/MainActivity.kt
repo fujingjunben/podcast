@@ -35,6 +35,7 @@ import com.example.jetcaster.data.DownloadState
 import com.example.jetcaster.data.EpisodeEntity
 import com.example.jetcaster.data.EpisodeStore
 import com.example.jetcaster.play.PlayerController
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -55,9 +56,8 @@ class MainActivity : ComponentActivity() {
             Timber.d("onDownloadComplete: $id")
             //Checking if the received broadcast is for our enqueued download by matching download id
             lifecycleScope.launch {
-                episodeStore.episodeWithDownloadId(id).take(1).collect {
-                    updateDownloadStatus(it)
-                }
+                val episodeEntity = episodeStore.episodeWithDownloadId(id).first()
+                updateDownloadStatus(episodeEntity)
             }
         }
     }
@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
             when (status) {
                 7, DownloadManager.STATUS_SUCCESSFUL -> {
                     val episode = episodeEntity.copy(
-                    downloadState = DownloadState.SUCCESS
+                        downloadState = DownloadState.SUCCESS
                     )
                     Timber.d("download success: ${episode.downloadState}")
                     episodeStore.updateEpisode(episode)

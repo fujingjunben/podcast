@@ -10,6 +10,7 @@ import com.example.jetcaster.data.EpisodeEntity
 import com.example.jetcaster.data.EpisodeStore
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -37,22 +38,28 @@ class PodcastDownloader(
 
         val id = downloadManager.enqueue(request)
         scope.launch {
-            episodeStore.episodeWithUri(episode.uri).take(1).collect {
-                episodeStore.updateEpisode(it.copy(downloadId = id,
+            val episodeEntity = episodeStore.episodeWithUri(episode.uri).first()
+            episodeStore.updateEpisode(
+                episodeEntity.copy(
+                    downloadId = id,
                     fileUri = "file:///${file.path}",
-                    downloadState = DownloadState.DOWNLOADING))
-            }
+                    downloadState = DownloadState.DOWNLOADING
+                )
+            )
         }
     }
 
     fun cancelDownload(episode: EpisodeEntity) {
         Timber.d("download episode: cancel")
         scope.launch {
-            episodeStore.episodeWithUri(episode.uri).take(1).collect {
-                downloadManager.remove(it.downloadId)
-                episodeStore.updateEpisode(it.copy(downloadId = -1L, fileUri = "",
-                    downloadState = DownloadState.NONE))
-            }
+            val episodeEntity = episodeStore.episodeWithUri(episode.uri).first()
+            downloadManager.remove(episodeEntity.downloadId)
+            episodeStore.updateEpisode(
+                episodeEntity.copy(
+                    downloadId = -1L, fileUri = "",
+                    downloadState = DownloadState.NONE
+                )
+            )
         }
     }
 }

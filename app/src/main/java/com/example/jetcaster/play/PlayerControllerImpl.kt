@@ -242,6 +242,7 @@ class PlayerControllerImpl(
 
         scope.launch {
             val episode = episodeStore.episodeWithUri(episodeState.currentMediaId).first()
+            Timber.d("update episode: $episode")
             episodeStore.updateEpisode(
                 episode.copy(
                     playbackPosition = position,
