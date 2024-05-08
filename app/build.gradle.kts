@@ -86,6 +86,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.constraintlayout)
+    implementation(project(":core:designsystem"))
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -144,4 +145,5 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
     coreLibraryDesugaring(libs.core.jdk.desugaring)
+
 }

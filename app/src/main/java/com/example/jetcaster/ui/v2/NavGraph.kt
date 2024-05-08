@@ -31,7 +31,7 @@ fun NavGraph(
     finishActivity: () -> Unit = {},
     appState: JetcasterAppState = rememberJetcasterAppState(navController = navController)
 ) {
-    NavHost(navController = navController, startDestination = Destination.EXPLORE_ROUTE) {
+    NavHost(navController = navController, startDestination = Destination.FAVOURITE_ROUTE) {
         composable(Destination.FAVOURITE_ROUTE) { backStackEntry ->
             Favourite(
                 modifier = modifier,

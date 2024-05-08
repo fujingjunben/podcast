@@ -3,7 +3,6 @@ package com.example.jetcaster.ui.v2.favourite
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
@@ -60,7 +59,7 @@ fun Favourite(
                 Box(
                     modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "Loading")
+                    Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
                 }
             }
 
@@ -71,7 +70,8 @@ fun Favourite(
                     episodeOfPodcasts,
                     navigateToEpisode,
                 ) {
-                    FollowedPodcasts(podcasts = episodeOfPodcasts.map { it.podcast }
+                    FollowedPodcasts(
+                        podcasts = episodeOfPodcasts.map { it.podcast }
                         .distinctBy { it.uri },
                         navigateToPodcast = navigateToPodcast,
                         onPodcastUnfollowed = viewModel::onPodcastUnfollowed
@@ -142,7 +142,7 @@ fun FavouriteAppBar(
 }
 
 @Composable
-fun LazyItemScope.FollowedPodcasts(
+fun FollowedPodcasts(
     modifier: Modifier = Modifier,
     podcasts: List<Podcast>,
     navigateToPodcast: (String) -> Unit,
@@ -158,7 +158,7 @@ fun LazyItemScope.FollowedPodcasts(
             Text(text = stringResource(id = R.string.follow))
             Text(text = stringResource(id = R.string.more))
         }
-        LazyRow(modifier = modifier.height(150.dp)) {
+        LazyRow(modifier = modifier.height(100.dp)) {
             items(podcasts, key = { podcast -> podcast.uri }) { podcast ->
                 FollowedPodcastCarouselItem(
                     podcastImageUrl = podcast.imageUrl,
@@ -201,16 +201,15 @@ private fun FollowedPodcastCarouselItem(
                         .clickable { navigateToPodcast() })
             }
 
-            ToggleFollowPodcastIconButton(
-                onClick = onUnfollowedClick,
-                isFollowed = true, /* All podcasts are followed in this feed */
-                modifier = Modifier.align(Alignment.BottomEnd)
-            )
+//            ToggleFollowPodcastIconButton(
+//                onClick = onUnfollowedClick,
+//                isFollowed = true, /* All podcasts are followed in this feed */
+//                modifier = Modifier.align(Alignment.BottomEnd)
+//            )
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertDialogExample(
     onDismissRequest: () -> Unit,

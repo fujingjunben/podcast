@@ -18,14 +18,12 @@ package com.example.jetcaster.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import com.google.samples.apps.nowinandroid.core.designsystem.theme.NiaTheme
+
 @Composable
 fun JetcasterTheme(
     content: @Composable () -> Unit
 ) {
-    MaterialTheme(
-        colorScheme = JetcasterColors,
-        typography = JetcasterTypography,
-        shapes = JetcasterShapes,
-        content = content
-    )
+
+    NiaTheme(content = content)
 }

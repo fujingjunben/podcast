@@ -17,6 +17,7 @@
 package com.example.jetcaster.ui.theme
 
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 /**
@@ -30,7 +31,7 @@ const val MinContrastOfPrimaryVsSurface = 3f
 val Yellow800 = Color(0xFFF29F05)
 val Red300 = Color(0xFFEA6D7E)
 
-val JetcasterColors = darkColorScheme(
+val JetcasterColors = lightColorScheme(
     primary = Yellow800,
     onPrimary = Color.Black,
     primaryContainer = Yellow800,

@@ -52,9 +52,6 @@ fun PodcastBottomBar(navController: NavController, tabs: Array<Tabs>) {
     if (currentRoute != Screen.Player.route) {
         Column {
             PlayerBar(
-                modifier = Modifier.background(
-                    color = MaterialTheme.colorScheme.secondary,
-                ),
                 navController = navController
             )
             NavigationBar(
