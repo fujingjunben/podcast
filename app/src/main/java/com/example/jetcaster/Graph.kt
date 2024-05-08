@@ -25,6 +25,7 @@ import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.room.Room
 import com.example.jetcaster.data.CategoryStore
 import com.example.jetcaster.data.EpisodeStore
+import com.example.jetcaster.data.FeedRepository
 import com.example.jetcaster.data.PodcastStore
 import com.example.jetcaster.data.PodcastsFetcher
 import com.example.jetcaster.data.PodcastsRepository
@@ -103,6 +104,13 @@ object Graph {
             categoryEntryDao = database.podcastCategoryEntryDao(),
             episodesDao = database.episodesDao(),
             podcastsDao = database.podcastsDao()
+        )
+    }
+
+    val feedRepository by lazy {
+        FeedRepository(
+            database.feedDao(),
+            ioDispatcher
         )
     }
 

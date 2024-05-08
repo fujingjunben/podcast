@@ -108,7 +108,7 @@ fun HomeAppBar(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Refresh,
-                        contentDescription = stringResource(R.string.cd_search)
+                        contentDescription = stringResource(R.string.retry_label)
                     )
                 }
                 IconButton(

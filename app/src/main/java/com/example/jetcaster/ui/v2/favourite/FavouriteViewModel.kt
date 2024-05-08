@@ -8,6 +8,8 @@ import com.example.jetcaster.data.*
 import com.example.jetcaster.play.PlayerController
 import com.example.jetcaster.ui.v2.common.EpisodeOfPodcast
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -15,6 +17,8 @@ import kotlinx.coroutines.launch
 class FavouriteViewModel(
     private val podcastStore: PodcastStore = Graph.podcastStore,
     private val episodeStore: EpisodeStore = Graph.episodeStore,
+    private val podcastsRepository: PodcastsRepository = Graph.podcastRepository,
+    private val feedRepository: FeedRepository = Graph.feedRepository,
     private val controller: PlayerController = Graph.playerController
 ) : ViewModel() {
 
@@ -67,6 +71,15 @@ class FavouriteViewModel(
         }
     }
 
+    fun addFeed(podcastUri: String) {
+        viewModelScope.launch {
+            feedRepository.addFeed(podcastUri)
+//          podcastsRepository.updatePodcasts(listOf(podcastUri), true)
+//            val s2 = async { podcastStore.togglePodcastFollowed(podcastUri) }
+//            awaitAll(s1, s2)
+        }
+    }
+
     fun play(episodeOfPodcast: EpisodeOfPodcast) {
         controller.play(episodeOfPodcast.toEpisode())
     }
@@ -92,5 +105,5 @@ sealed interface FavouriteUiState {
         val episodeOfPodcasts: List<EpisodeOfPodcast> = listOf()
     ) : FavouriteUiState
 
-    object Loading : FavouriteUiState
+    data object Loading : FavouriteUiState
 }

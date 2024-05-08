@@ -21,6 +21,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.jetcaster.data.Category
 import com.example.jetcaster.data.EpisodeEntity
+import com.example.jetcaster.data.FeedEntity
 import com.example.jetcaster.data.Podcast
 import com.example.jetcaster.data.PodcastCategoryEntry
 import com.example.jetcaster.data.PodcastFollowedEntry
@@ -34,7 +35,8 @@ import com.example.jetcaster.data.PodcastFollowedEntry
         EpisodeEntity::class,
         PodcastCategoryEntry::class,
         Category::class,
-        PodcastFollowedEntry::class
+        PodcastFollowedEntry::class,
+        FeedEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -47,4 +49,6 @@ abstract class JetcasterDatabase : RoomDatabase() {
     abstract fun podcastCategoryEntryDao(): PodcastCategoryEntryDao
     abstract fun transactionRunnerDao(): TransactionRunnerDao
     abstract fun podcastFollowedEntryDao(): PodcastFollowedEntryDao
+
+    abstract fun feedDao(): FeedDao
 }

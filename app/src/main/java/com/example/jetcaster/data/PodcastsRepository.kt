@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 /**
  * Data repository for Podcasts.
@@ -40,16 +41,18 @@ class PodcastsRepository(
 
     private val scope = CoroutineScope(mainDispatcher)
 
-    suspend fun updatePodcasts(force: Boolean) {
+    suspend fun updatePodcasts(feedUrls: List<String>, force: Boolean) {
+        Timber.d("podcast feedUrls: $feedUrls")
         if (refreshingJob?.isActive == true) {
             refreshingJob?.join()
         } else if (force || podcastStore.isEmpty()) {
             refreshingJob = scope.launch {
                 // Now fetch the podcasts, and add each to each store
-                podcastsFetcher(SampleFeeds)
+                podcastsFetcher(feedUrls)
                     .filter { it is PodcastRssResponse.Success }
                     .map { it as PodcastRssResponse.Success }
                     .collect { (podcast, episodes, categories) ->
+                        Timber.d("podcast: ${podcast.title}")
                         transactionRunner {
                             podcastStore.addPodcast(podcast)
                             episodeStore.addEpisodes(episodes)

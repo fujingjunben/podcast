@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Podcasts
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -16,10 +18,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -41,11 +46,11 @@ fun Favourite(
     val uiState by viewModel.uiState.collectAsState()
 
     Column(
-        modifier = modifier
-            .systemBarsPadding()
+        modifier = modifier.systemBarsPadding()
     ) {
         val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
         FavouriteAppBar(
+            onFollow = { url -> viewModel.addFeed(url) },
             backgroundColor = appBarColor,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -53,12 +58,12 @@ fun Favourite(
         when (uiState) {
             is FavouriteUiState.Loading -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
                 ) {
                     Text(text = "Loading")
                 }
             }
+
             is FavouriteUiState.Success -> {
                 val episodeOfPodcasts = (uiState as FavouriteUiState.Success).episodeOfPodcasts
 
@@ -66,8 +71,8 @@ fun Favourite(
                     episodeOfPodcasts,
                     navigateToEpisode,
                 ) {
-                    FollowedPodcasts(
-                        podcasts = episodeOfPodcasts.map { it.podcast }.distinctBy { it.uri },
+                    FollowedPodcasts(podcasts = episodeOfPodcasts.map { it.podcast }
+                        .distinctBy { it.uri },
                         navigateToPodcast = navigateToPodcast,
                         onPodcastUnfollowed = viewModel::onPodcastUnfollowed
                     )
@@ -80,47 +85,60 @@ fun Favourite(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavouriteAppBar(
-    backgroundColor: Color,
-    modifier: Modifier = Modifier
+    onFollow: (String) -> Unit, backgroundColor: Color, modifier: Modifier = Modifier
 ) {
-    TopAppBar(
-        title = {
-            Row {
-                Image(
-                    painter = painterResource(R.drawable.ic_logo),
-                    contentDescription = null
-                )
+
+    val feedState = remember { mutableStateOf("") }
+    val showDialog = remember {
+        mutableStateOf(false)
+    }
+    TopAppBar(title = {
+        Row {
+            Image(
+                painter = painterResource(R.drawable.ic_logo), contentDescription = null
+            )
+            Icon(
+                painter = painterResource(R.drawable.ic_text_logo),
+                contentDescription = stringResource(R.string.app_name),
+                modifier = Modifier
+                    .padding(start = 4.dp)
+                    .heightIn(max = 24.dp)
+            )
+        }
+    }, actions = {
+        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+            IconButton(onClick = { showDialog.value = true }) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_text_logo),
-                    contentDescription = stringResource(R.string.app_name),
-                    modifier = Modifier
-                        .padding(start = 4.dp)
-                        .heightIn(max = 24.dp)
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.cd_add)
                 )
             }
-        },
-        actions = {
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-                IconButton(
-                    onClick = { }
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Refresh,
-                        contentDescription = stringResource(R.string.cd_search)
-                    )
-                }
-                IconButton(
-                    onClick = { /* TODO: Open account? */ }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = stringResource(R.string.cd_account)
-                    )
-                }
+            IconButton(onClick = { /* TODO: Open account? */ }) {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = stringResource(R.string.cd_account)
+                )
             }
-        },
-        modifier = modifier
+        }
+    }, modifier = modifier
     )
+    if (showDialog.value) {
+        AlertDialogExample(
+            onDismissRequest = { showDialog.value = false },
+            onConfirmation = {
+                if (feedState.value.isNotEmpty()) {
+                    onFollow(feedState.value)
+                    showDialog.value = false
+                }
+            },
+            value = feedState.value,
+            onValueChange = { value -> feedState.value = value },
+            dialogTitle = "订阅播客",
+            dialogText = "请输入播客地址",
+            icon = Icons.Filled.Podcasts
+
+        )
+    }
 }
 
 @Composable
@@ -146,7 +164,7 @@ fun LazyItemScope.FollowedPodcasts(
                     podcastImageUrl = podcast.imageUrl,
                     podcastTitle = podcast.title,
                     onUnfollowedClick = { onPodcastUnfollowed(podcast.uri) },
-                    navigateToPodcast = { navigateToPodcast(podcast.uri)},
+                    navigateToPodcast = { navigateToPodcast(podcast.uri) },
                     modifier = Modifier
                         .padding(4.dp)
                         .fillMaxHeight()
@@ -174,15 +192,13 @@ private fun FollowedPodcastCarouselItem(
                 .aspectRatio(1f)
         ) {
             if (podcastImageUrl != null) {
-                AsyncImage(
-                    model = podcastImageUrl,
+                AsyncImage(model = podcastImageUrl,
                     contentDescription = podcastTitle,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(MaterialTheme.shapes.medium)
-                        .clickable { navigateToPodcast() }
-                )
+                        .clickable { navigateToPodcast() })
             }
 
             ToggleFollowPodcastIconButton(
@@ -192,4 +208,43 @@ private fun FollowedPodcastCarouselItem(
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AlertDialogExample(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    value: String,
+    onValueChange: (String) -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+    icon: ImageVector,
+) {
+    AlertDialog(icon = {
+        Icon(icon, contentDescription = "Example Icon")
+    }, title = {
+        Text(text = dialogTitle)
+    }, text = {
+        Column {
+            Text(text = dialogText)
+            TextField(
+                value = value, onValueChange = onValueChange
+            )
+        }
+    }, onDismissRequest = {
+        onDismissRequest()
+    }, confirmButton = {
+        TextButton(onClick = {
+            onConfirmation()
+        }) {
+            Text("Confirm")
+        }
+    }, dismissButton = {
+        TextButton(onClick = {
+            onDismissRequest()
+        }) {
+            Text("Dismiss")
+        }
+    })
 }

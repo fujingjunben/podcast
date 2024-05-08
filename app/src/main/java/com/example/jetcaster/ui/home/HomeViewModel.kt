@@ -19,17 +19,23 @@ package com.example.jetcaster.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jetcaster.Graph
+import com.example.jetcaster.data.FeedEntity
+import com.example.jetcaster.data.FeedRepository
 import com.example.jetcaster.data.PodcastStore
 import com.example.jetcaster.data.PodcastWithExtraInfo
 import com.example.jetcaster.data.PodcastsRepository
+import com.example.jetcaster.data.SampleFeeds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class HomeViewModel(
     private val podcastsRepository: PodcastsRepository = Graph.podcastRepository,
+    private val feedRepository: FeedRepository = Graph.feedRepository
 ) : ViewModel() {
 
     private val refreshing = MutableStateFlow(false)
@@ -38,15 +44,19 @@ class HomeViewModel(
         refresh(force = false)
     }
 
-    fun forceRefresh(){
+    fun forceRefresh() {
         refresh(true)
     }
 
     private fun refresh(force: Boolean) {
         viewModelScope.launch {
             runCatching {
-                refreshing.value = true
-                podcastsRepository.updatePodcasts(force)
+                feedRepository.feedFlow.map { feeds -> feeds.map { feed -> feed.url } }
+                    .collect { feedUrls ->
+                        Timber.d("refresh podcast: $feedUrls")
+                        refreshing.value = true
+                        podcastsRepository.updatePodcasts(SampleFeeds + feedUrls, true)
+                    }
             }
             // TODO: look at result of runCatching and show any errors
 
