@@ -23,7 +23,7 @@ import java.util.Objects
 
 class EpisodeToPodcast {
     @Embedded
-    lateinit var episode: com.bigdeal.core.data.EpisodeEntity
+    lateinit var episode: EpisodeEntity
 
     @Relation(parentColumn = "podcast_uri", entityColumn = "uri")
     lateinit var _podcasts: List<Podcast>
@@ -45,15 +45,4 @@ class EpisodeToPodcast {
     }
 
     override fun hashCode(): Int = Objects.hash(episode, _podcasts)
-}
-fun EpisodeToPodcast.toEpisode(): com.bigdeal.core.data.Episode {
-    return com.bigdeal.core.data.Episode(
-        playState = episode.playState,
-        playbackPosition = episode.playbackPosition,
-        title = episode.title,
-        url = episode.url(),
-        duration = episode.duration,
-        podcastName = podcast.title,
-        podcastImageUrl = podcast.imageUrl,
-    )
 }

@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PlaylistAdd
 import androidx.compose.material.icons.rounded.PauseCircleFilled
 import androidx.compose.material.icons.rounded.PlayCircleFilled
@@ -186,10 +187,8 @@ fun EpisodeListItem(
                 }
             )
         }
-        val icon =
-            if (episode.playState == PlayState.PLAYING) Icons.Rounded.PauseCircleFilled else Icons.Rounded.PlayCircleFilled
         Image(
-            imageVector = icon,
+            imageVector = Icons.Default.PlayArrow,
             contentDescription = stringResource(R.string.cd_play),
             contentScale = ContentScale.Fit,
             colorFilter = ColorFilter.tint(LocalContentColor.current),
@@ -211,19 +210,11 @@ fun EpisodeListItem(
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             if (episode.duration != null) {
                 Text(
-                    text = if (episode.playbackPosition == 0L) {
+                    text =
                         stringResource(
                             R.string.episode_duration,
                             episode.duration!!.toMinutes().toInt()
-                        )
-                    } else {
-                        val leftTime: Int = episode.duration!!.toMinutes()
-                            .toInt() - episode.playbackPosition.toInt() / 1000 / 60
-                        stringResource(
-                            R.string.episode_left_duration,
-                            leftTime
-                        )
-                    },
+                        ),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodySmall,

@@ -21,10 +21,12 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.bigdeal.core.data.Category
 import com.bigdeal.core.data.EpisodeEntity
+import com.bigdeal.core.data.EpisodeStateEntity
 import com.bigdeal.core.data.FeedEntity
 import com.bigdeal.core.data.Podcast
 import com.bigdeal.core.data.PodcastCategoryEntry
 import com.bigdeal.core.data.PodcastFollowedEntry
+import com.bigdeal.core.data.database.dao.EpisodeRecordDao
 
 /**
  * The [RoomDatabase] we use in this app.
@@ -32,9 +34,10 @@ import com.bigdeal.core.data.PodcastFollowedEntry
 @Database(
     entities = [
         Podcast::class,
+        EpisodeStateEntity::class,
         EpisodeEntity::class,
         PodcastCategoryEntry::class,
-        com.bigdeal.core.data.Category::class,
+        Category::class,
         PodcastFollowedEntry::class,
         FeedEntity::class
     ],
@@ -51,4 +54,6 @@ abstract class JetcasterDatabase : RoomDatabase() {
     abstract fun podcastFollowedEntryDao(): PodcastFollowedEntryDao
 
     abstract fun feedDao(): FeedDao
+
+    abstract fun episodeRecordDao(): EpisodeRecordDao
 }

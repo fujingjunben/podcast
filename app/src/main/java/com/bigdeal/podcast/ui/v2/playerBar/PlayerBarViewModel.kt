@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bigdeal.core.data.EpisodeStore
 import com.bigdeal.core.data.EpisodeToPodcast
-import com.bigdeal.core.data.toEpisode
-import com.bigdeal.core.play.PlayerController
+import com.bigdeal.podcast.core.player.model.toPlayerEpisode
+import com.bigdeal.podcast.core.player.service.PlayerController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -42,7 +42,7 @@ class PlayerBarViewModel @Inject constructor(
             is PlayerBarUiState.Success -> {
                 val episodeToPodcast =
                     (uiState.value as PlayerBarUiState.Success).episodeToPodcast
-                controller.play(episodeToPodcast.toEpisode())
+                controller.play(episodeToPodcast.toPlayerEpisode())
             }
             else -> {}
         }

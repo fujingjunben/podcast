@@ -50,9 +50,9 @@ fun PodcastBottomBar(navController: NavController, tabs: Array<Tabs>) {
     LogUtil.d("currentRoute: $currentRoute")
     if (currentRoute != Screen.Player.route) {
         Column {
-            PlayerBar(
-                navController = navController
-            )
+//            PlayerBar(
+//                navController = navController
+//            )
             NavigationBar(
                 Modifier.windowInsetsBottomHeight(
                     WindowInsets.navigationBars.add(WindowInsets(bottom = 56.dp))

@@ -33,7 +33,7 @@ import java.time.OffsetDateTime
     ],
     foreignKeys = [
         ForeignKey(
-            entity = com.bigdeal.core.data.Podcast::class,
+            entity = Podcast::class,
             parentColumns = ["uri"],
             childColumns = ["podcast_uri"],
             onUpdate = ForeignKey.CASCADE,
@@ -51,14 +51,11 @@ data class EpisodeEntity(
     @ColumnInfo(name = "author") val author: String? = null,
     @ColumnInfo(name = "published") val published: OffsetDateTime,
     @ColumnInfo(name = "duration") val duration: Duration? = null,
-    @ColumnInfo(name = "playback_position") val playbackPosition: Long = 0L,
-    @ColumnInfo(name = "is_playing") val isPlaying: Boolean = false,
-    @ColumnInfo(name = "play_state") val playState: com.bigdeal.core.data.PlayState = com.bigdeal.core.data.PlayState.PREPARE,
     @ColumnInfo(name = "file_uri") val fileUri: String = "",
-    @ColumnInfo(name = "download_state") val downloadState: com.bigdeal.core.data.DownloadState = com.bigdeal.core.data.DownloadState.NONE,
+    @ColumnInfo(name = "download_state") val downloadState: DownloadState = DownloadState.NONE,
     @ColumnInfo(name = "download_id") val downloadId: Long = -1L
 )
 
-fun com.bigdeal.core.data.EpisodeEntity.url(): String {
-    return if (downloadState == com.bigdeal.core.data.DownloadState.SUCCESS) fileUri else uri
+fun EpisodeEntity.url(): String {
+    return if (downloadState == DownloadState.SUCCESS) fileUri else uri
 }

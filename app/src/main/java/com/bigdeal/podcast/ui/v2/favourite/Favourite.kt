@@ -155,8 +155,8 @@ fun FollowedPodcasts(
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = stringResource(id = R.string.follow))
-            Text(text = stringResource(id = R.string.more))
+            Text(text = stringResource(id = R.string.cd_follow))
+            Text(text = stringResource(id = R.string.cd_more))
         }
         LazyRow(modifier = modifier.height(100.dp)) {
             items(podcasts, key = { podcast -> podcast.uri }) { podcast ->

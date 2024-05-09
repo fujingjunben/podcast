@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bigdeal.podcast.R
 import com.bigdeal.podcast.ui.v2.common.EpisodeListItem
 import com.bigdeal.podcast.ui.v2.common.PodcastTitleCard
@@ -71,7 +70,7 @@ private fun AppBar(
             IconButton(onClick = onBackPress) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = stringResource(id = R.string.back)
+                    contentDescription = null
                 )
             }
         },

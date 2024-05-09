@@ -58,7 +58,7 @@ fun PodcastAppBar(
             IconButton(onClick = onBackPress) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = stringResource(id = R.string.back)
+                    contentDescription = stringResource(id = R.string.cd_back)
                 )
             }
         },

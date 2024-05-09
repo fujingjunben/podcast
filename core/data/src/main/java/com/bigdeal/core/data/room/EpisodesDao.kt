@@ -65,7 +65,6 @@ abstract class EpisodesDao {
         """
         SELECT episodes.* FROM episodes 
         INNER JOIN podcasts ON podcasts.uri = episodes.podcast_uri
-        WHERE episodes.is_playing <> 0
         """
     )
     abstract fun episodeWhichIsPlaying(
@@ -86,6 +85,16 @@ abstract class EpisodesDao {
         categoryId: Long,
         limit: Int
     ): Flow<List<EpisodeToPodcast>>
+
+    @Query(
+        """
+        SELECT episodes.* FROM episodes
+        INNER JOIN podcasts ON episodes.podcast_uri = podcasts.uri
+        WHERE episodes.uri = :episodeUri
+        """
+    )
+    abstract fun episodeAndPodcast(episodeUri: String): Flow<EpisodeToPodcast>
+
 
     @Query("SELECT COUNT(*) FROM episodes")
     abstract suspend fun count(): Int

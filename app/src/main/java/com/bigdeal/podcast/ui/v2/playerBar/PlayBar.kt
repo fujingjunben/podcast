@@ -74,10 +74,7 @@ fun PlayerBarContent(
 ) {
 
     val (episode, podcast) = episodeToPodcast
-    val icon = when (episode.playState == PlayState.PLAYING) {
-        true -> Icons.Rounded.PauseCircleFilled
-        else -> Icons.Rounded.PlayCircleFilled
-    }
+    val icon = Icons.Rounded.PlayCircleFilled
 
     Surface {
         Row(

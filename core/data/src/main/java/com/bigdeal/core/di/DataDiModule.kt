@@ -28,6 +28,7 @@ import com.bigdeal.core.data.FeedRepository
 import com.bigdeal.core.data.PodcastStore
 import com.bigdeal.core.data.PodcastsFetcher
 import com.bigdeal.core.data.PodcastsRepository
+import com.bigdeal.core.data.database.dao.EpisodeRecordDao
 import com.bigdeal.core.data.room.CategoriesDao
 import com.bigdeal.core.data.room.EpisodesDao
 import com.bigdeal.core.data.room.FeedDao
@@ -37,8 +38,6 @@ import com.bigdeal.core.data.room.PodcastFollowedEntryDao
 import com.bigdeal.core.data.room.PodcastsDao
 import com.bigdeal.core.data.room.TransactionRunner
 import com.bigdeal.core.download.PodcastDownloader
-import com.bigdeal.core.play.PlayerController
-import com.bigdeal.core.play.PlayerControllerImpl
 import com.example.jetcaster.core.designsystem.BuildConfig
 import com.rometools.rome.io.SyndFeedInput
 import dagger.Module
@@ -121,9 +120,16 @@ object DataDiModule {
 
     @Provides
     @Singleton
+    fun provideEpisodeRecordDao(
+        database: JetcasterDatabase
+    ): EpisodeRecordDao = database.episodeRecordDao()
+
+    @Provides
+    @Singleton
     fun provideFeedDao(
         database: JetcasterDatabase
     ): FeedDao = database.feedDao()
+
 
     @Provides
     @Singleton
@@ -148,8 +154,9 @@ object DataDiModule {
     @Provides
     @Singleton
     fun provideEpisodeStore(
-        episodeDao: EpisodesDao
-    ): EpisodeStore = EpisodeStore(episodeDao)
+        episodeDao: EpisodesDao,
+        episodeRecordDao: EpisodeRecordDao
+    ): EpisodeStore = EpisodeStore(episodeDao, episodeRecordDao)
 
     @Provides
     @Singleton
@@ -203,12 +210,6 @@ object DataDiModule {
         transactionRunner = transactionRunner,
         mainDispatcher = mainDispatcher
     )
-
-    @Provides
-    @Singleton
-    fun providePlayerController(
-        episodeStore: EpisodeStore
-    ): PlayerController = PlayerControllerImpl(episodeStore)
 
     @Provides
     @Singleton

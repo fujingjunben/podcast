@@ -39,6 +39,11 @@ sealed class Screen(val route: String) {
     object Podcast: Screen("podcast/{podcastUri}"){
         fun createRoute(podcastUri: String) = "podcast/$podcastUri"
     }
+    companion object {
+        val ARG_PODCAST_URI = "podcastUri"
+        val ARG_EPISODE_URI = "episodeUri"
+    }
+
 }
 
 @Composable

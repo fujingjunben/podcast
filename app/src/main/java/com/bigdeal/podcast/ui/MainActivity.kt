@@ -32,7 +32,7 @@ import androidx.media3.common.util.UnstableApi
 import com.bigdeal.core.data.DownloadState
 import com.bigdeal.core.data.EpisodeEntity
 import com.bigdeal.core.data.EpisodeStore
-import com.bigdeal.core.play.PlayerController
+import com.bigdeal.podcast.core.player.service.PlayerController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -42,7 +42,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject lateinit var controller: PlayerController
+    @Inject lateinit var controller: com.bigdeal.podcast.core.player.service.PlayerController
 
     @Inject lateinit var episodeStore: EpisodeStore
 

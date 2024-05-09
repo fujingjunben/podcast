@@ -10,7 +10,7 @@ import com.bigdeal.core.data.Podcast
 import com.bigdeal.core.data.PodcastStore
 import com.bigdeal.core.data.PodcastWithExtraInfo
 import com.bigdeal.core.data.PodcastsRepository
-import com.bigdeal.core.play.PlayerController
+import com.bigdeal.podcast.core.player.service.PlayerController
 import com.bigdeal.podcast.ui.v2.common.EpisodeOfPodcast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
@@ -25,7 +25,7 @@ class FavouriteViewModel @Inject constructor(
     private val episodeStore: EpisodeStore,
     private val feedRepository: FeedRepository,
     private val podcastsRepository: PodcastsRepository,
-    private val controller: PlayerController,
+    private val controller: com.bigdeal.podcast.core.player.service.PlayerController,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(FavouriteViewModelState(isLoading = true))
@@ -37,6 +37,7 @@ class FavouriteViewModel @Inject constructor(
             SharingStarted.Eagerly,
             viewModelState.value.toUiState()
         )
+
 
     val pageSize = 5
 

@@ -5,8 +5,8 @@ import java.time.Duration
 const val THRESHOLD = 500
 
 data class Episode(
-    val playState: com.bigdeal.core.data.PlayState,
-    val playerAction: com.bigdeal.core.data.PlayerAction = com.bigdeal.core.data.Play,
+    val playState: PlayState,
+    val playerAction: PlayerAction = Play,
     val duration: Duration?,
     val playbackPosition: Long,
     val url: String,

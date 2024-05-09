@@ -87,6 +87,7 @@ android {
 dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(project(":core:domain"))
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)

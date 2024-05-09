@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="app_name">Podcast</string>
+    <string name="app_name">Jetcaster</string>
 
     <string name="connection_error_title">Connection error</string>
     <string name="connection_error_message">Unable to fetch podcasts feeds.\nCheck your internet connection and try again.</string>
@@ -23,9 +23,12 @@
     
     <string name="your_podcasts">Your podcasts</string>
     <string name="latest_episodes">Latest episodes</string>
-
+    <string name="episode_duration">%1$d mins</string>
     <string name="home_library">Your library</string>
     <string name="home_discover">Discover</string>
+    <string name="favourite">Favourite</string>
+    <string name="discover">Discover</string>
+    <string name="library">Library</string>
 
     <string name="updated_longer">Updated a while ago</string>
     <plurals name="updated_weeks_ago">
@@ -38,28 +41,30 @@
     </plurals>
     <string name="updated_today">Updated today</string>
 
-    <string name="episode_duration">%1$d mins</string>
-    <string name="episode_left_duration">left %1$d mins</string>
+    <string name="episode_date_duration">%1$s &#8226; %2$d mins</string>
 
-    <string name="cd_search">Search</string>
     <string name="cd_account">Account</string>
     <string name="cd_add">Add</string>
     <string name="cd_back">Back</string>
-    <string name="cd_more">More</string>
-    <string name="cd_play">Play</string>
-    <string name="cd_skip_previous">Skip previous</string>
-    <string name="cd_reply10">Reply 10 seconds</string>
-    <string name="cd_forward30">Forward 30 seconds</string>
-    <string name="cd_skip_next">Skip next</string>
-    <string name="cd_unfollow">Unfollow</string>
     <string name="cd_follow">Follow</string>
     <string name="cd_following">Following</string>
+    <string name="cd_forward10">Forward 10 seconds</string>
+    <string name="cd_more">More</string>
     <string name="cd_not_following">Not following</string>
-    <string name="favourite">Favourite</string>
-    <string name="manage">Manage</string>
-    <string name="explore">Explore</string>
-    <string name="follow">Follow</string>
-    <string name="more">More</string>
-    <string name="back">Back</string>
+    <string name="cd_pause">Pause</string>
+    <string name="cd_play">Play</string>
+    <string name="cd_replay10">Replay 10 seconds</string>
+    <string name="cd_search">Search</string>
+    <string name="cd_selected_category">Selected category</string>
+    <string name="cd_skip_next">Skip next</string>
+    <string name="cd_skip_previous">Skip previous</string>
+    <string name="cd_unfollow">Unfollow</string>
+    <string name="episode_added_to_your_queue">Episode added to your queue</string>
+    <string name="cd_podcast_image">Podcast image</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="subscribed">Subscribed</string>
+  <string name="see_more">see more</string>
+  <string name="search_for_a_podcast">Search for a podcast</string>
+  <string name="an_error_has_occurred">An error has occurred.</string>
 
 </resources>

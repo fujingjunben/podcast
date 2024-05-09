@@ -53,7 +53,7 @@
         </activity>
 
         <service
-            android:name="com.bigdeal.core.play.PlaybackService"
+            android:name=".core.player.service.PlaybackService"
             android:foregroundServiceType="mediaPlayback"
             android:exported="true">
             <intent-filter>

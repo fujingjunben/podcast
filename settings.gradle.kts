@@ -34,3 +34,4 @@ include(":sync:work")
 
 
 include(":core:data")
+include(":core:domain")
