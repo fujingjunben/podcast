@@ -32,7 +32,7 @@ This sample contains 1 screen so far: the home screen. It is split into sub-scre
 ### Dynamic theming
 The home screen currently implements dynamic theming, using the artwork of the currently selected podcast from the carousel to  update the  `primary` and `onPrimary` [colors](https://developer.android.com/reference/kotlin/androidx/compose/material/Colors). You can see it in action in the screenshots above: as the carousel item is changed, the background gradient is updated to match the artwork.
 
-This is implemented in [`DynamicTheming.kt`](app/src/main/java/com/example/jetcaster/util/DynamicTheming.kt), which provides the `DynamicThemePrimaryColorsFromImage` composable, to automatically animate the theme colors based on the provided image URL, like so:
+This is implemented in [`DynamicTheming.kt`](app/src/main/java/com/bigdeal/podcast/util/DynamicTheming.kt), which provides the `DynamicThemePrimaryColorsFromImage` composable, to automatically animate the theme colors based on the provided image URL, like so:
 
 ``` kotlin
 val dominantColorState: DominantColorState = rememberDominantColorState()
@@ -49,7 +49,7 @@ DynamicThemePrimaryColorsFromImage(dominantColorState) {
 }
 ```
 
-Underneath, [`DominantColorState`](app/src/main/java/com/example/jetcaster/util/DynamicTheming.kt) uses the [Coil][coil] library to fetch the artwork image 🖼️, and then [Palette][palette] to extract the dominant colors from the image 🎨.
+Underneath, [`DominantColorState`](app/src/main/java/com/bigdeal/podcast/util/DynamicTheming.kt) uses the [Coil][coil] library to fetch the artwork image 🖼️, and then [Palette][palette] to extract the dominant colors from the image 🎨.
 
 
 ### Others
@@ -60,7 +60,7 @@ Some other notable things which are implemented:
 ## Architecture
 The app is built in a Redux-style, where each UI 'screen' has its own [ViewModel][viewmodel], which exposes a single [StateFlow][stateflow] containing the entire view state. Each [ViewModel][viewmodel] is responsible for subscribing to any data streams required for the view, as well as exposing functions which allow the UI to send events.
 
-Using the example of the home screen in the [`com.example.jetcaster.ui.home`](app/src/main/java/com/example/jetcaster/ui/home) package:
+Using the example of the home screen in the [`com.example.jetcaster.ui.home`](app/src/main/java/com/bigdeal/podcast/ui/home) package:
 
  - The ViewModel is implemented as [`HomeViewModel`][homevm], which exposes a `StateFlow<HomeViewState>` for the UI to observe.
  - [`HomeViewState`][homevm] contains the complete view state for the home screen as an [`@Immutable`](https://developer.android.com/reference/kotlin/androidx/compose/runtime/Immutable) `data class`.
@@ -73,15 +73,15 @@ val viewState by viewModel.state.collectAsState()
 
 This pattern is used across the different screens:
 
-- __Home:__ [`com.example.jetcaster.ui.home`](app/src/main/java/com/example/jetcaster/ui/home)
-- __Discover:__ [`com.example.jetcaster.ui.home.discover`](app/src/main/java/com/example/jetcaster/ui/home/discover)
-- __Podcast Category:__ [`com.example.jetcaster.ui.category`](app/src/main/java/com/example/jetcaster/ui/home/category)
+- __Home:__ [`com.example.jetcaster.ui.home`](app/src/main/java/com/bigdeal/podcast/ui/home)
+- __Discover:__ [`com.example.jetcaster.ui.home.discover`](app/src/main/java/com/bigdeal/podcast/ui/home/discover)
+- __Podcast Category:__ [`com.example.jetcaster.ui.category`](app/src/main/java/com/bigdeal/podcast/ui/home/category)
 
 ## Data
 
 ### Podcast data
 
-The podcast data in this sample is dynamically fetched from a number of podcast RSS feeds, which are listed in [`Feeds.kt`](app/src/main/java/com/example/jetcaster/data/Feeds.kt). 
+The podcast data in this sample is dynamically fetched from a number of podcast RSS feeds, which are listed in [`Feeds.kt`](app/src/main/java/com/bigdeal/podcast/data/Feeds.kt). 
 
 The [`PodcastRepository`][podcastrepo] class is responsible for handling the data fetching of all podcast information:
 
@@ -90,11 +90,11 @@ The [`PodcastRepository`][podcastrepo] class is responsible for handling the dat
 
  ### Follow podcasts
 
- The sample allows users to 'follow' podcasts, which is implemented within the data layer in the [`PodcastFollowedEntry`](app/src/main/java/com/example/jetcaster/data/PodcastFollowedEntry.kt) entity class, and as functions in [PodcastStore][podcaststore]: `followPodcast()`, `unfollowPodcast()`.
+ The sample allows users to 'follow' podcasts, which is implemented within the data layer in the [`PodcastFollowedEntry`](app/src/main/java/com/bigdeal/podcast/data/PodcastFollowedEntry.kt) entity class, and as functions in [PodcastStore][podcaststore]: `followPodcast()`, `unfollowPodcast()`.
 
  ### Date + time
 
- The sample uses the JDK 8 [date and time APIs](https://developer.android.com/reference/java/time/package-summary) through the [desugaring support][jdk8desugar] available in Android Gradle Plugin 4.0+. Relevant Room [`TypeConverters`](https://developer.android.com/reference/kotlin/androidx/room/TypeConverters) are implemented in [`DateTimeTypeConverters.kt`](app/src/main/java/com/example/jetcaster/data/room/DateTimeTypeConverters.kt).
+ The sample uses the JDK 8 [date and time APIs](https://developer.android.com/reference/java/time/package-summary) through the [desugaring support][jdk8desugar] available in Android Gradle Plugin 4.0+. Relevant Room [`TypeConverters`](https://developer.android.com/reference/kotlin/androidx/room/TypeConverters) are implemented in [`DateTimeTypeConverters.kt`](app/src/main/java/com/bigdeal/podcast/data/room/DateTimeTypeConverters.kt).
 
 ## License
 
@@ -114,15 +114,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
- [feeds]: app/src/main/java/com/example/jetcaster/data/Feeds.kt
- [fetcher]: app/src/main/java/com/example/jetcaster/data/PodcastFetcher.kt
- [podcastrepo]: app/src/main/java/com/example/jetcaster/data/PodcastsRepository.kt
- [podcaststore]: app/src/main/java/com/example/jetcaster/data/PodcastStore.kt
- [epstore]: app/src/main/java/com/example/jetcaster/data/EpisodeStore.kt
- [catstore]: app/src/main/java/com/example/jetcaster/data/CategoryStore.kt
- [db]: app/src/main/java/com/example/jetcaster/data/room/JetcasterDatabase.kt
- [homevm]: app/src/main/java/com/example/jetcaster/ui/home/HomeViewModel.kt
- [homeui]: app/src/main/java/com/example/jetcaster/ui/home/Home.kt
+ [feeds]: app/src/main/java/com/bigdeal/podcast/data/Feeds.kt
+ [fetcher]: app/src/main/java/com/bigdeal/podcast/data/PodcastFetcher.kt
+ [podcastrepo]: app/src/main/java/com/bigdeal/podcast/data/PodcastsRepository.kt
+ [podcaststore]: app/src/main/java/com/bigdeal/podcast/data/PodcastStore.kt
+ [epstore]: app/src/main/java/com/bigdeal/podcast/data/EpisodeStore.kt
+ [catstore]: app/src/main/java/com/bigdeal/podcast/data/CategoryStore.kt
+ [db]: app/src/main/java/com/bigdeal/podcast/data/room/JetcasterDatabase.kt
+ [homevm]: app/src/main/java/com/bigdeal/podcast/ui/home/HomeViewModel.kt
+ [homeui]: app/src/main/java/com/bigdeal/podcast/ui/home/Home.kt
  [compose]: https://developer.android.com/jetpack/compose
  [palette]: https://developer.android.com/reference/kotlin/androidx/palette/graphics/package-summary
  [room]: https://developer.android.com/topic/libraries/architecture/room

@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="app_name">Jetcaster</string>
+    <string name="app_name">Podcast</string>
 
     <string name="connection_error_title">Connection error</string>
     <string name="connection_error_message">Unable to fetch podcasts feeds.\nCheck your internet connection and try again.</string>

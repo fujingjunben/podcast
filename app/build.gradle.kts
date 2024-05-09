@@ -23,10 +23,10 @@ plugins {
 
 android {
     compileSdk = libs.versions.compileSdk.get().toInt()
-    namespace = "com.example.jetcaster"
+    namespace = "com.bigdeal.podcast"
 
     defaultConfig {
-        applicationId = "com.example.jetcaster"
+        applicationId = "com.bigdeal.podcast"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
@@ -86,7 +86,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.constraintlayout)
-    implementation(project(":core:designsystem"))
+    implementation(libs.androidx.work.runtime.ktx)
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -146,4 +146,7 @@ dependencies {
 
     coreLibraryDesugaring(libs.core.jdk.desugaring)
 
+    implementation(project(":core:designsystem"))
+    implementation(project(":core:data"))
+    implementation(project(":sync:work"))
 }

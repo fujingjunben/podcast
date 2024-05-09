@@ -27,8 +27,10 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Jetcaster"
+rootProject.name = "Podcast"
 include(":app")
 include(":core:designsystem")
+include(":sync:work")
 
 
+include(":core:data")
