@@ -28,9 +28,8 @@ class PodcastDownloader (
     private val scope = CoroutineScope(ioDispatcher)
 
     fun downloadEpisode(episode: EpisodeEntity) {
-        val fileName = URLEncoder.encode(episode.title, "UTF-8")
-        val file = File(downloadDir, "$fileName.mp3")
-        val request = DownloadManager.Request(Uri.parse(episode.id))
+        val file = File(downloadDir, "${episode.id}.mp3")
+        val request = DownloadManager.Request(Uri.parse(episode.uri))
             .setMimeType(MimeTypes.AUDIO_MPEG)
             .setTitle(episode.title)
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
@@ -54,14 +53,30 @@ class PodcastDownloader (
     fun cancelDownload(episode: EpisodeEntity) {
         Timber.d("download episode: cancel")
         scope.launch {
+            queryDownloadStatus(episode)
             val episodeEntity = episodeStore.episodeWithId(episode.id).first()
-            downloadManager.remove(episodeEntity.downloadId)
+//            downloadManager.remove(episodeEntity.downloadId)
             episodeStore.updateEpisode(
                 episodeEntity.copy(
                     downloadId = -1L, fileUri = "",
                     downloadState = DownloadState.NONE
                 )
             )
+        }
+    }
+
+    fun queryDownloadStatus(episode: EpisodeEntity) {
+        val query = DownloadManager.Query()
+        query.setFilterById(episode.downloadId)
+        val cursor = downloadManager.query(query)
+        if (cursor == null) {
+            Timber.d("download manager doesn't find ${episode.downloadId}")
+        }
+        if (cursor.moveToFirst()) {
+            val status = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+            val reason = cursor.getColumnIndex(DownloadManager.COLUMN_REASON).toInt()
+            Timber.d("download status: $status, reason: $reason")
+
         }
     }
 }
