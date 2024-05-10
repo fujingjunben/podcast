@@ -54,6 +54,7 @@
     <string name="cd_pause">Pause</string>
     <string name="cd_play">Play</string>
     <string name="cd_replay10">Replay 10 seconds</string>
+    <string name="cd_repeat">Repeat</string>
     <string name="cd_search">Search</string>
     <string name="cd_selected_category">Selected category</string>
     <string name="cd_skip_next">Skip next</string>

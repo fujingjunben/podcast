@@ -33,6 +33,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.Forward10
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.RepeatOne
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Replay10
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
@@ -51,6 +54,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -104,6 +108,7 @@ fun PlayerScreen(
             onSeekingFinished = viewModel::onSeekingFinished,
             onNext = viewModel::onNext,
             onPrevious = viewModel::onPrevious,
+            onSetRepeatMode = viewModel::onSetRepeatMode,
         ),
     )
 }
@@ -203,6 +208,7 @@ data class PlayerControlActions(
     val onPrevious: () -> Unit,
     val onSeekingStarted: () -> Unit,
     val onSeekingFinished: (newElapsed: Duration) -> Unit,
+    val onSetRepeatMode: (Int) -> Unit,
 )
 
 @Composable
@@ -283,6 +289,8 @@ private fun PlayerContentRegular(
                     onPrevious = playerControlActions.onPrevious,
                     Modifier.padding(vertical = 8.dp)
                 )
+
+                PlayerControllBar(onSetRepeatMode = playerControlActions.onSetRepeatMode)
             }
             Spacer(modifier = Modifier.weight(1f))
         }
@@ -694,6 +702,46 @@ private fun PlayerButtons(
                 .clickable(enabled = hasNext, onClick = onNext)
                 .alpha(if (hasNext) 1f else 0.25f)
         )
+    }
+}
+
+@Composable
+fun PlayerControllBar(
+    onSetRepeatMode: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    sideButtonSize: Dp = 48.dp,
+) {
+    var mode by remember {
+        mutableIntStateOf(0)
+    }
+    val icon = when (mode) {
+        1 -> Icons.Filled.RepeatOne
+        2 -> Icons.Filled.Repeat
+        else -> Icons.Filled.Replay
+    }
+
+    val sideButtonsModifier = Modifier
+        .size(sideButtonSize)
+        .background(
+            color = MaterialTheme.colorScheme.surfaceContainerHighest,
+            shape = CircleShape
+        )
+        .semantics { role = Role.Button }
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Image(imageVector = icon,
+            contentDescription = stringResource(R.string.cd_repeat),
+            contentScale = ContentScale.Inside,
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+            modifier = sideButtonsModifier
+                .clickable {
+                    mode = (mode + 1) % 3
+                    onSetRepeatMode(mode)
+                })
     }
 }
 

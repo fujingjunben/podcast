@@ -57,7 +57,9 @@ class MockEpisodePlayer(
 
             timeElapsed.collect {
                 val episode = _currentEpisode.value
-                while (episode != null && (timeElapsed.value > episode.duration)) {
+                while (episode != null
+                    && (timeElapsed.value >
+                            episode.duration?.minus(Duration.ofSeconds(5)))) {
                     Timber.d("the episode is end")
                     isPlaying.value = false
 
@@ -194,6 +196,10 @@ class MockEpisodePlayer(
 
     override fun decreaseSpeed(speed: Duration) {
         _playerSpeed.value -= speed
+    }
+
+    override fun setRepeatMode(mode: Int) {
+        playerController.setRepeatMode(mode)
     }
 
     override fun next() {

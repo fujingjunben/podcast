@@ -108,4 +108,6 @@ interface EpisodePlayer {
      * Decreases the speed of Player playback by a given time specified in [duration].
      */
     fun decreaseSpeed(speed: Duration = Duration.ofMillis(500))
+
+    fun setRepeatMode(mode: Int)
 }

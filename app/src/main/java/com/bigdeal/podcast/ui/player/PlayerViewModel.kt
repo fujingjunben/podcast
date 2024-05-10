@@ -95,4 +95,8 @@ class PlayerViewModel @Inject constructor(
             episodePlayer.addToQueue(it)
         }
     }
+
+    fun onSetRepeatMode(mode: Int) {
+        episodePlayer.setRepeatMode(mode)
+    }
 }

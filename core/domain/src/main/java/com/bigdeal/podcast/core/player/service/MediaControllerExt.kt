@@ -63,7 +63,7 @@ fun MediaController.play(episode: PlayerEpisode, position: Long = 0) {
     play()
 }
 
-private fun buildMediaItem(episode: PlayerEpisode): MediaItem {
+fun buildMediaItem(episode: PlayerEpisode): MediaItem {
     // get the correct source for streaming / local playback
     // put uri in RequestMetadata - credit: https://stackoverflow.com/a/70103460
     val source = episode.uri

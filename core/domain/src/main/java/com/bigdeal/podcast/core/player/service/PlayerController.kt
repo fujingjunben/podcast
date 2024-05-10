@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.Duration
 
 abstract class PlayerController {
-    val positionState =  MutableStateFlow(Duration.ZERO)
+    val positionState = MutableStateFlow(Duration.ZERO)
     abstract fun init(context: Context)
     abstract fun release()
     abstract fun play(episode: PlayerEpisode)
@@ -21,5 +21,5 @@ abstract class PlayerController {
 
     abstract fun seekBack()
 
-
+    abstract fun setRepeatMode(mode: Int)
 }

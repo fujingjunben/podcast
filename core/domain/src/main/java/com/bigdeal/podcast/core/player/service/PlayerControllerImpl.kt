@@ -61,6 +61,10 @@ class PlayerControllerImpl(
         mController?.seekBack()
     }
 
+    override fun setRepeatMode(mode: Int) {
+        mController?.repeatMode = mode
+    }
+
     override fun seekForward() {
         mController?.seekForward()
     }
