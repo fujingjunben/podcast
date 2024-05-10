@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class MockEpisodePlayer(
     mainDispatcher: CoroutineDispatcher,
@@ -59,6 +60,7 @@ class MockEpisodePlayer(
             timeElapsed.collect {
                 val episode = _currentEpisode.value
                 while (episode != null && (timeElapsed.value > episode.duration)) {
+                    Timber.d("the episode is end")
                     isPlaying.value = false
 
                     if (hasNext()) {
@@ -161,8 +163,6 @@ class MockEpisodePlayer(
     }
 
     override fun stop() {
-        isPlaying.value = false
-
         timerJob?.cancel()
         timerJob = null
     }

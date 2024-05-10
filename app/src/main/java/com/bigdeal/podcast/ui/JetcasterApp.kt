@@ -29,10 +29,11 @@ fun PodcastApp() {
     val navController = rememberNavController()
 
     JetcasterTheme {
-        val showPlayerBar = remember { mutableStateOf(false) }
         val episodeUri = remember {
             mutableStateOf("")
         }
+        val showPlayerBar = remember(episodeUri) { mutableStateOf(false) }
+
         Scaffold(
             bottomBar = {
                 PodcastBottomBar(navController, tabs = tabs,

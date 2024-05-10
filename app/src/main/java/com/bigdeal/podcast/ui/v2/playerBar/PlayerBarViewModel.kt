@@ -20,6 +20,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel(assistedFactory = PlayerBarViewModel.Factory::class)
@@ -35,6 +36,7 @@ class PlayerBarViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
+            Timber.d("playbar episodeAndPodcast")
             episodeStore.episodeAndPodcastWithUri(decodedEpisodeUri).flatMapConcat {
                 episodePlayer.currentEpisode = it.toPlayerEpisode()
                 episodePlayer.playerState
@@ -42,6 +44,7 @@ class PlayerBarViewModel @AssistedInject constructor(
                 PlayerUiState(episodePlayerState = it)
             }.collect {
                 uiState = it
+                Timber.d("playerbar isPlaying: ${uiState.episodePlayerState.isPlaying}")
             }
         }
     }
