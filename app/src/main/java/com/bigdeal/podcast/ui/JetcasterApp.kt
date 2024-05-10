@@ -4,11 +4,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -17,42 +19,64 @@ import com.bigdeal.podcast.ui.v2.NavGraph
 import com.bigdeal.podcast.ui.v2.Tabs
 import com.bigdeal.podcast.ui.v2.playerBar.PlayerBar
 import com.bigdeal.core.util.LogUtil
+import com.bigdeal.podcast.ui.v2.playerBar.PlayerBarViewModel
 
 @Composable
 fun PodcastApp() {
     val tabs = remember {
-        Tabs.values()
+        Tabs.entries.toTypedArray()
     }
     val navController = rememberNavController()
 
     JetcasterTheme {
+        val showPlayerBar = remember { mutableStateOf(false) }
+        val episodeUri = remember {
+            mutableStateOf("")
+        }
         Scaffold(
             bottomBar = {
-                PodcastBottomBar(navController, tabs = tabs)
+                PodcastBottomBar(navController, tabs = tabs,
+                    showPlayerBar.value, episodeUri.value)
             }
         ) { paddingValues ->
             NavGraph(
                 navController = navController,
                 modifier = Modifier.padding(paddingValues),
-                toPlay = { uri -> {} }
+                onPlay = { uri ->
+                    run {
+                        showPlayerBar.value = true
+                        episodeUri.value = uri
+                    }
+                }
             )
         }
     }
 }
 
 @Composable
-fun PodcastBottomBar(navController: NavController, tabs: Array<Tabs>) {
+fun PodcastBottomBar(navController: NavController,
+                     tabs: Array<Tabs>,
+                     showPlayerBar: Boolean,
+                     episodeUri: String) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
         ?: Tabs.EXPLORE.route
 
-    val routes = remember { Tabs.values().map { it.route } }
     LogUtil.d("currentRoute: $currentRoute")
     if (currentRoute != Screen.Player.route) {
         Column {
-//            PlayerBar(
-//                navController = navController
-//            )
+            if (showPlayerBar) {
+                val podcastDetailsViewModel =
+                    hiltViewModel<PlayerBarViewModel, PlayerBarViewModel.Factory>(
+                        key = episodeUri
+                    ) {
+                        it.create(episodeUri)
+                    }
+                PlayerBar(
+                    navController = navController,
+                    viewModel = podcastDetailsViewModel
+                )
+            }
             NavigationBar(
                 Modifier.windowInsetsBottomHeight(
                     WindowInsets.navigationBars.add(WindowInsets(bottom = 56.dp))

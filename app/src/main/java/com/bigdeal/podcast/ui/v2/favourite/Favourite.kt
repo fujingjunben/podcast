@@ -40,6 +40,7 @@ fun Favourite(
     modifier: Modifier,
     navigateToEpisode: (String, String) -> Unit,
     navigateToPodcast: (String) -> Unit,
+    onPlay: (String) -> Unit,
     viewModel: FavouriteViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -69,6 +70,7 @@ fun Favourite(
                 EpisodeList(
                     episodeOfPodcasts,
                     navigateToEpisode,
+                    onPlay = {url -> onPlay(url)}
                 ) {
                     FollowedPodcasts(
                         podcasts = episodeOfPodcasts.map { it.podcast }

@@ -1,73 +1,60 @@
 package com.bigdeal.podcast.ui.v2.playerBar
 
+import android.net.Uri
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bigdeal.core.data.EpisodeStore
 import com.bigdeal.core.data.EpisodeToPodcast
+import com.bigdeal.podcast.core.player.EpisodePlayer
+import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.core.player.model.toPlayerEpisode
 import com.bigdeal.podcast.core.player.service.PlayerController
+import com.bigdeal.podcast.ui.player.PlayerUiState
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
-class PlayerBarViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = PlayerBarViewModel.Factory::class)
+class PlayerBarViewModel @AssistedInject constructor(
     private val episodeStore: EpisodeStore,
-    private val controller: PlayerController,
+    private val episodePlayer: EpisodePlayer,
+    @Assisted private val episodeUri: String
 ) : ViewModel() {
-    private val viewModelState = MutableStateFlow(PlayerBarViewModelState())
+    private val decodedEpisodeUri = Uri.decode(episodeUri)
 
-    val uiState = viewModelState.map {
-        it.toUiState()
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.Eagerly,
-        viewModelState.value.toUiState()
-    )
+    var uiState by mutableStateOf(PlayerUiState())
+        private set
 
     init {
         viewModelScope.launch {
-            episodeStore.episodeWhichIsPlaying().collect { episodeToPodcasts ->
-//                LogUtil.d(TAG, "episode: ${episodeToPodcasts.size}")
-                if (episodeToPodcasts.isNotEmpty()) {
-                    viewModelState.update { it.copy(episodeToPodcast = episodeToPodcasts[0]) }
-                }
+            episodeStore.episodeAndPodcastWithUri(decodedEpisodeUri).flatMapConcat {
+                episodePlayer.currentEpisode = it.toPlayerEpisode()
+                episodePlayer.playerState
+            }.map {
+                PlayerUiState(episodePlayerState = it)
+            }.collect {
+                uiState = it
             }
         }
     }
+
 
     fun play() {
-        return when (uiState.value) {
-            is PlayerBarUiState.Success -> {
-                val episodeToPodcast =
-                    (uiState.value as PlayerBarUiState.Success).episodeToPodcast
-                controller.play(episodeToPodcast.toPlayerEpisode())
-            }
-            else -> {}
-        }
+        episodePlayer.play()
     }
 
-    companion object {
-        const val TAG:String = "PlayerBarViewModelState"
+    fun pause() {
+        episodePlayer.pause()
     }
-}
-
-private data class PlayerBarViewModelState(
-    val isPlaying: Boolean = false,
-    val episodeToPodcast: EpisodeToPodcast? = null
-) {
-    fun toUiState(): PlayerBarUiState {
-        return if (episodeToPodcast == null) {
-            PlayerBarUiState.Loading
-        } else {
-            PlayerBarUiState.Success(episodeToPodcast)
-        }
+    @AssistedFactory
+    interface Factory {
+        fun create(podcastUri: String): PlayerBarViewModel
     }
-}
-
-sealed interface PlayerBarUiState {
-    data class Success(val episodeToPodcast: EpisodeToPodcast) : PlayerBarUiState
-    object Loading : PlayerBarUiState
-
 }

@@ -21,7 +21,7 @@ import com.bigdeal.podcast.ui.v2.podcast.PodcastScreen
 fun NavGraph(
     navController: NavHostController,
     modifier: Modifier,
-    toPlay: (String) -> Unit,
+    onPlay: (String) -> Unit,
     finishActivity: () -> Unit = {},
     appState: JetcasterAppState = rememberJetcasterAppState(navController = navController)
 ) {
@@ -34,7 +34,8 @@ fun NavGraph(
                 },
                 navigateToPodcast = { podcastUri ->
                     appState.navigateToPodcast(podcastUri, backStackEntry)
-                }
+                },
+                onPlay = onPlay
             )
         }
 
@@ -44,6 +45,8 @@ fun NavGraph(
                 navigateToPodcast = { podcastUri ->
                     appState.navigateToPodcast(podcastUri, backStackEntry)
                 },
+
+                onPlay = onPlay,
                 modifier = Modifier
             )
         }
@@ -53,6 +56,7 @@ fun NavGraph(
                 navigateToEpisode = { podcastUri, episodeUri ->
                     appState.navigateToEpisode(podcastUri, episodeUri, backStackEntry)
                 },
+                onPlay = onPlay,
                 modifier = Modifier
             )
         }

@@ -45,6 +45,7 @@ import com.bigdeal.core.data.DownloadState
 import com.bigdeal.core.data.EpisodeEntity
 import com.bigdeal.core.data.Podcast
 import com.bigdeal.core.data.PlayState
+import com.bigdeal.core.data.url
 import com.bigdeal.podcast.ui.theme.Keyline1
 import timber.log.Timber
 import java.time.format.DateTimeFormatter
@@ -55,6 +56,7 @@ import com.bigdeal.podcast.R
 fun EpisodeList(
     episodes: List<EpisodeOfPodcast>,
     navigateToEpisode: (String, String) -> Unit,
+    onPlay: (String) -> Unit,
     showPodcastImage: Boolean = true,
     episodeViewModel: EpisodeViewModel = hiltViewModel(),
     header: @Composable LazyItemScope.() -> Unit = {},
@@ -71,7 +73,7 @@ fun EpisodeList(
                 episode = item.episode,
                 podcast = item.podcast,
                 onClick = navigateToEpisode,
-                onPlay = { episodeViewModel.play(item) },
+                onPlay = { onPlay(item.episode.url()) },
                 onDownload = { episodeViewModel.download(item) },
                 onCancelDownload = { episodeViewModel.cancelDownload(item) },
                 showPodcastImage = showPodcastImage,

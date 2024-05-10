@@ -23,6 +23,7 @@ import com.bigdeal.podcast.R
 fun PodcastScreen(
     onBackPress: () -> Unit,
     navigateToEpisode: (String, String) -> Unit,
+    onPlay: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PodcastViewModel = hiltViewModel()
 ) {
@@ -39,6 +40,7 @@ fun PodcastScreen(
             episodes = uiState.episodeOfPodcasts,
             navigateToEpisode = navigateToEpisode,
             showPodcastImage = false,
+            onPlay = onPlay,
             header = {
                 PodcastInfo(uiState.podcast)
             })

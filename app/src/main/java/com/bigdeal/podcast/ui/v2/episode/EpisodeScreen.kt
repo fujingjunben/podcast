@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.bigdeal.core.data.url
 import com.bigdeal.podcast.R
 import com.bigdeal.podcast.ui.v2.common.EpisodeListItem
 import com.bigdeal.podcast.ui.v2.common.PodcastTitleCard
@@ -20,6 +21,7 @@ import com.bigdeal.podcast.ui.v2.common.PodcastTitleCard
 fun EpisodeScreen(
     onBackPress: () -> Unit,
     navigateToPodcast: (String) -> Unit,
+    onPlay: (String) -> Unit,
     modifier: Modifier,
     episodeScreenViewModel: EpisodeScreenViewModel = hiltViewModel()
 ) {
@@ -39,7 +41,7 @@ fun EpisodeScreen(
                 episode = item.episode,
                 podcast = item.podcast,
                 onClick = { podcastUri, episodeUri -> navigateToPodcast(podcastUri)},
-                onPlay = { episodeScreenViewModel.play(item) },
+                onPlay = { onPlay(item.episode.url()) },
                 onDownload = {},
                 onCancelDownload = {},
                 showPodcastImage = false,
