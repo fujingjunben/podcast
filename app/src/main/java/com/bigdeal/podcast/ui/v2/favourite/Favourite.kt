@@ -29,7 +29,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.bigdeal.podcast.R
 import com.bigdeal.core.data.Podcast
@@ -72,7 +71,7 @@ fun Favourite(
                     navigateToEpisode,
                     onPlay = { playerEpisode ->
                         run {
-                            onPlay(playerEpisode.uri)
+                            onPlay(playerEpisode.id)
                             viewModel.play(playerEpisode)
                         }
                     }
@@ -166,12 +165,12 @@ fun FollowedPodcasts(
             Text(text = stringResource(id = R.string.cd_more))
         }
         LazyRow(modifier = modifier.height(100.dp)) {
-            items(podcasts, key = { podcast -> podcast.uri }) { podcast ->
+            items(podcasts, key = { podcast -> podcast.id }) { podcast ->
                 FollowedPodcastCarouselItem(
                     podcastImageUrl = podcast.imageUrl,
                     podcastTitle = podcast.title,
-                    onUnfollowedClick = { onPodcastUnfollowed(podcast.uri) },
-                    navigateToPodcast = { navigateToPodcast(podcast.uri) },
+                    onUnfollowedClick = { onPodcastUnfollowed(podcast.id) },
+                    navigateToPodcast = { navigateToPodcast(podcast.id) },
                     modifier = Modifier
                         .padding(4.dp)
                         .fillMaxHeight()

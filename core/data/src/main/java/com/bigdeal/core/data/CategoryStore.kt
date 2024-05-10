@@ -37,7 +37,7 @@ class CategoryStore(
      */
     fun categoriesSortedByPodcastCount(
         limit: Int = Integer.MAX_VALUE
-    ): Flow<List<com.bigdeal.core.data.Category>> {
+    ): Flow<List<Category>> {
         return categoriesDao.categoriesSortedByPodcastCount(limit)
     }
 
@@ -48,7 +48,7 @@ class CategoryStore(
     fun podcastsInCategorySortedByPodcastCount(
         categoryId: Long,
         limit: Int = Int.MAX_VALUE
-    ): Flow<List<com.bigdeal.core.data.PodcastWithExtraInfo>> {
+    ): Flow<List<PodcastWithExtraInfo>> {
         return podcastsDao.podcastsInCategorySortedByLastEpisode(categoryId, limit)
     }
 
@@ -59,7 +59,7 @@ class CategoryStore(
     fun episodesFromPodcastsInCategory(
         categoryId: Long,
         limit: Int = Integer.MAX_VALUE
-    ): Flow<List<com.bigdeal.core.data.EpisodeToPodcast>> {
+    ): Flow<List<EpisodeToPodcast>> {
         return episodesDao.episodesFromPodcastsInCategory(categoryId, limit)
     }
 
@@ -68,17 +68,17 @@ class CategoryStore(
      *
      * @return the id of the newly inserted/existing category
      */
-    suspend fun addCategory(category: com.bigdeal.core.data.Category): Long {
+    suspend fun addCategory(category: Category): Long {
         return when (val local = categoriesDao.getCategoryWithName(category.name)) {
             null -> categoriesDao.insert(category)
             else -> local.id
         }
     }
 
-    suspend fun addPodcastToCategory(podcastUri: String, categoryId: Long) {
+    suspend fun addPodcastToCategory(podcastId: String, categoryId: Long) {
         categoryEntryDao.insert(
-            com.bigdeal.core.data.PodcastCategoryEntry(
-                podcastUri = podcastUri,
+            PodcastCategoryEntry(
+                podcastId = podcastId,
                 categoryId = categoryId
             )
         )

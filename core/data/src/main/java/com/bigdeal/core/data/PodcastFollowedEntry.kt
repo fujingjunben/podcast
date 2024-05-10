@@ -35,11 +35,11 @@ import androidx.room.PrimaryKey
 //        )
 //    ],
     indices = [
-        Index("podcast_uri", unique = true)
+        Index("podcast_id", unique = true)
     ]
 )
 @Immutable
 data class PodcastFollowedEntry(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long = 0,
-    @ColumnInfo(name = "podcast_uri") val podcastUri: String
+    @ColumnInfo(name = "podcast_id") val podcastId: String
 )

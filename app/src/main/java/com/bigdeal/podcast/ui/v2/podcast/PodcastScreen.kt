@@ -40,7 +40,7 @@ fun PodcastScreen(
             episodes = uiState.episodeOfPodcasts,
             navigateToEpisode = navigateToEpisode,
             showPodcastImage = false,
-            onPlay = { playerEpisode -> onPlay(playerEpisode.uri) },
+            onPlay = { playerEpisode -> onPlay(playerEpisode.id) },
             header = {
                 PodcastInfo(uiState.podcast)
             })

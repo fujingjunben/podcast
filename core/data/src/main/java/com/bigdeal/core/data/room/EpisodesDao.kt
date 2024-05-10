@@ -25,20 +25,21 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.bigdeal.core.data.EpisodeEntity
 import com.bigdeal.core.data.EpisodeToPodcast
+import com.bigdeal.core.data.database.dao.BaseDao
 import kotlinx.coroutines.flow.Flow
 
 /**
  * [Room] DAO for [EpisodeEntity] related operations.
  */
 @Dao
-abstract class EpisodesDao {
+abstract class EpisodesDao : BaseDao<EpisodeEntity> {
 
     @Query(
         """
-        SELECT * FROM episodes WHERE uri = :uri OR file_uri =:uri
+        SELECT * FROM episodes WHERE id = :id
         """
     )
-    abstract fun episode(uri: String): Flow<EpisodeEntity>
+    abstract fun episode(id: String): Flow<EpisodeEntity>
 
     @Query(
         """
@@ -49,13 +50,13 @@ abstract class EpisodesDao {
 
     @Query(
         """
-        SELECT * FROM episodes WHERE podcast_uri = :podcastUri
+        SELECT * FROM episodes WHERE podcast_id = :podcastId
         ORDER BY datetime(published) DESC
         LIMIT :limit
         """
     )
-    abstract fun episodesForPodcastUri(
-        podcastUri: String,
+    abstract fun episodesForPodcastId(
+        podcastId: String,
         limit: Int
     ): Flow<List<EpisodeEntity>>
 
@@ -64,7 +65,7 @@ abstract class EpisodesDao {
     @Query(
         """
         SELECT episodes.* FROM episodes 
-        INNER JOIN podcasts ON podcasts.uri = episodes.podcast_uri
+        INNER JOIN podcasts ON podcasts.id = episodes.podcast_id
         """
     )
     abstract fun episodeWhichIsPlaying(
@@ -75,7 +76,7 @@ abstract class EpisodesDao {
     @Query(
         """
         SELECT episodes.* FROM episodes
-        INNER JOIN podcast_category_entries ON episodes.podcast_uri = podcast_category_entries.podcast_uri
+        INNER JOIN podcast_category_entries ON episodes.podcast_id = podcast_category_entries.podcast_id
         WHERE category_id = :categoryId
         ORDER BY datetime(published) DESC
         LIMIT :limit
@@ -89,34 +90,14 @@ abstract class EpisodesDao {
     @Query(
         """
         SELECT episodes.* FROM episodes
-        INNER JOIN podcasts ON episodes.podcast_uri = podcasts.uri
-        WHERE episodes.uri = :episodeUri
+        INNER JOIN podcasts ON episodes.podcast_id = podcasts.id
+        WHERE episodes.id = :episodeId
         """
     )
-    abstract fun episodeAndPodcast(episodeUri: String): Flow<EpisodeToPodcast>
+    abstract fun episodeAndPodcast(episodeId: String): Flow<EpisodeToPodcast>
 
 
     @Query("SELECT COUNT(*) FROM episodes")
     abstract suspend fun count(): Int
-
-    /**
-     * The following methods should really live in a base interface. Unfortunately the Kotlin
-     * Compiler which we need to use for Compose doesn't work with that.
-     * TODO: remove this once we move to a more recent Kotlin compiler
-     */
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(entity: EpisodeEntity): Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertAll(vararg entity: EpisodeEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertAll(entities: Collection<EpisodeEntity>)
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun update(entity: EpisodeEntity)
-
-    @Delete
-    abstract suspend fun delete(entity: EpisodeEntity): Int
 }
+

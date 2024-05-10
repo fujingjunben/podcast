@@ -22,18 +22,17 @@ fun NavGraph(
     navController: NavHostController,
     modifier: Modifier,
     onPlay: (String) -> Unit,
-    finishActivity: () -> Unit = {},
     appState: JetcasterAppState = rememberJetcasterAppState(navController = navController)
 ) {
     NavHost(navController = navController, startDestination = Destination.FAVOURITE_ROUTE) {
         composable(Destination.FAVOURITE_ROUTE) { backStackEntry ->
             Favourite(
                 modifier = modifier,
-                navigateToEpisode = {podcastUri, episodeUri ->
-                    appState.navigateToEpisode(podcastUri, episodeUri, backStackEntry)
+                navigateToEpisode = {podcastId, episodeId ->
+                    appState.navigateToEpisode(podcastId, episodeId, backStackEntry)
                 },
-                navigateToPodcast = { podcastUri ->
-                    appState.navigateToPodcast(podcastUri, backStackEntry)
+                navigateToPodcast = { podcastId ->
+                    appState.navigateToPodcast(podcastId, backStackEntry)
                 },
                 onPlay = onPlay
             )
@@ -42,8 +41,8 @@ fun NavGraph(
         composable(Screen.Episode.route) { backStackEntry ->
             EpisodeScreen(
                 onBackPress = appState::navigateBack,
-                navigateToPodcast = { podcastUri ->
-                    appState.navigateToPodcast(podcastUri, backStackEntry)
+                navigateToPodcast = { podcastId ->
+                    appState.navigateToPodcast(podcastId, backStackEntry)
                 },
 
                 onPlay = onPlay,
@@ -53,8 +52,8 @@ fun NavGraph(
         composable(Screen.Podcast.route) { backStackEntry ->
             PodcastScreen(
                 onBackPress = appState::navigateBack,
-                navigateToEpisode = { podcastUri, episodeUri ->
-                    appState.navigateToEpisode(podcastUri, episodeUri, backStackEntry)
+                navigateToEpisode = { podcastId, episodeId ->
+                    appState.navigateToEpisode(podcastId, episodeId, backStackEntry)
                 },
                 onPlay = onPlay,
                 modifier = Modifier
@@ -84,6 +83,6 @@ object Destination {
     const val FAVOURITE_ROUTE = "favourite"
     const val EXPLORE_ROUTE = "discover"
     const val MANAGE_ROUTE = "library"
-    const val EPISODE = "episodeUri"
-    const val PODCAST = "podcastUri"
+    const val EPISODE = "episodeId"
+    const val PODCAST = "podcastId"
 }

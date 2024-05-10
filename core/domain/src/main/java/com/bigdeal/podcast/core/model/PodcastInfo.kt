@@ -8,6 +8,7 @@ import java.time.OffsetDateTime
  * External data layer representation of a podcast.
  */
 data class PodcastInfo(
+    val id: String = "",
     val uri: String = "",
     val title: String = "",
     val author: String = "",
@@ -19,6 +20,7 @@ data class PodcastInfo(
 
 fun Podcast.asExternalModel(): PodcastInfo =
     PodcastInfo(
+        id = this.id,
         uri = this.uri,
         title = this.title,
         author = this.author ?: "",

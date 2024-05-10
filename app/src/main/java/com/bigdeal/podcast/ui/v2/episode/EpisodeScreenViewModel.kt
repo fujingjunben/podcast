@@ -5,23 +5,21 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bigdeal.core.data.EpisodeStore
-import com.bigdeal.core.data.PodcastStore
-import com.bigdeal.podcast.core.player.service.PlayerController
+import com.bigdeal.podcast.core.player.EpisodePlayer
 import com.bigdeal.podcast.ui.v2.Destination
-import com.bigdeal.podcast.ui.v2.common.EpisodeOfPodcast
+import com.bigdeal.podcast.core.model.EpisodeOfPodcast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class EpisodeScreenViewModel @Inject constructor(
     val episodeStore: EpisodeStore,
-    val podcastStore: PodcastStore,
     savedStateHandle: SavedStateHandle,
-    private val playerController: com.bigdeal.podcast.core.player.service.PlayerController
-): ViewModel(){
-    private val podcastUri: String = Uri.decode(savedStateHandle.get<String>(Destination.PODCAST)!!)
+    private val episodePlayer: EpisodePlayer
+) : ViewModel() {
     private val episodeUri: String = Uri.decode(savedStateHandle.get<String>(Destination.EPISODE)!!)
 
     private val viewModelState = MutableStateFlow(EpisodeUiState())
@@ -30,15 +28,22 @@ class EpisodeScreenViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val podcast = podcastStore.podcastWithUri(podcastUri).first()
-            episodeStore.episodeWithUri(episodeUri).collect{ episodeEntity ->
-                viewModelState.update { it.copy(episodeOfPodcast = EpisodeOfPodcast(podcast, episodeEntity))  }
+            Timber.d("episodeUri: $episodeUri")
+            episodeStore.episodeAndPodcastWithId(episodeUri).collect { item ->
+                Timber.d("episodeAndPodcast: $item")
+                if (item != null) {
+                    viewModelState.update {
+                        it.copy(
+                            episodeOfPodcast =
+                            EpisodeOfPodcast(item.podcast, item.episode)
+                        )
+                    }
+                }
             }
         }
     }
 
     fun play(episodeOfPodcast: EpisodeOfPodcast) {
-        playerController.play(episodeOfPodcast.toEpisode())
     }
 }
 

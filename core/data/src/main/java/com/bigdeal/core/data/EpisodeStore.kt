@@ -12,10 +12,10 @@ class EpisodeStore(
     private val episodeRecordDao: EpisodeRecordDao
 ) {
     /**
-     * Returns a flow containing the episode given [episodeUri].
+     * Returns a flow containing the episode given [episodeId].
      */
-    fun episodeWithUri(episodeUri: String): Flow<EpisodeEntity> {
-        return episodesDao.episode(episodeUri)
+    fun episodeWithId(episodeId: String): Flow<EpisodeEntity> {
+        return episodesDao.episode(episodeId)
     }
 
     fun episodeWithDownloadId(id: Long): Flow<EpisodeEntity> {
@@ -27,10 +27,10 @@ class EpisodeStore(
      * given [podcastUri].
      */
     fun episodesInPodcast(
-        podcastUri: String,
+        podcastId: String,
         limit: Int = Integer.MAX_VALUE
     ): Flow<List<EpisodeEntity>> {
-        return episodesDao.episodesForPodcastUri(podcastUri, limit)
+        return episodesDao.episodesForPodcastId(podcastId, limit)
     }
 
     fun episodeWhichIsPlaying(): Flow<List<EpisodeToPodcast>> {
@@ -42,7 +42,7 @@ class EpisodeStore(
      *
      * This automatically switches to the main thread to maintain thread consistency.
      */
-    suspend fun addEpisodes(episodes: Collection<com.bigdeal.core.data.EpisodeEntity>) = episodesDao.insertAll(episodes)
+    suspend fun addEpisodes(episodes: Collection<EpisodeEntity>) = episodesDao.insertAll(episodes)
 
     suspend fun isEmpty(): Boolean = episodesDao.count() == 0
 
@@ -51,13 +51,13 @@ class EpisodeStore(
     suspend fun updateEpisodeState(episodeStateEntity: EpisodeStateEntity)
     = episodeRecordDao.update(episodeStateEntity)
 
-    fun queryEpisodeState(url: String) : Flow<EpisodeStateEntity> {
-        return episodeRecordDao.queryRecordByUri(url)
+    fun queryEpisodeState(id: String) : Flow<EpisodeStateEntity> {
+        return episodeRecordDao.queryRecordById(id)
     }
 
 
-    fun episodeAndPodcastWithUri(episodeUri: String): Flow<EpisodeToPodcast> {
-        return episodesDao.episodeAndPodcast(episodeUri)
+    fun episodeAndPodcastWithId(episodeId: String): Flow<EpisodeToPodcast> {
+        return episodesDao.episodeAndPodcast(episodeId)
     }
 
 }

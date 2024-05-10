@@ -29,24 +29,24 @@ fun PodcastApp() {
     val navController = rememberNavController()
 
     JetcasterTheme {
-        val episodeUri = remember {
+        val episodeId = remember {
             mutableStateOf("")
         }
-        val showPlayerBar = remember(episodeUri) { mutableStateOf(false) }
+        val showPlayerBar = remember(episodeId) { mutableStateOf(false) }
 
         Scaffold(
             bottomBar = {
                 PodcastBottomBar(navController, tabs = tabs,
-                    showPlayerBar.value, episodeUri.value)
+                    showPlayerBar.value, episodeId.value)
             }
         ) { paddingValues ->
             NavGraph(
                 navController = navController,
                 modifier = Modifier.padding(paddingValues),
-                onPlay = { uri ->
+                onPlay = { id ->
                     run {
                         showPlayerBar.value = true
-                        episodeUri.value = uri
+                        episodeId.value = id
                     }
                 }
             )
@@ -58,7 +58,7 @@ fun PodcastApp() {
 fun PodcastBottomBar(navController: NavController,
                      tabs: Array<Tabs>,
                      showPlayerBar: Boolean,
-                     episodeUri: String) {
+                     episodeId: String) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
         ?: Tabs.EXPLORE.route
@@ -69,9 +69,9 @@ fun PodcastBottomBar(navController: NavController,
             if (showPlayerBar) {
                 val podcastDetailsViewModel =
                     hiltViewModel<PlayerBarViewModel, PlayerBarViewModel.Factory>(
-                        key = episodeUri
+                        key = episodeId
                     ) {
-                        it.create(episodeUri)
+                        it.create(episodeId)
                     }
                 PlayerBar(
                     navController = navController,

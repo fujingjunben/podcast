@@ -22,10 +22,8 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
-import com.bigdeal.core.data.Episode
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.google.common.util.concurrent.ListenableFuture
-import java.time.Duration
 
 
 /* Continue playback */
@@ -44,13 +42,13 @@ fun MediaController.startSleepTimer() {
 
 /* Cancels the sleep timer */
 fun MediaController.cancelSleepTimer() {
-    sendCustomCommand(SessionCommand(com.bigdeal.podcast.core.player.service.Keys.CMD_CANCEL_SLEEP_TIMER, Bundle.EMPTY), Bundle.EMPTY)
+    sendCustomCommand(SessionCommand(Keys.CMD_CANCEL_SLEEP_TIMER, Bundle.EMPTY), Bundle.EMPTY)
 }
 
 /* Request sleep timer remaining */
 fun MediaController.requestSleepTimerRemaining(): ListenableFuture<SessionResult> {
     return sendCustomCommand(
-        SessionCommand(com.bigdeal.podcast.core.player.service.Keys.CMD_REQUEST_SLEEP_TIMER_REMAINING, Bundle.EMPTY),
+        SessionCommand(Keys.CMD_REQUEST_SLEEP_TIMER_REMAINING, Bundle.EMPTY),
         Bundle.EMPTY
     )
 }
@@ -79,7 +77,7 @@ private fun buildMediaItem(episode: PlayerEpisode): MediaItem {
         setArtworkUri(episode.podcastImageUrl?.toUri())
     }.build()
     return MediaItem.Builder().apply {
-        setMediaId(source)
+        setMediaId(episode.id)
         setRequestMetadata(requestMetadata)
         setMediaMetadata(mediaMetadata)
         setUri(source.toUri())
@@ -89,8 +87,8 @@ private fun buildMediaItem(episode: PlayerEpisode): MediaItem {
 /* Updates Up Next episode media id */
 fun MediaController.updateUpNextEpisode(upNextEpisodeMediaId: String) {
     sendCustomCommand(
-        SessionCommand(com.bigdeal.podcast.core.player.service.Keys.CMD_UPDATE_UP_NEXT_EPISODE, Bundle.EMPTY),
-        bundleOf(Pair(com.bigdeal.podcast.core.player.service.Keys.EXTRA_UP_NEXT_EPISODE_MEDIA_ID, upNextEpisodeMediaId))
+        SessionCommand(Keys.CMD_UPDATE_UP_NEXT_EPISODE, Bundle.EMPTY),
+        bundleOf(Pair(Keys.EXTRA_UP_NEXT_EPISODE_MEDIA_ID, upNextEpisodeMediaId))
     )
 }
 

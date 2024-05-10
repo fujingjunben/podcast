@@ -30,18 +30,18 @@ import androidx.navigation.compose.rememberNavController
  */
 sealed class Screen(val route: String) {
     object Home : Screen("home")
-    object Player : Screen("player/{episodeUri}") {
-        fun createRoute(episodeUri: String) = "player/$episodeUri"
+    object Player : Screen("player/{episodeId}") {
+        fun createRoute(episodeId: String) = "player/$episodeId"
     }
-    object Episode: Screen("episode/{podcastUri}/{episodeUri}"){
-        fun createRoute(podcastUri: String, episodeUri: String) = "episode/$podcastUri/$episodeUri"
+    object Episode: Screen("episode/{podcastId}/{episodeId}"){
+        fun createRoute(podcastId: String, episodeId: String) = "episode/$podcastId/$episodeId"
     }
-    object Podcast: Screen("podcast/{podcastUri}"){
-        fun createRoute(podcastUri: String) = "podcast/$podcastUri"
+    object Podcast: Screen("podcast/{podcastId}"){
+        fun createRoute(podcastId: String) = "podcast/$podcastId"
     }
     companion object {
-        val ARG_PODCAST_URI = "podcastUri"
-        val ARG_EPISODE_URI = "episodeUri"
+        val ARG_PODCAST_ID = "podcastId"
+        val ARG_EPISODE_ID = "episodeId"
     }
 
 }
@@ -65,28 +65,28 @@ class JetcasterAppState(
         isOnline = checkIfOnline()
     }
 
-    fun navigateToPlayer(episodeUri: String, from: NavBackStackEntry) {
+    fun navigateToPlayer(episodeId: String, from: NavBackStackEntry) {
         // In order to discard duplicated navigation events, we check the Lifecycle
         if (from.lifecycleIsResumed()) {
-            val encodedUri = Uri.encode(episodeUri)
+            val encodedUri = Uri.encode(episodeId)
             navController.navigate(Screen.Player.createRoute(encodedUri))
         }
     }
 
-    fun navigateToEpisode(podcastUri: String, episodeUri: String, from: NavBackStackEntry) {
+    fun navigateToEpisode(podcastId: String, episodeId: String, from: NavBackStackEntry) {
         // In order to discard duplicated navigation events, we check the Lifecycle
         if (from.lifecycleIsResumed()) {
-            val encodedEpisodeUri = Uri.encode(episodeUri)
-            val encodedPodcastUri = Uri.encode(podcastUri)
-            navController.navigate(Screen.Episode.createRoute(encodedPodcastUri, encodedEpisodeUri))
+            val encodedEpisodeId = Uri.encode(episodeId)
+            val encodedPodcastId = Uri.encode(podcastId)
+            navController.navigate(Screen.Episode.createRoute(encodedPodcastId, encodedEpisodeId))
         }
     }
 
-    fun navigateToPodcast(podcastUri: String, from: NavBackStackEntry) {
+    fun navigateToPodcast(podcastId: String, from: NavBackStackEntry) {
         // In order to discard duplicated navigation events, we check the Lifecycle
         if (from.lifecycleIsResumed()) {
-            val encodedUri = Uri.encode(podcastUri)
-            navController.navigate(Screen.Podcast.createRoute(encodedUri))
+            val encodedId = Uri.encode(podcastId)
+            navController.navigate(Screen.Podcast.createRoute(encodedId))
         }
     }
 

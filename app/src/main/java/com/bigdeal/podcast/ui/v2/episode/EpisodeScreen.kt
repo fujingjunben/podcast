@@ -40,8 +40,8 @@ fun EpisodeScreen(
             EpisodeListItem(
                 episode = item.episode,
                 podcast = item.podcast,
-                onClick = { podcastUri, episodeUri -> navigateToPodcast(podcastUri)},
-                onPlay = { onPlay(item.episode.url()) },
+                onClick = { podcastId, _ -> navigateToPodcast(podcastId)},
+                onPlay = { onPlay(item.episode.id) },
                 onDownload = {},
                 onCancelDownload = {},
                 showPodcastImage = false,
@@ -52,7 +52,7 @@ fun EpisodeScreen(
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp)) {
-                    Text(text = item.episode.summary!!)
+                    Text(text = item.episode.summary as String)
                 }
             }
         }

@@ -34,7 +34,7 @@ abstract class CategoriesDao {
         """
         SELECT categories.* FROM categories
         INNER JOIN (
-            SELECT category_id, COUNT(podcast_uri) AS podcast_count FROM podcast_category_entries
+            SELECT category_id, COUNT(podcast_id) AS podcast_count FROM podcast_category_entries
             GROUP BY category_id
         ) ON category_id = categories.id
         ORDER BY podcast_count DESC

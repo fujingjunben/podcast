@@ -89,7 +89,7 @@ class PodcastsRepository (
                         val categoryId = categoryStore.addCategory(category)
                         // Now we can add the podcast to the category
                         categoryStore.addPodcastToCategory(
-                            podcastUri = podcast.uri,
+                            podcastId = podcast.id,
                             categoryId = categoryId
                         )
                     }

@@ -15,10 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.rounded.PlayCircleFilled
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,21 +28,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
-import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.bigdeal.podcast.R
-import com.bigdeal.core.data.EpisodeToPodcast
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.ui.Screen
 import com.bigdeal.podcast.ui.player.PlayerUiState
-import com.bigdeal.podcast.ui.v2.favourite.FavouriteUiState
 
 @Composable
 fun PlayerBar(
@@ -59,9 +52,9 @@ fun PlayerBar(
         onPlay = { playerEpisode -> viewModel.play(playerEpisode) },
         onPause = { viewModel.pause() },
         modifier,
-    ) { episodeUri ->
+    ) { episodeId ->
         navigateToEpisode(
-            episodeUri,
+            episodeId,
             navController,
             navBackStackEntry
         )
@@ -87,7 +80,7 @@ fun PlayerBarContent(
                     .height(50.dp)
                     .padding(end = 10.dp)
                     .clickable {
-                        navigateToPlayer(episode.uri)
+                        navigateToPlayer(episode.id)
                     },
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -148,14 +141,14 @@ fun PlayerBarContent(
 }
 
 private fun navigateToEpisode(
-    episodeUri: String,
+    episodeId: String,
     navController: NavController,
     from: NavBackStackEntry?
 ) {
     // In order to discard duplicated navigation events, we check the Lifecycle
     if (from?.lifecycleIsResumed() == true) {
-        val encodedUri = Uri.encode(episodeUri)
-        navController.navigate(Screen.Player.createRoute(encodedUri))
+        val encodedId = Uri.encode(episodeId)
+        navController.navigate(Screen.Player.createRoute(encodedId))
     }
 }
 

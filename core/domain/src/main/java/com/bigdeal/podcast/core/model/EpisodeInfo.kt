@@ -8,6 +8,7 @@ import java.time.OffsetDateTime
  * External data layer representation of an episode.
  */
 data class EpisodeInfo(
+    val id: String = "",
     val uri: String = "",
     val title: String = "",
     val subTitle: String = "",
@@ -19,6 +20,7 @@ data class EpisodeInfo(
 
 fun EpisodeEntity.asExternalModel(): EpisodeInfo =
     EpisodeInfo(
+        id = id,
         uri = uri,
         title = title,
         subTitle = subtitle ?: "",

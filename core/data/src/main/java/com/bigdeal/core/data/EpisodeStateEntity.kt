@@ -26,13 +26,13 @@ import androidx.room.PrimaryKey
 @Entity(
     tableName = "episodes_state_record",
     indices = [
-        Index("episode_uri", unique = true)
+        Index("episode_id", unique = true)
     ],
     foreignKeys = [
         ForeignKey(
             entity = EpisodeEntity::class,
-            parentColumns = ["uri"],
-            childColumns = ["episode_uri"],
+            parentColumns = ["id"],
+            childColumns = ["episode_id"],
             onUpdate = ForeignKey.CASCADE,
             onDelete = ForeignKey.CASCADE
         )
@@ -40,7 +40,7 @@ import androidx.room.PrimaryKey
 )
 @Immutable
 data class EpisodeStateEntity(
-    @PrimaryKey @ColumnInfo(name = "episode_uri") val uri: String,
+    @PrimaryKey @ColumnInfo(name = "episode_id") val id: String,
     @ColumnInfo(name = "time_elapsed") val timeElapsed: Long = 0L,
     @ColumnInfo(name = "is_playing") val isPlaying: Boolean = false,
     @ColumnInfo(name = "play_state") val playState: PlayState = PlayState.PREPARE,

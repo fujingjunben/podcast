@@ -11,8 +11,8 @@ abstract class EpisodeRecordDao : BaseDao<EpisodeStateEntity> {
 
     @Query(
         """
-            SELECT * FROM episodes_state_record WHERE episode_uri = :uri
+            SELECT * FROM episodes_state_record WHERE episode_id = :id
         """
     )
-    abstract fun queryRecordByUri(uri: String): Flow<EpisodeStateEntity>
+    abstract fun queryRecordById(id: String): Flow<EpisodeStateEntity>
 }

@@ -8,7 +8,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import com.bigdeal.core.data.Episode
 import com.bigdeal.core.data.EpisodeStateEntity
 import com.bigdeal.core.data.EpisodeStore
 import com.bigdeal.core.data.PlayState
@@ -21,32 +20,6 @@ import timber.log.Timber
 import java.lang.Runnable
 import java.time.Duration
 
-private data class EpisodeState(
-    val currentMediaId: String = "",
-    val playState: PlayState = PlayState.PREPARE,
-    val playbackPosition: Long = 0L
-) {
-    fun pause(): EpisodeState {
-        return this.copy(playState = PlayState.PAUSE)
-    }
-
-    fun playing(): EpisodeState {
-        return this.copy(playState = PlayState.PLAYING)
-    }
-
-    fun prepare(): EpisodeState {
-        return this.copy(playState = PlayState.PREPARE)
-    }
-
-    fun position(position: Long): EpisodeState {
-        return this.copy(playbackPosition = position)
-    }
-
-    fun mediaId(mediaId: String): EpisodeState {
-        return this.copy(currentMediaId = mediaId)
-    }
-}
-
 class PlayerControllerImpl(
     private val episodeStore: EpisodeStore,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
@@ -56,8 +29,6 @@ class PlayerControllerImpl(
         get() = if (controllerFuture.isDone) controllerFuture.get() else null
 
     private val handler: Handler = Handler(Looper.getMainLooper())
-
-    private var episodeState: EpisodeState = EpisodeState()
 
     private var _currentEpisode: PlayerEpisode? = null
 
@@ -179,36 +150,6 @@ class PlayerControllerImpl(
             if (isPlaying) {
                 togglePeriodicProgressUpdateRequest()
             }
-        }
-    }
-
-    private fun updateEpisode(episodeState: EpisodeState, isPlaying: Boolean = false) {
-        this.episodeState = episodeState
-        if (mController == null) {
-            return
-        }
-
-        if (episodeState.currentMediaId.isEmpty()) {
-            return
-        }
-        val isFinished = episodeState.playbackPosition >= mController!!.duration - 500
-        val position =
-            if (isFinished) 0L else episodeState.playbackPosition
-
-        if (isFinished) {
-            this.episodeState = episodeState.prepare()
-        }
-
-        scope.launch {
-            Timber.d("update episode state record: $episodeState")
-            episodeStore.updateEpisodeState(
-                EpisodeStateEntity(
-                    uri = episodeState.currentMediaId,
-                    timeElapsed = position,
-                    isPlaying = isPlaying,
-                    playState = episodeState.playState
-                )
-            )
         }
     }
 }

@@ -2,7 +2,6 @@ package com.bigdeal.core.download
 
 import android.app.DownloadManager
 import android.net.Uri
-import android.util.Base64
 import androidx.core.net.toUri
 import androidx.media3.common.MimeTypes
 import com.bigdeal.core.Dispatcher
@@ -17,7 +16,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 import java.net.URLEncoder
-import javax.inject.Inject
 
 class PodcastDownloader (
     private val downloadManager: DownloadManager,
@@ -32,7 +30,7 @@ class PodcastDownloader (
     fun downloadEpisode(episode: EpisodeEntity) {
         val fileName = URLEncoder.encode(episode.title, "UTF-8")
         val file = File(downloadDir, "$fileName.mp3")
-        val request = DownloadManager.Request(Uri.parse(episode.uri))
+        val request = DownloadManager.Request(Uri.parse(episode.id))
             .setMimeType(MimeTypes.AUDIO_MPEG)
             .setTitle(episode.title)
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
@@ -42,7 +40,7 @@ class PodcastDownloader (
 
         val id = downloadManager.enqueue(request)
         scope.launch {
-            val episodeEntity = episodeStore.episodeWithUri(episode.uri).first()
+            val episodeEntity = episodeStore.episodeWithId(episode.id).first()
             episodeStore.updateEpisode(
                 episodeEntity.copy(
                     downloadId = id,
@@ -56,7 +54,7 @@ class PodcastDownloader (
     fun cancelDownload(episode: EpisodeEntity) {
         Timber.d("download episode: cancel")
         scope.launch {
-            val episodeEntity = episodeStore.episodeWithUri(episode.uri).first()
+            val episodeEntity = episodeStore.episodeWithId(episode.id).first()
             downloadManager.remove(episodeEntity.downloadId)
             episodeStore.updateEpisode(
                 episodeEntity.copy(

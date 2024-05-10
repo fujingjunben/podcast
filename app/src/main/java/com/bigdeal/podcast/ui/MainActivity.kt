@@ -42,7 +42,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject lateinit var controller: com.bigdeal.podcast.core.player.service.PlayerController
+    @Inject lateinit var controller: PlayerController
 
     @Inject lateinit var episodeStore: EpisodeStore
 

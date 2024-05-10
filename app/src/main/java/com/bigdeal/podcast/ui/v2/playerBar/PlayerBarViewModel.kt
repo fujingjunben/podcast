@@ -7,12 +7,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bigdeal.core.data.EpisodeStore
-import com.bigdeal.core.data.EpisodeToPodcast
 import com.bigdeal.podcast.core.player.EpisodePlayer
-import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.core.player.model.toPlayerEpisode
-import com.bigdeal.podcast.core.player.service.PlayerController
 import com.bigdeal.podcast.ui.player.PlayerUiState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -21,30 +18,28 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel(assistedFactory = PlayerBarViewModel.Factory::class)
 class PlayerBarViewModel @AssistedInject constructor(
     private val episodeStore: EpisodeStore,
     private val episodePlayer: EpisodePlayer,
-    @Assisted private val episodeUri: String
+    @Assisted private val episodeId: String
 ) : ViewModel() {
-    private val decodedEpisodeUri = Uri.decode(episodeUri)
+    private val decodedEpisodeId = Uri.decode(episodeId)
 
     var uiState by mutableStateOf(PlayerUiState())
         private set
 
     init {
         viewModelScope.launch {
-            Timber.d("playbar episodeAndPodcast")
-            episodeStore.episodeAndPodcastWithUri(decodedEpisodeUri).flatMapConcat {
+            Timber.d("playbar episodeAndPodcast: $decodedEpisodeId")
+            episodeStore.episodeAndPodcastWithId(decodedEpisodeId).flatMapConcat {
                 episodePlayer.currentEpisode = it.toPlayerEpisode()
                 episodePlayer.playerState
             }.map {
                 PlayerUiState(episodePlayerState = it)
             }.collect {
                 uiState = it
-                Timber.d("playerbar isPlaying: ${uiState.episodePlayerState.isPlaying}")
             }
         }
     }
@@ -59,6 +54,6 @@ class PlayerBarViewModel @AssistedInject constructor(
     }
     @AssistedFactory
     interface Factory {
-        fun create(podcastUri: String): PlayerBarViewModel
+        fun create(podcastId: String): PlayerBarViewModel
     }
 }

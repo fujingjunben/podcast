@@ -16,6 +16,7 @@
 
 package com.bigdeal.core.data
 
+import com.bigdeal.core.data.extension.toSHA256
 import com.bigdeal.core.data.room.PodcastFollowedEntryDao
 import com.bigdeal.core.data.room.PodcastsDao
 import com.bigdeal.core.data.room.TransactionRunner
@@ -30,10 +31,10 @@ class PodcastStore(
     private val transactionRunner: TransactionRunner
 ) {
     /**
-     * Return a flow containing the [Podcast] with the given [uri].
+     * Return a flow containing the [Podcast] with the given [id].
      */
-    fun podcastWithUri(uri: String): Flow<Podcast> {
-        return podcastDao.podcastWithUri(uri)
+    fun podcastWithId(id: String): Flow<Podcast> {
+        return podcastDao.podcastWithId(id)
     }
 
     /**
@@ -57,20 +58,20 @@ class PodcastStore(
     }
 
 
-    suspend fun followPodcast(podcastUri: String) {
-        podcastFollowedEntryDao.insert(PodcastFollowedEntry(podcastUri = podcastUri))
+    suspend fun followPodcast(podcastId: String) {
+        podcastFollowedEntryDao.insert(PodcastFollowedEntry(podcastId = podcastId))
     }
 
-    suspend fun togglePodcastFollowed(podcastUri: String) = transactionRunner {
-        if (podcastFollowedEntryDao.isPodcastFollowed(podcastUri)) {
-            unfollowPodcast(podcastUri)
+    suspend fun togglePodcastFollowed(podcastId: String) = transactionRunner {
+        if (podcastFollowedEntryDao.isPodcastFollowed(podcastId)) {
+            unfollowPodcast(podcastId)
         } else {
-            followPodcast(podcastUri)
+            followPodcast(podcastId)
         }
     }
 
-    suspend fun unfollowPodcast(podcastUri: String) {
-        podcastFollowedEntryDao.deleteWithPodcastUri(podcastUri)
+    suspend fun unfollowPodcast(podcastId: String) {
+        podcastFollowedEntryDao.deleteWithPodcastId(podcastId)
     }
 
     /**

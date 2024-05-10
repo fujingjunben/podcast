@@ -29,13 +29,14 @@ import java.time.OffsetDateTime
     tableName = "episodes",
     indices = [
         Index("uri", unique = true),
-        Index("podcast_uri")
+        Index("id", unique = true),
+        Index("podcast_id")
     ],
     foreignKeys = [
         ForeignKey(
             entity = Podcast::class,
-            parentColumns = ["uri"],
-            childColumns = ["podcast_uri"],
+            parentColumns = ["id"],
+            childColumns = ["podcast_id"],
             onUpdate = ForeignKey.CASCADE,
             onDelete = ForeignKey.CASCADE
         )
@@ -43,8 +44,9 @@ import java.time.OffsetDateTime
 )
 @Immutable
 data class EpisodeEntity(
-    @PrimaryKey @ColumnInfo(name = "uri") val uri: String,
-    @ColumnInfo(name = "podcast_uri") val podcastUri: String,
+    @PrimaryKey @ColumnInfo(name = "id") val id: String,
+    @ColumnInfo(name = "uri") val uri: String,
+    @ColumnInfo(name = "podcast_id") val podcastId: String,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "subtitle") val subtitle: String? = null,
     @ColumnInfo(name = "summary") val summary: String? = null,

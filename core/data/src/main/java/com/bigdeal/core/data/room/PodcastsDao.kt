@@ -25,27 +25,28 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.bigdeal.core.data.Podcast
 import com.bigdeal.core.data.PodcastWithExtraInfo
+import com.bigdeal.core.data.database.dao.BaseDao
 import kotlinx.coroutines.flow.Flow
 
 /**
  * [Room] DAO for [Podcast] related operations.
  */
 @Dao
-abstract class PodcastsDao {
-    @Query("SELECT * FROM podcasts WHERE uri = :uri")
-    abstract fun podcastWithUri(uri: String): Flow<Podcast>
+abstract class PodcastsDao: BaseDao<Podcast>{
+    @Query("SELECT * FROM podcasts WHERE id = :id")
+    abstract fun podcastWithId(id: String): Flow<Podcast>
 
     @Transaction
     @Query(
         """
-        SELECT podcasts.*, last_episode_date, (followed_entries.podcast_uri IS NOT NULL) AS is_followed
+        SELECT podcasts.*, last_episode_date, (followed_entries.podcast_id IS NOT NULL) AS is_followed
         FROM podcasts 
         INNER JOIN (
-            SELECT podcast_uri, MAX(published) AS last_episode_date
+            SELECT podcast_id, MAX(published) AS last_episode_date
             FROM episodes
-            GROUP BY podcast_uri
-        ) episodes ON podcasts.uri = episodes.podcast_uri
-        LEFT JOIN podcast_followed_entries AS followed_entries ON followed_entries.podcast_uri = episodes.podcast_uri
+            GROUP BY podcast_id
+        ) episodes ON podcasts.id = episodes.podcast_id
+        LEFT JOIN podcast_followed_entries AS followed_entries ON followed_entries.podcast_id = episodes.podcast_id
         ORDER BY datetime(last_episode_date) DESC
         LIMIT :limit
         """
@@ -57,16 +58,16 @@ abstract class PodcastsDao {
     @Transaction
     @Query(
         """
-        SELECT podcasts.*, last_episode_date, (followed_entries.podcast_uri IS NOT NULL) AS is_followed
+        SELECT podcasts.*, last_episode_date, (followed_entries.podcast_id IS NOT NULL) AS is_followed
         FROM podcasts 
         INNER JOIN (
-            SELECT episodes.podcast_uri, MAX(published) AS last_episode_date
+            SELECT episodes.podcast_id, MAX(published) AS last_episode_date
             FROM episodes
-            INNER JOIN podcast_category_entries ON episodes.podcast_uri = podcast_category_entries.podcast_uri
+            INNER JOIN podcast_category_entries ON episodes.podcast_id = podcast_category_entries.podcast_id
             WHERE category_id = :categoryId
-            GROUP BY episodes.podcast_uri
-        ) inner_query ON podcasts.uri = inner_query.podcast_uri
-        LEFT JOIN podcast_followed_entries AS followed_entries ON followed_entries.podcast_uri = inner_query.podcast_uri
+            GROUP BY episodes.podcast_id
+        ) inner_query ON podcasts.uri = inner_query.podcast_id
+        LEFT JOIN podcast_followed_entries AS followed_entries ON followed_entries.podcast_id = inner_query.podcast_id
         ORDER BY datetime(last_episode_date) DESC
         LIMIT :limit
         """
@@ -79,12 +80,12 @@ abstract class PodcastsDao {
     @Transaction
     @Query(
         """
-        SELECT podcasts.*, last_episode_date, (followed_entries.podcast_uri IS NOT NULL) AS is_followed
+        SELECT podcasts.*, last_episode_date, (followed_entries.podcast_id IS NOT NULL) AS is_followed
         FROM podcasts 
         INNER JOIN (
-            SELECT podcast_uri, MAX(published) AS last_episode_date FROM episodes GROUP BY podcast_uri
-        ) episodes ON podcasts.uri = episodes.podcast_uri
-        INNER JOIN podcast_followed_entries AS followed_entries ON followed_entries.podcast_uri = episodes.podcast_uri
+            SELECT podcast_id, MAX(published) AS last_episode_date FROM episodes GROUP BY podcast_id
+        ) episodes ON podcasts.id = episodes.podcast_id
+        INNER JOIN podcast_followed_entries AS followed_entries ON followed_entries.podcast_id = episodes.podcast_id
         ORDER BY datetime(last_episode_date) DESC
         LIMIT :limit
         """
@@ -95,25 +96,4 @@ abstract class PodcastsDao {
 
     @Query("SELECT COUNT(*) FROM podcasts")
     abstract suspend fun count(): Int
-
-    /**
-     * The following methods should really live in a base interface. Unfortunately the Kotlin
-     * Compiler which we need to use for Compose doesn't work with that.
-     * TODO: remove this once we move to a more recent Kotlin compiler
-     */
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(entity: Podcast): Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertAll(vararg entity: Podcast)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertAll(entities: Collection<Podcast>)
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun update(entity: Podcast)
-
-    @Delete
-    abstract suspend fun delete(entity: Podcast): Int
 }

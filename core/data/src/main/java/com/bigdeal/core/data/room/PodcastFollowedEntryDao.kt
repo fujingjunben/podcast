@@ -23,36 +23,17 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.bigdeal.core.data.PodcastFollowedEntry
+import com.bigdeal.core.data.database.dao.BaseDao
 
 @Dao
-abstract class PodcastFollowedEntryDao {
-    @Query("DELETE FROM podcast_followed_entries WHERE podcast_uri = :podcastUri")
-    abstract suspend fun deleteWithPodcastUri(podcastUri: String)
+abstract class PodcastFollowedEntryDao : BaseDao<PodcastFollowedEntry> {
+    @Query("DELETE FROM podcast_followed_entries WHERE podcast_id = :podcastId")
+    abstract suspend fun deleteWithPodcastId(podcastId: String)
 
-    @Query("SELECT COUNT(*) FROM podcast_followed_entries WHERE podcast_uri = :podcastUri")
-    protected abstract suspend fun podcastFollowRowCount(podcastUri: String): Int
+    @Query("SELECT COUNT(*) FROM podcast_followed_entries WHERE podcast_id = :podcastId")
+    protected abstract suspend fun podcastFollowRowCount(podcastId: String): Int
 
-    suspend fun isPodcastFollowed(podcastUri: String): Boolean {
-        return podcastFollowRowCount(podcastUri) > 0
+    suspend fun isPodcastFollowed(podcastId: String): Boolean {
+        return podcastFollowRowCount(podcastId) > 0
     }
-
-    /**
-     * The following methods should really live in a base interface. Unfortunately the Kotlin
-     * Compiler which we need to use for Compose doesn't work with.
-     * TODO: remove this once we move to a more recent Kotlin compiler
-     */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(entity: PodcastFollowedEntry): Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertAll(vararg entity: PodcastFollowedEntry)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertAll(entities: Collection<PodcastFollowedEntry>)
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun update(entity: PodcastFollowedEntry)
-
-    @Delete
-    abstract suspend fun delete(entity: PodcastFollowedEntry): Int
 }

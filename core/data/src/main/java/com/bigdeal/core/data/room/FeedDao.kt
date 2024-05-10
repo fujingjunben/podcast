@@ -6,10 +6,11 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.bigdeal.core.data.FeedEntity
+import com.bigdeal.core.data.database.dao.BaseDao
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class FeedDao {
+abstract class FeedDao : BaseDao<FeedEntity> {
 
     @Query(
         """
@@ -17,10 +18,4 @@ abstract class FeedDao {
         """
     )
     abstract fun queryAll(): Flow<List<FeedEntity>>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(feedEntity: FeedEntity)
-
-    @Delete
-    abstract suspend fun delete(feedEntity: FeedEntity)
 }

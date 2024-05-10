@@ -18,8 +18,6 @@ import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.PlaylistAdd
-import androidx.compose.material.icons.rounded.PauseCircleFilled
-import androidx.compose.material.icons.rounded.PlayCircleFilled
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -38,14 +36,12 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.bigdeal.core.data.DownloadState
 import com.bigdeal.core.data.EpisodeEntity
 import com.bigdeal.core.data.Podcast
-import com.bigdeal.core.data.PlayState
-import com.bigdeal.core.data.url
+import com.bigdeal.podcast.core.model.EpisodeOfPodcast
 import com.bigdeal.podcast.ui.theme.Keyline1
 import timber.log.Timber
 import java.time.format.DateTimeFormatter
@@ -69,7 +65,7 @@ fun EpisodeList(
         item {
             header(this)
         }
-        items(episodes, key = { it.episode.uri }) { item ->
+        items(episodes, key = { it.episode.id }) { item ->
             EpisodeListItem(
                 episode = item.episode,
                 podcast = item.podcast,
@@ -95,7 +91,7 @@ fun EpisodeListItem(
     showPodcastImage: Boolean,
     modifier: Modifier = Modifier
 ) {
-    ConstraintLayout(modifier = modifier.clickable { onClick(podcast.uri, episode.uri) }) {
+    ConstraintLayout(modifier = modifier.clickable { onClick(podcast.id, episode.id) }) {
         val (
             divider, publishDate, episodeTitle, podcastTitle, image, playIcon,
             date, downloadIcon, addPlaylist, overflow

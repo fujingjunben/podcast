@@ -10,6 +10,7 @@ import java.time.OffsetDateTime
  * Episode data with necessary information to be used within a player.
  */
 data class PlayerEpisode(
+    val id: String = "",
     val uri: String = "",
     val title: String = "",
     val subTitle: String = "",
@@ -29,12 +30,13 @@ data class PlayerEpisode(
         author = episodeInfo.author,
         summary = episodeInfo.summary,
         podcastImageUrl = podcastInfo.imageUrl,
-        uri = episodeInfo.uri
+        uri = episodeInfo.uri,
     )
 }
 
 fun EpisodeToPodcast.toPlayerEpisode(): PlayerEpisode =
     PlayerEpisode(
+        id = episode.id,
         uri = episode.uri,
         title = episode.title,
         subTitle = episode.subtitle ?: "",

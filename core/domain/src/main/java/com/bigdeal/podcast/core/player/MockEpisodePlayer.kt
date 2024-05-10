@@ -7,14 +7,12 @@ import kotlin.reflect.KProperty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -112,7 +110,7 @@ class MockEpisodePlayer(
     }
 
     override fun play(playerEpisode: PlayerEpisode) {
-        if (_currentEpisode.value?.uri == playerEpisode.uri) {
+        if (_currentEpisode.value?.id == playerEpisode.id) {
             if (isPlaying.value) {
                 return
             } else {

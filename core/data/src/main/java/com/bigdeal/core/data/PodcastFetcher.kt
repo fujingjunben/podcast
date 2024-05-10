@@ -19,6 +19,7 @@ package com.bigdeal.core.data
 import coil.network.HttpException
 import com.bigdeal.core.Dispatcher
 import com.bigdeal.core.JetcasterDispatchers
+import com.bigdeal.core.data.extension.toSHA256
 import com.rometools.modules.itunes.EntryInformation
 import com.rometools.modules.itunes.FeedInformation
 import com.rometools.rome.feed.synd.SyndEntry
@@ -39,6 +40,7 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.io.encoding.Base64
 
 /**
  * A class which fetches some selected podcast RSS feeds.
@@ -111,8 +113,8 @@ sealed class PodcastRssResponse {
 
     data class Success(
         val podcast: Podcast,
-        val episodes: List<com.bigdeal.core.data.EpisodeEntity>,
-        val categories: Set<com.bigdeal.core.data.Category>
+        val episodes: List<EpisodeEntity>,
+        val categories: Set<Category>
     ) : PodcastRssResponse()
 }
 
@@ -125,6 +127,7 @@ private fun SyndFeed.toPodcastResponse(feedUrl: String): PodcastRssResponse {
 
     val feedInfo = getModule(PodcastModuleDtd) as? FeedInformation
     val podcast = Podcast(
+        id = podcastUri.toSHA256(),
         uri = podcastUri,
         title = title,
         description = feedInfo?.summary ?: description,
@@ -134,7 +137,7 @@ private fun SyndFeed.toPodcastResponse(feedUrl: String): PodcastRssResponse {
     )
 
     val categories = feedInfo?.categories
-        ?.map { com.bigdeal.core.data.Category(name = it.name) }
+        ?.map { Category(name = it.name) }
         ?.toSet() ?: emptySet()
 
     return PodcastRssResponse.Success(podcast, episodes, categories)
@@ -143,11 +146,13 @@ private fun SyndFeed.toPodcastResponse(feedUrl: String): PodcastRssResponse {
 /**
  * Map a Rome [SyndEntry] instance to our own [EpisodeEntity] data class.
  */
-private fun SyndEntry.toEpisode(podcastUri: String): com.bigdeal.core.data.EpisodeEntity {
+private fun SyndEntry.toEpisode(podcastUri: String): EpisodeEntity {
     val entryInformation = getModule(PodcastModuleDtd) as? EntryInformation
-    return com.bigdeal.core.data.EpisodeEntity(
-        uri = if (enclosures.isEmpty()) "" else enclosures[0].url,
-        podcastUri = podcastUri,
+    val uri = if (enclosures.isEmpty()) "" else enclosures[0].url
+    return EpisodeEntity(
+        uri = uri,
+        id = uri.toSHA256(),
+        podcastId = podcastUri.toSHA256(),
         title = title,
         author = author,
         summary = entryInformation?.summary ?: description?.value,

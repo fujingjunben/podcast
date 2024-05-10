@@ -10,16 +10,16 @@ import com.bigdeal.core.data.Podcast
 import com.bigdeal.core.data.PodcastStore
 import com.bigdeal.core.data.PodcastWithExtraInfo
 import com.bigdeal.core.data.PodcastsRepository
+import com.bigdeal.core.data.extension.toSHA256
 import com.bigdeal.podcast.core.player.EpisodePlayer
-import com.bigdeal.podcast.core.player.MockEpisodePlayer
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
-import com.bigdeal.podcast.core.player.service.PlayerController
-import com.bigdeal.podcast.ui.v2.common.EpisodeOfPodcast
+import com.bigdeal.podcast.core.model.EpisodeOfPodcast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,10 +48,11 @@ class FavouriteViewModel @Inject constructor(
         viewModelScope.launch {
             podcastStore.followedPodcastsSortedByLastEpisode()
                 .flatMapLatest { podcastWithExtraInfoList: List<PodcastWithExtraInfo> ->
+                    Timber.d("podcastWithExtra: ${podcastWithExtraInfoList.size}")
                     val episodeToPodcasts: List<Flow<Pair<Podcast, List<EpisodeEntity>>>> =
                         podcastWithExtraInfoList.map { podcastWithExtraInfo ->
                             episodeStore.episodesInPodcast(
-                                podcastWithExtraInfo.podcast.uri,
+                                podcastWithExtraInfo.podcast.id,
                                 limit = pageSize
                             )
                                 .map { episodeEntities: List<EpisodeEntity> ->
@@ -77,18 +78,18 @@ class FavouriteViewModel @Inject constructor(
         }
     }
 
-    fun onPodcastUnfollowed(podcastUri: String) {
+    fun onPodcastUnfollowed(podcastId: String) {
         viewModelScope.launch {
-            podcastStore.unfollowPodcast(podcastUri)
+            podcastStore.unfollowPodcast(podcastId)
         }
     }
 
-    fun addFeed(podcastUri: String) {
+    fun addFeed(podcastUrl: String) {
         viewModelScope.launch {
+            val feedEntity = async { feedRepository.addFeed(podcastUrl) }.await()
             awaitAll(
-                async { feedRepository.addFeed(podcastUri) },
-                async { podcastsRepository.fetchPodcasts(listOf(podcastUri)) },
-                async { podcastStore.followPodcast(podcastUri) }
+                async { podcastsRepository.fetchPodcasts(listOf(podcastUrl)) },
+                async { podcastStore.followPodcast(feedEntity.id) }
             )
         }
     }
