@@ -8,21 +8,15 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
-import com.bigdeal.core.data.EpisodeStateEntity
-import com.bigdeal.core.data.EpisodeStore
-import com.bigdeal.core.data.PlayState
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 import java.lang.Runnable
 import java.time.Duration
 
 class PlayerControllerImpl(
-    private val episodeStore: EpisodeStore,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
 ) : PlayerController() {
     private lateinit var controllerFuture: ListenableFuture<MediaController>
     private val mController: MediaController?
@@ -42,10 +36,10 @@ class PlayerControllerImpl(
         releaseController()
     }
 
-    override fun play(episode: PlayerEpisode) {
+    override fun play(episode: PlayerEpisode, duration: Duration) {
         Timber.d("play episode: $episode")
         _currentEpisode = episode
-        mController?.play(episode)
+        mController?.play(episode, duration.toMillis())
     }
 
     override fun pause() {
@@ -53,7 +47,6 @@ class PlayerControllerImpl(
     }
 
     override fun seekTo(duration: Duration) {
-        positionState.update { duration }
         _currentEpisode?.let { mController?.play(it, duration.toMillis()) }
     }
 
@@ -63,6 +56,26 @@ class PlayerControllerImpl(
 
     override fun setRepeatMode(mode: Int) {
         mController?.repeatMode = mode
+    }
+
+    override fun addToQueue(episode: PlayerEpisode) {
+        mController?.apply {
+            addMediaItem(buildMediaItem(episode))
+        }
+        Timber.d("mediaItemCount: ${mController?.mediaItemCount}")
+    }
+
+    override fun removeAllFromQueue() {
+        TODO("Not yet implemented")
+    }
+
+    override fun addPlayerListener(listener: Player.Listener) {
+        Timber.d("addPlayerListener")
+        mController?.addListener(listener)
+    }
+
+    override fun getMediaController(): MediaController? {
+        return mController
     }
 
     override fun seekForward() {
@@ -133,7 +146,6 @@ class PlayerControllerImpl(
     private fun updateProgressBar() {
         // update progress bar - only if controller is prepared with a media item
         val position = mController?.currentPosition ?: 0L
-        positionState.update { Duration.ofMillis(position)}
         if (mController?.hasMediaItems() == true) {
 //            updateEpisode(episodeState.position(position), true)
         }
@@ -151,9 +163,24 @@ class PlayerControllerImpl(
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
+            playerState.value = PlayerEvent.IsPlayingChanged(isPlaying)
             if (isPlaying) {
-                togglePeriodicProgressUpdateRequest()
             }
+        }
+
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            super.onPlaybackStateChanged(playbackState)
+            playerState.value = PlayerEvent.PlaybackStateChanged(playbackState)
+            when(playbackState) {
+                Player.STATE_READY -> Timber.tag("mockplayer").d("ready")
+                Player.STATE_IDLE -> Timber.tag("mockplayer").d("idle")
+                Player.STATE_ENDED -> Timber.tag("mockplayer").d("end")
+                else -> {}
+            }
+        }
+
+        override fun onEvents(player: Player, events: Player.Events) {
+            super.onEvents(player, events)
         }
     }
 }

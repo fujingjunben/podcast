@@ -74,7 +74,8 @@ fun Favourite(
                             onPlay(playerEpisode.id)
                             viewModel.play(playerEpisode)
                         }
-                    }
+                    },
+                    onAddToQueue = {playerEpisode ->  viewModel.onAddToQueue(playerEpisode)}
                 ) {
                     FollowedPodcasts(
                         podcasts = episodeOfPodcasts.map { it.podcast }

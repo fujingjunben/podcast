@@ -42,6 +42,7 @@ fun EpisodeScreen(
                 podcast = item.podcast,
                 onClick = { podcastId, _ -> navigateToPodcast(podcastId)},
                 onPlay = { onPlay(item.episode.id) },
+                onAddToQueue = { },
                 onDownload = {},
                 onCancelDownload = {},
                 showPodcastImage = false,

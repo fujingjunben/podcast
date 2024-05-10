@@ -41,6 +41,7 @@ fun PodcastScreen(
             navigateToEpisode = navigateToEpisode,
             showPodcastImage = false,
             onPlay = { playerEpisode -> onPlay(playerEpisode.id) },
+            onAddToQueue = {},
             header = {
                 PodcastInfo(uiState.podcast)
             })

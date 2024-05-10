@@ -97,6 +97,10 @@ class FavouriteViewModel @Inject constructor(
     fun play(playerEpisode: PlayerEpisode) {
         episodePlayer.play(playerEpisode)
     }
+
+    fun onAddToQueue(playerEpisode: PlayerEpisode) {
+        episodePlayer.addToQueue(playerEpisode)
+    }
 }
 
 data class FavouriteViewModelState(

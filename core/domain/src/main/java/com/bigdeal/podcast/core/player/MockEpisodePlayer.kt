@@ -1,20 +1,24 @@
 package com.bigdeal.podcast.core.player
 
+import androidx.media3.common.Player
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.core.player.service.PlayerController
-import java.time.Duration
-import kotlin.reflect.KProperty
+import com.bigdeal.podcast.core.player.service.PlayerEvent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.time.Duration
+import kotlin.reflect.KProperty
 
 class MockEpisodePlayer(
     mainDispatcher: CoroutineDispatcher,
@@ -25,7 +29,7 @@ class MockEpisodePlayer(
     private val _currentEpisode = MutableStateFlow<PlayerEpisode?>(null)
     private val queue = MutableStateFlow<List<PlayerEpisode>>(emptyList())
     private val isPlaying = MutableStateFlow(false)
-    private val timeElapsed = playerController.positionState.asStateFlow()
+    private val timeElapsed = MutableStateFlow(Duration.ZERO)
     private val _playerSpeed = MutableStateFlow(DefaultPlaybackSpeed)
     private val coroutineScope = CoroutineScope(mainDispatcher)
 
@@ -54,18 +58,19 @@ class MockEpisodePlayer(
             }.collect {
                 _playerState.value = it
             }
+        }
 
-            timeElapsed.collect {
-                val episode = _currentEpisode.value
-                while (episode != null
-                    && (timeElapsed.value >
-                            episode.duration?.minus(Duration.ofSeconds(5)))) {
-                    Timber.d("the episode is end")
-                    isPlaying.value = false
+        coroutineScope.launch {
+            playerController.playerState.collect { playerEvent ->
+                Timber.d("mockplayer playerstate")
+                when (playerEvent) {
+                    is PlayerEvent.IsPlayingChanged -> {
+                        if (playerEvent.isPlaying) {
 
-                    if (hasNext()) {
-                        next()
+                        }
                     }
+
+                    else -> {}
                 }
             }
         }
@@ -80,6 +85,7 @@ class MockEpisodePlayer(
         queue.update {
             it + episode
         }
+
     }
 
     override fun removeAllFromQueue() {
@@ -93,37 +99,35 @@ class MockEpisodePlayer(
         }
 
         val episode = _currentEpisode.value ?: return
-
         isPlaying.value = true
+        playerController.play(episode, timeElapsed.value)
 
-        playerController.play(episode)
+        timerJob = coroutineScope.launch {
+            // Increment timer by a second
+            while (isActive && timeElapsed.value < episode.duration) {
+                delay(playerSpeed.toMillis())
+                timeElapsed.update { it + playerSpeed }
+            }
+
+            // Once done playing, see if
+            isPlaying.value = false
+            timeElapsed.value = Duration.ZERO
+
+            if (hasNext()) {
+                next()
+            }
+        }
     }
 
     override fun continuePlay() {
-        if (isPlaying.value) {
-            return
-        }
-
-        val episode = _currentEpisode.value ?: return
-
-        isPlaying.value = true
-
-        playerController.continuePlay()
+        play()
     }
 
     override fun play(playerEpisode: PlayerEpisode) {
-        if (_currentEpisode.value?.id == playerEpisode.id) {
-            if (isPlaying.value) {
-                return
-            } else {
-                isPlaying.value = true
-                playerController.continuePlay()
-            }
-        } else {
+        if (_currentEpisode.value?.id != playerEpisode.id) {
             _currentEpisode.value = playerEpisode
-            isPlaying.value = true
-            playerController.play(playerEpisode)
         }
+        play()
     }
 
     override fun play(playerEpisodes: List<PlayerEpisode>) {
@@ -169,12 +173,16 @@ class MockEpisodePlayer(
 
     override fun advanceBy(duration: Duration) {
         val currentEpisodeDuration = _currentEpisode.value?.duration ?: return
-        val offset = timeElapsed.value.plus(duration).coerceIn(Duration.ZERO, currentEpisodeDuration)
-//        playerController.seekTo(offset)
+        timeElapsed.update {
+            (it + duration).coerceAtMost(currentEpisodeDuration)
+        }
         playerController.seekForward()
     }
 
     override fun rewindBy(duration: Duration) {
+        timeElapsed.update {
+            (it - duration).coerceAtLeast(Duration.ZERO)
+        }
         playerController.seekBack()
     }
 
@@ -186,8 +194,8 @@ class MockEpisodePlayer(
     override fun onSeekingFinished(duration: Duration) {
         val currentEpisodeDuration = _currentEpisode.value?.duration ?: return
         val time = duration.coerceIn(Duration.ZERO, currentEpisodeDuration)
-        isPlaying.value = true
-        playerController.seekTo(time)
+        timeElapsed.update { time }
+        play()
     }
 
     override fun increaseSpeed(speed: Duration) {
@@ -208,6 +216,7 @@ class MockEpisodePlayer(
             return
         }
 
+        timeElapsed.value = Duration.ZERO
         val nextEpisode = q[0]
         currentEpisode = nextEpisode
         queue.value = q - nextEpisode
@@ -215,6 +224,7 @@ class MockEpisodePlayer(
     }
 
     override fun previous() {
+        timeElapsed.value = Duration.ZERO
         isPlaying.value = false
         timerJob?.cancel()
         timerJob = null

@@ -127,7 +127,7 @@ private fun PlayerScreen(
 ) {
     DisposableEffect(Unit) {
         onDispose {
-            onStop()
+//            onStop()
         }
     }
 

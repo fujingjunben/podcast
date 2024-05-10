@@ -37,9 +37,8 @@ object DomainDiModule {
     @Provides
     @Singleton
     fun providePlayerController(
-        episodeStore: EpisodeStore
     ): PlayerController =
-        PlayerControllerImpl(episodeStore)
+        PlayerControllerImpl()
 
     @Provides
     @Singleton

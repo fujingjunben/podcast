@@ -54,6 +54,7 @@ fun EpisodeList(
     episodes: List<EpisodeOfPodcast>,
     navigateToEpisode: (String, String) -> Unit,
     onPlay: (PlayerEpisode) -> Unit,
+    onAddToQueue: (PlayerEpisode) -> Unit,
     showPodcastImage: Boolean = true,
     episodeViewModel: EpisodeViewModel = hiltViewModel(),
     header: @Composable LazyItemScope.() -> Unit = {},
@@ -71,6 +72,7 @@ fun EpisodeList(
                 podcast = item.podcast,
                 onClick = navigateToEpisode,
                 onPlay = { onPlay(item.toEpisode()) },
+                onAddToQueue = {onAddToQueue(item.toEpisode())},
                 onDownload = { episodeViewModel.download(item) },
                 onCancelDownload = { episodeViewModel.cancelDownload(item) },
                 showPodcastImage = showPodcastImage,
@@ -86,6 +88,7 @@ fun EpisodeListItem(
     podcast: Podcast,
     onClick: (String, String) -> Unit,
     onPlay: () -> Unit,
+    onAddToQueue: () -> Unit,
     onDownload: () -> Unit,
     onCancelDownload: () -> Unit,
     showPodcastImage: Boolean,
@@ -254,7 +257,7 @@ fun EpisodeListItem(
             }
 
             IconButton(
-                onClick = { /* TODO */ },
+                onClick = { onAddToQueue() },
                 modifier = Modifier.constrainAs(addPlaylist) {
                     end.linkTo(overflow.start)
                     centerVerticallyTo(playIcon)
