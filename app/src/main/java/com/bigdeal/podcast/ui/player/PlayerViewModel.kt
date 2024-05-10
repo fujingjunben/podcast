@@ -71,7 +71,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun onPlay() {
-        episodePlayer.play()
+        episodePlayer.continuePlay()
     }
 
     fun onPause() {

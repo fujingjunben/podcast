@@ -46,6 +46,8 @@ interface EpisodePlayer {
      */
     fun play()
 
+    fun continuePlay()
+
     /**
      * Plays the specified episode
      */

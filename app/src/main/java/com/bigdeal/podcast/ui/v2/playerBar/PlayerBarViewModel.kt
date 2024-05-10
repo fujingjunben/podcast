@@ -10,6 +10,7 @@ import com.bigdeal.core.data.EpisodeStore
 import com.bigdeal.core.data.EpisodeToPodcast
 import com.bigdeal.podcast.core.player.EpisodePlayer
 import com.bigdeal.podcast.core.player.EpisodePlayerState
+import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.core.player.model.toPlayerEpisode
 import com.bigdeal.podcast.core.player.service.PlayerController
 import com.bigdeal.podcast.ui.player.PlayerUiState
@@ -46,8 +47,8 @@ class PlayerBarViewModel @AssistedInject constructor(
     }
 
 
-    fun play() {
-        episodePlayer.play()
+    fun play(playerEpisode: PlayerEpisode) {
+        episodePlayer.continuePlay()
     }
 
     fun pause() {

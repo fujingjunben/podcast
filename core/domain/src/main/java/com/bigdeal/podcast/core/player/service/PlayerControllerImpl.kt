@@ -71,9 +71,6 @@ class PlayerControllerImpl(
         releaseController()
     }
 
-    /**
-     * 上一次播放的状态需要保存，不然每次都是ready
-     */
     override fun play(episode: PlayerEpisode) {
         Timber.d("play episode: $episode")
         _currentEpisode = episode
@@ -84,8 +81,9 @@ class PlayerControllerImpl(
         mController?.pause()
     }
 
-    override fun seekTo(timeOffset: Long) {
-        _currentEpisode?.let { mController?.play(it, timeOffset) }
+    override fun seekTo(duration: Duration) {
+        positionState.update { duration }
+        _currentEpisode?.let { mController?.play(it, duration.toMillis()) }
     }
 
     override fun seekBack() {
@@ -160,7 +158,7 @@ class PlayerControllerImpl(
     private fun updateProgressBar() {
         // update progress bar - only if controller is prepared with a media item
         val position = mController?.currentPosition ?: 0L
-        positionState.update { Duration.ofSeconds(position)}
+        positionState.update { Duration.ofMillis(position)}
         if (mController?.hasMediaItems() == true) {
 //            updateEpisode(episodeState.position(position), true)
         }

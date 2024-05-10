@@ -41,6 +41,7 @@ import coil.compose.AsyncImagePainter
 import coil.request.ImageRequest
 import com.bigdeal.podcast.R
 import com.bigdeal.core.data.EpisodeToPodcast
+import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.ui.Screen
 import com.bigdeal.podcast.ui.player.PlayerUiState
 import com.bigdeal.podcast.ui.v2.favourite.FavouriteUiState
@@ -55,7 +56,7 @@ fun PlayerBar(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     PlayerBarContent(
         uiState,
-        onPlay = { viewModel.play() },
+        onPlay = { playerEpisode -> viewModel.play(playerEpisode) },
         onPause = { viewModel.pause() },
         modifier,
     ) { episodeUri ->
@@ -70,7 +71,7 @@ fun PlayerBar(
 @Composable
 fun PlayerBarContent(
     uiState: PlayerUiState,
-    onPlay: () -> Unit,
+    onPlay: (PlayerEpisode) -> Unit,
     onPause: () -> Unit,
     modifier: Modifier,
     navigateToPlayer: (String) -> Unit
@@ -135,7 +136,7 @@ fun PlayerBarContent(
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = rememberRipple(bounded = false, radius = 24.dp)
-                            ) { onPlay() }
+                            ) { onPlay(episode) }
                     )
                 }
 

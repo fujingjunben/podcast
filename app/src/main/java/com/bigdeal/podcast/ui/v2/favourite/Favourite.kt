@@ -70,11 +70,16 @@ fun Favourite(
                 EpisodeList(
                     episodeOfPodcasts,
                     navigateToEpisode,
-                    onPlay = {url -> onPlay(url)}
+                    onPlay = { playerEpisode ->
+                        run {
+                            onPlay(playerEpisode.uri)
+                            viewModel.play(playerEpisode)
+                        }
+                    }
                 ) {
                     FollowedPodcasts(
                         podcasts = episodeOfPodcasts.map { it.podcast }
-                        .distinctBy { it.uri },
+                            .distinctBy { it.uri },
                         navigateToPodcast = navigateToPodcast,
                         onPodcastUnfollowed = viewModel::onPodcastUnfollowed
                     )

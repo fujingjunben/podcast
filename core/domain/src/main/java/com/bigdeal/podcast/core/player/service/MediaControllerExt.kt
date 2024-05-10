@@ -38,7 +38,7 @@ fun MediaController.continuePlayback() {
 
 /* Starts the sleep timer */
 fun MediaController.startSleepTimer() {
-    sendCustomCommand(SessionCommand(com.bigdeal.podcast.core.player.service.Keys.CMD_START_SLEEP_TIMER, Bundle.EMPTY), Bundle.EMPTY)
+    sendCustomCommand(SessionCommand(Keys.CMD_START_SLEEP_TIMER, Bundle.EMPTY), Bundle.EMPTY)
 }
 
 

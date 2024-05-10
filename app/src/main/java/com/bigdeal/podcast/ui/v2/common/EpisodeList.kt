@@ -51,12 +51,13 @@ import timber.log.Timber
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import com.bigdeal.podcast.R
+import com.bigdeal.podcast.core.player.model.PlayerEpisode
 
 @Composable
 fun EpisodeList(
     episodes: List<EpisodeOfPodcast>,
     navigateToEpisode: (String, String) -> Unit,
-    onPlay: (String) -> Unit,
+    onPlay: (PlayerEpisode) -> Unit,
     showPodcastImage: Boolean = true,
     episodeViewModel: EpisodeViewModel = hiltViewModel(),
     header: @Composable LazyItemScope.() -> Unit = {},
@@ -73,7 +74,7 @@ fun EpisodeList(
                 episode = item.episode,
                 podcast = item.podcast,
                 onClick = navigateToEpisode,
-                onPlay = { onPlay(item.episode.url()) },
+                onPlay = { onPlay(item.toEpisode()) },
                 onDownload = { episodeViewModel.download(item) },
                 onCancelDownload = { episodeViewModel.cancelDownload(item) },
                 showPodcastImage = showPodcastImage,

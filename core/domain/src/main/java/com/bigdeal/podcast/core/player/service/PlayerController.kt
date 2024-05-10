@@ -15,7 +15,7 @@ abstract class PlayerController {
 
     abstract fun pause()
 
-    abstract fun seekTo(timeOffset: Long)
+    abstract fun seekTo(duration: Duration)
 
     abstract fun seekForward()
 

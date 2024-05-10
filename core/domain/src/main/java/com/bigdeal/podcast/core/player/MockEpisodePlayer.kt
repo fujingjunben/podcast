@@ -93,11 +93,35 @@ class MockEpisodePlayer(
         val episode = _currentEpisode.value ?: return
 
         isPlaying.value = true
+
         playerController.play(episode)
     }
 
+    override fun continuePlay() {
+        if (isPlaying.value) {
+            return
+        }
+
+        val episode = _currentEpisode.value ?: return
+
+        isPlaying.value = true
+
+        playerController.continuePlay()
+    }
+
     override fun play(playerEpisode: PlayerEpisode) {
-        play(listOf(playerEpisode))
+        if (_currentEpisode.value?.uri == playerEpisode.uri) {
+            if (isPlaying.value) {
+                return
+            } else {
+                isPlaying.value = true
+                playerController.continuePlay()
+            }
+        } else {
+            _currentEpisode.value = playerEpisode
+            isPlaying.value = true
+            playerController.play(playerEpisode)
+        }
     }
 
     override fun play(playerEpisodes: List<PlayerEpisode>) {
@@ -130,6 +154,7 @@ class MockEpisodePlayer(
 
     override fun pause() {
         isPlaying.value = false
+        playerController.pause()
 
         timerJob?.cancel()
         timerJob = null
@@ -144,7 +169,9 @@ class MockEpisodePlayer(
 
     override fun advanceBy(duration: Duration) {
         val currentEpisodeDuration = _currentEpisode.value?.duration ?: return
-        playerController.seekTo(currentEpisodeDuration.toSeconds())
+        val offset = timeElapsed.value.plus(duration).coerceIn(Duration.ZERO, currentEpisodeDuration)
+//        playerController.seekTo(offset)
+        playerController.seekForward()
     }
 
     override fun rewindBy(duration: Duration) {
@@ -159,7 +186,8 @@ class MockEpisodePlayer(
     override fun onSeekingFinished(duration: Duration) {
         val currentEpisodeDuration = _currentEpisode.value?.duration ?: return
         val time = duration.coerceIn(Duration.ZERO, currentEpisodeDuration)
-        playerController.seekTo(time.toSeconds())
+        isPlaying.value = true
+        playerController.seekTo(time)
     }
 
     override fun increaseSpeed(speed: Duration) {
