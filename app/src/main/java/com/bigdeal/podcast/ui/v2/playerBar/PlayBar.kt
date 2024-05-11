@@ -80,7 +80,6 @@ fun PlayerBarContent(
             Row(
                 modifier = modifier
                     .height(50.dp)
-                    .background(color = Color.Red)
                     .padding(end = 10.dp)
                     .clickable {
                         navigateToPlayer(episode.id)

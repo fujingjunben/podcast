@@ -11,7 +11,6 @@ data class EpisodeOfPodcast(
     val episode: EpisodeEntity
 ) {
     fun toEpisode(): PlayerEpisode {
-        Timber.d("episodeOfPodcast: $episode")
         return PlayerEpisode(
             id = episode.id,
             uri = episode.url(),

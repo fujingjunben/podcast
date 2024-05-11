@@ -66,63 +66,63 @@ fun Favourite(
 //        },
 //        modifier = modifier
 //    ) { contentPadding ->
-        Column(
-            modifier = modifier.systemBarsPadding()
-        ) {
-            val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
-            FavouriteAppBar(
-                onFollow = { url -> viewModel.addFeed(url) },
-                backgroundColor = appBarColor,
-                modifier = Modifier.fillMaxWidth(),
-            )
+    Column(
+        modifier = modifier.systemBarsPadding()
+    ) {
+        val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
+        FavouriteAppBar(
+            onFollow = { url -> viewModel.addFeed(url) },
+            backgroundColor = appBarColor,
+            modifier = Modifier.fillMaxWidth(),
+        )
 
-            when (uiState) {
-                is FavouriteUiState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-                    ) {
-                        Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
-                    }
+        when (uiState) {
+            is FavouriteUiState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+                ) {
+                    Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
                 }
+            }
 
-                is FavouriteUiState.Success -> {
-                    val episodeOfPodcasts = (uiState as FavouriteUiState.Success).episodeOfPodcasts
+            is FavouriteUiState.Success -> {
+                val episodeOfPodcasts = (uiState as FavouriteUiState.Success).episodeOfPodcasts
 
-                    EpisodeList(
-                        (uiState as FavouriteUiState.Success).episodePlayerState!!,
-                        episodeOfPodcasts,
-                        navigateToEpisode,
-                        episodeActions = EpisodeActions(
-                            onPlay = { playerEpisode ->
-                                run {
-                                    onPlay(playerEpisode.id)
-                                    viewModel.play(playerEpisode)
-                                }
-                            },
-                            onPause = viewModel::pause,
-                            onAddToQueue = { playerEpisode ->
-                                run {
+                EpisodeList(
+                    (uiState as FavouriteUiState.Success).episodePlayerState!!,
+                    episodeOfPodcasts,
+                    navigateToEpisode,
+                    episodeActions = EpisodeActions(
+                        onPlay = { playerEpisode ->
+                            run {
+                                onPlay(playerEpisode.id)
+                                viewModel.play(playerEpisode)
+                            }
+                        },
+                        onPause = viewModel::pause,
+                        onAddToQueue = { playerEpisode ->
+                            run {
 //                                    coroutineScope.launch {
 //                                        snackbarHostState.showSnackbar(snackBarText)
 //                                    }
-                                    viewModel.addToQueue(playerEpisode)
-                                }
-                            },
-                            onDownload = viewModel::download,
-                            onCancelDownload = viewModel::cancelDownload,
-                            onDeleteDownload = viewModel::deleteDownload,
-                        )
-                    ) {
-                        FollowedPodcasts(
-                            podcasts = episodeOfPodcasts.map { it.podcast }
-                                .distinctBy { it.uri },
-                            navigateToPodcast = navigateToPodcast,
-                            onPodcastUnfollowed = viewModel::onPodcastUnfollowed
-                        )
-                    }
+                                viewModel.addToQueue(playerEpisode)
+                            }
+                        },
+                        onDownload = viewModel::download,
+                        onCancelDownload = viewModel::cancelDownload,
+                        onDeleteDownload = viewModel::deleteDownload,
+                    )
+                ) {
+                    FollowedPodcasts(
+                        podcasts = episodeOfPodcasts.map { it.podcast }
+                            .distinctBy { it.uri },
+                        navigateToPodcast = navigateToPodcast,
+                        onPodcastUnfollowed = viewModel::onPodcastUnfollowed
+                    )
                 }
             }
         }
+    }
 //    }
 }
 

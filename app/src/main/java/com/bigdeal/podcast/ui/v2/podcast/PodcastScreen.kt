@@ -1,13 +1,17 @@
 package com.bigdeal.podcast.ui.v2.podcast
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -21,6 +25,7 @@ import com.bigdeal.podcast.R
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
 import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.ui.v2.favourite.EpisodeActions
+import com.bigdeal.podcast.ui.v2.favourite.FavouriteUiState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -40,27 +45,35 @@ fun PodcastScreen(
             modifier = Modifier.fillMaxWidth(),
             onBackPress
         )
-        EpisodeList(
-            episodePlayerState = EpisodePlayerState(),
-            episodes = uiState.episodeOfPodcasts,
-            navigateToEpisode = navigateToEpisode,
-            showPodcastImage = false,
-            episodeActions = EpisodeActions(
-                onPlay = { playerEpisode ->
-                    run {
-                        onPlay(playerEpisode.id)
-                    }
-                },
-                onPause = {},
-                onAddToQueue = {
-                },
-                onDownload = {},
-                onCancelDownload = {},
-                onDeleteDownload = {},
-            ),
-            header = {
-                PodcastInfo(uiState.episodeOfPodcasts[0])
-            })
+        if (!uiState.isLoading) {
+            EpisodeList(
+                episodePlayerState = EpisodePlayerState(),
+                episodes = uiState.episodeOfPodcasts,
+                navigateToEpisode = navigateToEpisode,
+                showPodcastImage = false,
+                episodeActions = EpisodeActions(
+                    onPlay = { playerEpisode ->
+                        run {
+                            onPlay(playerEpisode.id)
+                        }
+                    },
+                    onPause = {},
+                    onAddToQueue = {
+                    },
+                    onDownload = {},
+                    onCancelDownload = {},
+                    onDeleteDownload = {},
+                ),
+                header = {
+                    PodcastInfo(uiState.episodeOfPodcasts[0])
+                })
+        } else {
+                Box(
+                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+                ) {
+                    Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
+                }
+        }
     }
 }
 
