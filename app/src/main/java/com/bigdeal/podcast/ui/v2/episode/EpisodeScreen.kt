@@ -12,8 +12,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bigdeal.core.data.url
 import com.bigdeal.podcast.R
+import com.bigdeal.podcast.core.player.model.toPlayerEpisode
 import com.bigdeal.podcast.ui.v2.common.EpisodeListItem
 import com.bigdeal.podcast.ui.v2.common.PodcastTitleCard
 
@@ -23,10 +25,10 @@ fun EpisodeScreen(
     navigateToPodcast: (String) -> Unit,
     onPlay: (String) -> Unit,
     modifier: Modifier,
-    episodeScreenViewModel: EpisodeScreenViewModel = hiltViewModel()
+    viewModel: EpisodeScreenViewModel = hiltViewModel()
 ) {
-    val uiState by episodeScreenViewModel.uiState.collectAsState()
-    val item = uiState.episodeOfPodcast
+    val uiState by viewModel.uiState.collectAsState()
+    val item = uiState.episodeToPodcast
     val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
     Column(modifier = modifier.systemBarsPadding()) {
         AppBar(
@@ -41,7 +43,10 @@ fun EpisodeScreen(
                 episode = item.episode,
                 podcast = item.podcast,
                 onClick = { podcastId, _ -> navigateToPodcast(podcastId)},
-                onPlay = { onPlay(item.episode.id) },
+                onPlay = {
+                    onPlay(item.episode.id)
+                    viewModel.play(item)
+                         },
                 onAddToQueue = { },
                 onDownload = {},
                 onCancelDownload = {},

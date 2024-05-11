@@ -5,9 +5,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bigdeal.core.data.EpisodeStore
+import com.bigdeal.core.data.EpisodeToPodcast
 import com.bigdeal.podcast.core.player.EpisodePlayer
 import com.bigdeal.podcast.ui.v2.Destination
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
+import com.bigdeal.podcast.core.player.model.toPlayerEpisode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -31,27 +33,20 @@ class EpisodeScreenViewModel @Inject constructor(
             Timber.d("episodeUri: $episodeUri")
             episodeStore.episodeAndPodcastWithId(episodeUri).collect { item ->
                 Timber.d("episodeAndPodcast: $item")
-                if (item != null) {
-                    viewModelState.update {
-                        it.copy(
-                            episodeOfPodcast =
-                            EpisodeOfPodcast(item.podcast, item.episode)
-                        )
-                    }
+                viewModelState.update {
+                    it.copy(
+                        episodeToPodcast = item
+                    )
                 }
             }
         }
     }
 
-    fun play(episodeOfPodcast: EpisodeOfPodcast) {
+    fun play(episodeToPodcast: EpisodeToPodcast) {
+        episodePlayer.play(episodeToPodcast.toPlayerEpisode())
     }
 }
 
 data class EpisodeUiState(
-    val episodeOfPodcast: EpisodeOfPodcast? = null
-)
-
-private data class EpisodeViewModelState(
-    val isLoading: Boolean = false,
-    val episodeOfPodcast: EpisodeOfPodcast? = null
+    val episodeToPodcast: EpisodeToPodcast? = null
 )
