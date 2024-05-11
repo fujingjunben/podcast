@@ -52,6 +52,7 @@ fun EpisodeScreen(
                 onDownload = {},
                 onCancelDownload = {},
                 showPodcastImage = false,
+                showSummary = true,
                 modifier = Modifier.fillMaxWidth(),
             )
 

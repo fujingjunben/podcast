@@ -22,6 +22,7 @@ import com.bigdeal.core.data.Podcast
 import com.bigdeal.podcast.ui.v2.common.EpisodeList
 import com.bigdeal.podcast.ui.v2.common.PodcastTitleCard
 import com.bigdeal.podcast.R
+import com.bigdeal.podcast.core.designsystem.component.HtmlTextContainer
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
 import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.ui.v2.favourite.EpisodeActions
@@ -51,6 +52,7 @@ fun PodcastScreen(
                 episodes = uiState.episodeOfPodcasts,
                 navigateToEpisode = navigateToEpisode,
                 showPodcastImage = false,
+                showSummary = true,
                 episodeActions = EpisodeActions(
                     onPlay = { playerEpisode ->
                         run {
@@ -64,6 +66,7 @@ fun PodcastScreen(
                     onCancelDownload = {},
                     onDeleteDownload = {},
                 ),
+
                 header = {
                     PodcastInfo(uiState.episodeOfPodcasts[0])
                 })
@@ -112,9 +115,11 @@ fun PodcastStatusBar() {
 @Composable
 fun PodcastDescription(description: String?) {
     if (description != null) {
-        Text(
-            text = description,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-        )
+        HtmlTextContainer(text = description) {
+            Text(
+                text = it,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+            )
+        }
     }
 }

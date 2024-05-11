@@ -92,6 +92,7 @@ fun Favourite(
                     (uiState as FavouriteUiState.Success).episodePlayerState!!,
                     episodeOfPodcasts,
                     navigateToEpisode,
+                    showSummary = false,
                     episodeActions = EpisodeActions(
                         onPlay = { playerEpisode ->
                             run {
