@@ -24,7 +24,6 @@ data class PlayerEpisode(
     val podcastImageUrl: String = "",
     val podcastId: String = "",
     val downloadState: DownloadState = DownloadState.NONE,
-    val isPlaying: Boolean = false
 ) {
     constructor(podcastInfo: PodcastInfo, episodeInfo: EpisodeInfo) : this(
         title = episodeInfo.title,

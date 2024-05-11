@@ -46,12 +46,13 @@ fun EpisodeScreen(
                     onPlay(playerEpisode.id)
                     viewModel.play(playerEpisode)
                 },
-                onPause = {},
+                onPause = viewModel::pause,
                 onAddToQueue = { },
                 onDownload = {},
                 onCancelDownload = {},
                 showPodcastImage = false,
                 modifier = Modifier.fillMaxWidth(),
+                isPlaying = uiState.episodePlayerState.isPlaying
             )
 
             if (playerEpisode.summary.isNotEmpty()) {

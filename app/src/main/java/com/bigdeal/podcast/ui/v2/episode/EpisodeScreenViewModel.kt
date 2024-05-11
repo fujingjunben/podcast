@@ -51,4 +51,8 @@ class EpisodeScreenViewModel @Inject constructor(
     fun play(playerEpisode: PlayerEpisode) {
         episodePlayer.play(playerEpisode)
     }
+
+    fun pause() {
+        episodePlayer.pause()
+    }
 }

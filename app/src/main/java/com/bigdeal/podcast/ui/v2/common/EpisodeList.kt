@@ -93,6 +93,7 @@ fun EpisodeListItem(
     onCancelDownload: () -> Unit,
     showPodcastImage: Boolean,
     modifier: Modifier = Modifier,
+    isPlaying: Boolean = false
 ) {
     ConstraintLayout(modifier = modifier.clickable {
         onClick(playerEpisode.podcastId, playerEpisode.id) }) {
@@ -190,8 +191,8 @@ fun EpisodeListItem(
                 }
             )
         }
-        val icon = if (playerEpisode.isPlaying) Icons.Filled.PauseCircleOutline else Icons.Default.PlayCircleOutline
-        val onClickEvent = if (playerEpisode.isPlaying) onPause else onPlay
+        val icon = if (isPlaying) Icons.Filled.PauseCircleOutline else Icons.Default.PlayCircleOutline
+        val onClickEvent = if (isPlaying) onPause else onPlay
         Image(
             imageVector = icon,
             contentDescription = stringResource(R.string.cd_play),
