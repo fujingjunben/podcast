@@ -100,6 +100,8 @@ class MockEpisodePlayer(
 
         val episode = _currentEpisode.value ?: return
         isPlaying.value = true
+
+        _currentEpisode.update { it?.copy(isPlaying = true) }
         playerController.play(episode, timeElapsed.value)
 
         timerJob = coroutineScope.launch {
@@ -113,6 +115,7 @@ class MockEpisodePlayer(
 
             // Once done playing, see if
             isPlaying.value = false
+            _currentEpisode.update { it?.copy(isPlaying = false) }
             timeElapsed.value = Duration.ZERO
 
             if (hasNext()) {
@@ -162,6 +165,7 @@ class MockEpisodePlayer(
 
     override fun pause() {
         isPlaying.value = false
+        _currentEpisode.update { it?.copy(isPlaying = false) }
         playerController.pause()
 
         timerJob?.cancel()
@@ -228,6 +232,7 @@ class MockEpisodePlayer(
     override fun previous() {
         timeElapsed.value = Duration.ZERO
         isPlaying.value = false
+        _currentEpisode.update { it?.copy(isPlaying = false) }
         timerJob?.cancel()
         timerJob = null
     }

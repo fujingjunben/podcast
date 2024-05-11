@@ -16,7 +16,10 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.DownloadDone
 import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.PauseCircleFilled
+import androidx.compose.material.icons.filled.PauseCircleOutline
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.material.icons.filled.PlaylistAdd
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -39,8 +42,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.bigdeal.core.data.DownloadState
-import com.bigdeal.core.data.EpisodeEntity
-import com.bigdeal.core.data.Podcast
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
 import com.bigdeal.podcast.ui.theme.Keyline1
 import timber.log.Timber
@@ -48,15 +49,14 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import com.bigdeal.podcast.R
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
+import com.bigdeal.podcast.ui.v2.favourite.EpisodeActions
 
 @Composable
 fun EpisodeList(
     episodes: List<EpisodeOfPodcast>,
     navigateToEpisode: (String, String) -> Unit,
-    onPlay: (PlayerEpisode) -> Unit,
-    onAddToQueue: (PlayerEpisode) -> Unit,
+    episodeActions: EpisodeActions,
     showPodcastImage: Boolean = true,
-    episodeViewModel: EpisodeViewModel = hiltViewModel(),
     header: @Composable LazyItemScope.() -> Unit = {},
 ) {
     LazyColumn(
@@ -68,13 +68,13 @@ fun EpisodeList(
         }
         items(episodes, key = { it.episode.id }) { item ->
             EpisodeListItem(
-                episode = item.episode,
-                podcast = item.podcast,
+                playerEpisode = item.toEpisode() ,
                 onClick = navigateToEpisode,
-                onPlay = { onPlay(item.toEpisode()) },
-                onAddToQueue = {onAddToQueue(item.toEpisode())},
-                onDownload = { episodeViewModel.download(item) },
-                onCancelDownload = { episodeViewModel.cancelDownload(item) },
+                onPlay = { episodeActions.onPlay(item.toEpisode()) },
+                onPause = episodeActions.onPause,
+                onAddToQueue = {episodeActions.onAddToQueue(item.toEpisode())},
+                onDownload = { episodeActions.onDownload(item.episode) },
+                onCancelDownload = { episodeActions.onCancelDownload(item.episode) },
                 showPodcastImage = showPodcastImage,
                 modifier = Modifier.fillParentMaxWidth()
             )
@@ -84,17 +84,18 @@ fun EpisodeList(
 
 @Composable
 fun EpisodeListItem(
-    episode: EpisodeEntity,
-    podcast: Podcast,
+    playerEpisode: PlayerEpisode,
     onClick: (String, String) -> Unit,
     onPlay: () -> Unit,
+    onPause: () -> Unit,
     onAddToQueue: () -> Unit,
     onDownload: () -> Unit,
     onCancelDownload: () -> Unit,
     showPodcastImage: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    ConstraintLayout(modifier = modifier.clickable { onClick(podcast.id, episode.id) }) {
+    ConstraintLayout(modifier = modifier.clickable {
+        onClick(playerEpisode.podcastId, playerEpisode.id) }) {
         val (
             divider, publishDate, episodeTitle, podcastTitle, image, playIcon,
             date, downloadIcon, addPlaylist, overflow
@@ -110,7 +111,7 @@ fun EpisodeListItem(
 
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
-                text = MediumDateFormatter.format(episode.published),
+                text = MediumDateFormatter.format(playerEpisode.published),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.titleMedium,
@@ -133,7 +134,7 @@ fun EpisodeListItem(
         if (showPodcastImage) {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(podcast.imageUrl)
+                    .data(playerEpisode.podcastImageUrl)
                     .crossfade(true)
                     .build(),
                 contentDescription = null,
@@ -149,7 +150,7 @@ fun EpisodeListItem(
         }
 
         Text(
-            text = episode.title,
+            text = playerEpisode.title,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.titleSmall,
@@ -171,7 +172,7 @@ fun EpisodeListItem(
 
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
-                text = podcast.title,
+                text = playerEpisode.podcastName,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.titleMedium,
@@ -189,8 +190,10 @@ fun EpisodeListItem(
                 }
             )
         }
+        val icon = if (playerEpisode.isPlaying) Icons.Filled.PauseCircleOutline else Icons.Default.PlayCircleOutline
+        val onClickEvent = if (playerEpisode.isPlaying) onPause else onPlay
         Image(
-            imageVector = Icons.Default.PlayArrow,
+            imageVector = icon,
             contentDescription = stringResource(R.string.cd_play),
             contentScale = ContentScale.Fit,
             colorFilter = ColorFilter.tint(LocalContentColor.current),
@@ -198,7 +201,7 @@ fun EpisodeListItem(
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = rememberRipple(bounded = false, radius = 24.dp)
-                ) { onPlay() }
+                ) { onClickEvent() }
                 .size(48.dp)
                 .padding(6.dp)
                 .semantics { role = Role.Button }
@@ -210,12 +213,12 @@ fun EpisodeListItem(
         )
 
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-            if (episode.duration != null) {
+            if (playerEpisode.duration != null) {
                 Text(
                     text =
                         stringResource(
                             R.string.episode_duration,
-                            episode.duration!!.toMinutes().toInt()
+                            playerEpisode.duration!!.toMinutes().toInt()
                         ),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -235,10 +238,10 @@ fun EpisodeListItem(
             }
 
             IconButton(onClick = {
-                when (episode.downloadState) {
+                when (playerEpisode.downloadState) {
                     DownloadState.DOWNLOADING -> onCancelDownload()
                     DownloadState.NONE -> onDownload()
-                    else -> Timber.d("download state is ${episode.downloadState}")
+                    else -> Timber.d("download state is ${playerEpisode.downloadState}")
                 }
             },
                 modifier = Modifier.constrainAs(downloadIcon) {
@@ -247,7 +250,7 @@ fun EpisodeListItem(
                 }
             ) {
                 Icon(
-                    imageVector = when (episode.downloadState) {
+                    imageVector = when (playerEpisode.downloadState) {
                         DownloadState.DOWNLOADING -> Icons.Default.Downloading
                         DownloadState.FAILED, DownloadState.NONE -> Icons.Default.Download
                         DownloadState.SUCCESS -> Icons.Default.DownloadDone

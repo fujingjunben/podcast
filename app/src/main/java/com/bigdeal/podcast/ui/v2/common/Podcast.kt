@@ -11,24 +11,23 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.bigdeal.core.data.Podcast
+import com.bigdeal.podcast.core.player.model.PlayerEpisode
 
 @Composable
-fun PodcastTitleCard(podcast: Podcast) {
+fun PodcastTitleCard(playerEpisode: PlayerEpisode) {
     Row(horizontalArrangement = Arrangement.Start,
         modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        if (podcast.imageUrl != null) {
-            AsyncImage(
-                model = podcast.imageUrl,
-                contentDescription = podcast.description,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(MaterialTheme.shapes.medium)
-                    .clickable { }
-            )
-        }
+        AsyncImage(
+            model = playerEpisode.podcastImageUrl,
+            contentDescription = playerEpisode.podcastName,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(100.dp)
+                .clip(MaterialTheme.shapes.medium)
+                .clickable { }
+        )
 
-        Text(text = podcast.title, modifier = Modifier.padding(12.dp))
+        Text(text = playerEpisode.podcastName, modifier = Modifier.padding(12.dp))
     }
 }

@@ -10,7 +10,7 @@ import com.bigdeal.core.data.Podcast
 import com.bigdeal.core.data.PodcastStore
 import com.bigdeal.core.data.PodcastWithExtraInfo
 import com.bigdeal.core.data.PodcastsRepository
-import com.bigdeal.core.data.extension.toSHA256
+import com.bigdeal.core.download.PodcastDownloader
 import com.bigdeal.podcast.core.player.EpisodePlayer
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
@@ -29,6 +29,7 @@ class FavouriteViewModel @Inject constructor(
     private val feedRepository: FeedRepository,
     private val podcastsRepository: PodcastsRepository,
     private val episodePlayer: EpisodePlayer,
+    private val podcastDownloader: PodcastDownloader,
 ) : ViewModel() {
 
     private val viewModelState = MutableStateFlow(FavouriteViewModelState(isLoading = true))
@@ -98,8 +99,24 @@ class FavouriteViewModel @Inject constructor(
         episodePlayer.play(playerEpisode)
     }
 
-    fun onAddToQueue(playerEpisode: PlayerEpisode) {
+    fun pause() {
+        episodePlayer.pause()
+    }
+    fun addToQueue(playerEpisode: PlayerEpisode) {
         episodePlayer.addToQueue(playerEpisode)
+    }
+
+
+    fun download(episode: EpisodeEntity) {
+        podcastDownloader.downloadEpisode(episode)
+    }
+
+    fun cancelDownload(episode: EpisodeEntity) {
+        podcastDownloader.cancelDownload(episode)
+    }
+
+    fun deleteDownload(episode: EpisodeEntity) {
+        podcastDownloader.cancelDownload(episode)
     }
 }
 
@@ -125,3 +142,5 @@ sealed interface FavouriteUiState {
 
     data object Loading : FavouriteUiState
 }
+
+

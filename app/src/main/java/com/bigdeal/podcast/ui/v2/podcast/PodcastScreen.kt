@@ -18,6 +18,9 @@ import com.bigdeal.core.data.Podcast
 import com.bigdeal.podcast.ui.v2.common.EpisodeList
 import com.bigdeal.podcast.ui.v2.common.PodcastTitleCard
 import com.bigdeal.podcast.R
+import com.bigdeal.podcast.core.model.EpisodeOfPodcast
+import com.bigdeal.podcast.ui.v2.favourite.EpisodeActions
+import kotlinx.coroutines.launch
 
 @Composable
 fun PodcastScreen(
@@ -40,10 +43,21 @@ fun PodcastScreen(
             episodes = uiState.episodeOfPodcasts,
             navigateToEpisode = navigateToEpisode,
             showPodcastImage = false,
-            onPlay = { playerEpisode -> onPlay(playerEpisode.id) },
-            onAddToQueue = {},
+            episodeActions = EpisodeActions(
+                onPlay = { playerEpisode ->
+                    run {
+                        onPlay(playerEpisode.id)
+                    }
+                },
+                onPause = {},
+                onAddToQueue = {
+                },
+                onDownload = {},
+                onCancelDownload = {},
+                onDeleteDownload = {},
+            ),
             header = {
-                PodcastInfo(uiState.podcast)
+                PodcastInfo(uiState.episodeOfPodcasts[0])
             })
     }
 }
@@ -69,12 +83,10 @@ fun PodcastAppBar(
 }
 
 @Composable
-fun PodcastInfo(podcast: Podcast?) {
-    if (podcast != null) {
-        PodcastTitleCard(podcast = podcast)
-        PodcastStatusBar()
-        PodcastDescription(description = podcast.description)
-    }
+fun PodcastInfo(episodeOfPodcast: EpisodeOfPodcast) {
+    PodcastTitleCard(episodeOfPodcast.toEpisode())
+    PodcastStatusBar()
+    PodcastDescription(description = episodeOfPodcast.podcast.description)
 }
 
 @Composable

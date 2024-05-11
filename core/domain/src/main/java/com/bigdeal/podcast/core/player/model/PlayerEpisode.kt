@@ -1,6 +1,8 @@
 package com.bigdeal.podcast.core.player.model
 
+import com.bigdeal.core.data.DownloadState
 import com.bigdeal.core.data.EpisodeToPodcast
+import com.bigdeal.core.data.url
 import com.bigdeal.podcast.core.model.EpisodeInfo
 import com.bigdeal.podcast.core.model.PodcastInfo
 import java.time.Duration
@@ -20,6 +22,9 @@ data class PlayerEpisode(
     val author: String = "",
     val summary: String = "",
     val podcastImageUrl: String = "",
+    val podcastId: String = "",
+    val downloadState: DownloadState = DownloadState.NONE,
+    val isPlaying: Boolean = false
 ) {
     constructor(podcastInfo: PodcastInfo, episodeInfo: EpisodeInfo) : this(
         title = episodeInfo.title,
@@ -31,13 +36,15 @@ data class PlayerEpisode(
         summary = episodeInfo.summary,
         podcastImageUrl = podcastInfo.imageUrl,
         uri = episodeInfo.uri,
+        podcastId = podcastInfo.id,
+        id = episodeInfo.id
     )
 }
 
 fun EpisodeToPodcast.toPlayerEpisode(): PlayerEpisode =
     PlayerEpisode(
         id = episode.id,
-        uri = episode.uri,
+        uri = episode.url(),
         title = episode.title,
         subTitle = episode.subtitle ?: "",
         published = episode.published,
@@ -46,4 +53,6 @@ fun EpisodeToPodcast.toPlayerEpisode(): PlayerEpisode =
         author = episode.author ?: podcast.author ?: "",
         summary = episode.summary ?: "",
         podcastImageUrl = podcast.imageUrl ?: "",
+        podcastId = podcast.id,
+        downloadState = episode.downloadState
     )

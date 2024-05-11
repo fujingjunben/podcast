@@ -31,10 +31,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.bigdeal.core.data.EpisodeEntity
 import com.bigdeal.podcast.R
 import com.bigdeal.core.data.Podcast
+import com.bigdeal.podcast.core.model.EpisodeOfPodcast
+import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.ui.v2.common.EpisodeList
 import kotlinx.coroutines.launch
+
+data class EpisodeActions(
+    val onPlay: (playerEpisode: PlayerEpisode) -> Unit,
+    val onPause: () -> Unit,
+    val onAddToQueue: (playerEpisode: PlayerEpisode) -> Unit,
+    val onDownload: (episode: EpisodeEntity) -> Unit,
+    val onCancelDownload: (episode: EpisodeEntity) -> Unit,
+    val onDeleteDownload: (episode: EpisodeEntity) -> Unit,
+)
 
 @Composable
 fun Favourite(
@@ -79,19 +91,26 @@ fun Favourite(
                     EpisodeList(
                         episodeOfPodcasts,
                         navigateToEpisode,
-                        onPlay = { playerEpisode ->
-                            run {
-                                onPlay(playerEpisode.id)
-                                viewModel.play(playerEpisode)
-                            }
-                        },
-                        onAddToQueue = { playerEpisode -> run {
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(snackBarText)
-                            }
-
-                            viewModel.onAddToQueue(playerEpisode)
-                        } }
+                        episodeActions = EpisodeActions(
+                            onPlay = { playerEpisode ->
+                                run {
+                                    onPlay(playerEpisode.id)
+                                    viewModel.play(playerEpisode)
+                                }
+                            },
+                            onPause = viewModel::pause,
+                            onAddToQueue = { playerEpisode ->
+                                run {
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar(snackBarText)
+                                    }
+                                    viewModel.addToQueue(playerEpisode)
+                                }
+                            },
+                            onDownload = viewModel::download,
+                            onCancelDownload = viewModel::cancelDownload,
+                            onDeleteDownload = viewModel::deleteDownload,
+                        )
                     ) {
                         FollowedPodcasts(
                             podcasts = episodeOfPodcasts.map { it.podcast }

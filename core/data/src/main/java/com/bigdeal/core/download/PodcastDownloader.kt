@@ -65,6 +65,8 @@ class PodcastDownloader (
         }
     }
 
+    fun deleteDownload(episode: EpisodeEntity) {}
+
     fun queryDownloadStatus(episode: EpisodeEntity) {
         val query = DownloadManager.Query()
         query.setFilterById(episode.downloadId)

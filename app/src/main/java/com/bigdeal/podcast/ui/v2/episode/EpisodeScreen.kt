@@ -15,6 +15,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bigdeal.core.data.url
 import com.bigdeal.podcast.R
+import com.bigdeal.podcast.core.designsystem.component.HtmlTextContainer
 import com.bigdeal.podcast.core.player.model.toPlayerEpisode
 import com.bigdeal.podcast.ui.v2.common.EpisodeListItem
 import com.bigdeal.podcast.ui.v2.common.PodcastTitleCard
@@ -27,8 +28,8 @@ fun EpisodeScreen(
     modifier: Modifier,
     viewModel: EpisodeScreenViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val item = uiState.episodeToPodcast
+    val uiState = viewModel.uiState
+    val playerEpisode = uiState.episodePlayerState.currentEpisode
     val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
     Column(modifier = modifier.systemBarsPadding()) {
         AppBar(
@@ -36,17 +37,16 @@ fun EpisodeScreen(
             modifier = Modifier.fillMaxWidth(),
             onBackPress
         )
-
-        if (item != null) {
-            PodcastTitleCard(podcast = item.podcast)
+        if (playerEpisode != null) {
+            PodcastTitleCard(playerEpisode)
             EpisodeListItem(
-                episode = item.episode,
-                podcast = item.podcast,
-                onClick = { podcastId, _ -> navigateToPodcast(podcastId)},
+                playerEpisode = playerEpisode,
+                onClick = { podcastId, _ -> navigateToPodcast(podcastId) },
                 onPlay = {
-                    onPlay(item.episode.id)
-                    viewModel.play(item)
-                         },
+                    onPlay(playerEpisode.id)
+                    viewModel.play(playerEpisode)
+                },
+                onPause = {},
                 onAddToQueue = { },
                 onDownload = {},
                 onCancelDownload = {},
@@ -54,11 +54,19 @@ fun EpisodeScreen(
                 modifier = Modifier.fillMaxWidth(),
             )
 
-            if (!item.episode.summary.isNullOrEmpty()) {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp)) {
-                    Text(text = item.episode.summary as String)
+            if (playerEpisode.summary.isNotEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp)
+                ) {
+                    HtmlTextContainer(text =  playerEpisode.summary) {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = LocalContentColor.current
+                        )
+                    }
                 }
             }
         }

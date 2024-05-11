@@ -14,11 +14,17 @@ data class EpisodeOfPodcast(
         Timber.d("episodeOfPodcast: $episode")
         return PlayerEpisode(
             id = episode.id,
-            title = episode.title,
             uri = episode.url(),
+            title = episode.title,
+            subTitle = episode.subtitle ?: "",
+            published = episode.published,
             duration = episode.duration,
             podcastName = podcast.title,
+            author = episode.author ?: podcast.author ?: "",
+            summary = episode.summary ?: "",
             podcastImageUrl = podcast.imageUrl ?: "",
+            podcastId = podcast.id,
+            downloadState = episode.downloadState
         )
     }
 }
