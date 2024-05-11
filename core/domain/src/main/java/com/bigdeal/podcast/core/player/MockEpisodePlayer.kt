@@ -104,9 +104,11 @@ class MockEpisodePlayer(
 
         timerJob = coroutineScope.launch {
             // Increment timer by a second
-            while (isActive && timeElapsed.value < episode.duration) {
+            while (isActive && timeElapsed.value < episode.duration?.minus(EpisodeDurationThreshold)) {
                 delay(playerSpeed.toMillis())
-                timeElapsed.update { it + playerSpeed }
+                playerController.getMediaController()?.let {controller ->
+                    timeElapsed.update { Duration.ofMillis(controller.currentPosition) }
+                }
             }
 
             // Once done playing, see if

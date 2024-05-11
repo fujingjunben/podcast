@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.Forward10
+import androidx.compose.material.icons.filled.LinkOff
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.RepeatOne
@@ -716,8 +717,8 @@ fun PlayerControllBar(
     }
     val icon = when (mode) {
         1 -> Icons.Filled.RepeatOne
-        2 -> Icons.Filled.Repeat
-        else -> Icons.Filled.Replay
+        2 -> Icons.Default.LinkOff
+        else -> Icons.Filled.Repeat
     }
 
     val sideButtonsModifier = Modifier

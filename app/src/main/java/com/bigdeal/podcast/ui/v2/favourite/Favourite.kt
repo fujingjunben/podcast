@@ -19,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +34,7 @@ import coil.compose.AsyncImage
 import com.bigdeal.podcast.R
 import com.bigdeal.core.data.Podcast
 import com.bigdeal.podcast.ui.v2.common.EpisodeList
+import kotlinx.coroutines.launch
 
 @Composable
 fun Favourite(
@@ -43,46 +45,61 @@ fun Favourite(
     viewModel: FavouriteViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    val snackBarText = stringResource(id = R.string.episode_added_to_your_queue)
+    val snackbarHostState = remember { SnackbarHostState() }
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+        modifier = modifier
+    ) { contentPadding ->
+        Column(
+            modifier = modifier.systemBarsPadding()
+        ) {
+            val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
+            FavouriteAppBar(
+                onFollow = { url -> viewModel.addFeed(url) },
+                backgroundColor = appBarColor,
+                modifier = Modifier.fillMaxWidth(),
+            )
 
-    Column(
-        modifier = modifier.systemBarsPadding()
-    ) {
-        val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
-        FavouriteAppBar(
-            onFollow = { url -> viewModel.addFeed(url) },
-            backgroundColor = appBarColor,
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-        when (uiState) {
-            is FavouriteUiState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-                ) {
-                    Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
+            when (uiState) {
+                is FavouriteUiState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+                    ) {
+                        Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
+                    }
                 }
-            }
 
-            is FavouriteUiState.Success -> {
-                val episodeOfPodcasts = (uiState as FavouriteUiState.Success).episodeOfPodcasts
+                is FavouriteUiState.Success -> {
+                    val episodeOfPodcasts = (uiState as FavouriteUiState.Success).episodeOfPodcasts
 
-                EpisodeList(
-                    episodeOfPodcasts,
-                    navigateToEpisode,
-                    onPlay = { playerEpisode ->
-                        run {
-                            onPlay(playerEpisode.id)
-                            viewModel.play(playerEpisode)
-                        }
-                    },
-                    onAddToQueue = {playerEpisode ->  viewModel.onAddToQueue(playerEpisode)}
-                ) {
-                    FollowedPodcasts(
-                        podcasts = episodeOfPodcasts.map { it.podcast }
-                            .distinctBy { it.uri },
-                        navigateToPodcast = navigateToPodcast,
-                        onPodcastUnfollowed = viewModel::onPodcastUnfollowed
-                    )
+                    EpisodeList(
+                        episodeOfPodcasts,
+                        navigateToEpisode,
+                        onPlay = { playerEpisode ->
+                            run {
+                                onPlay(playerEpisode.id)
+                                viewModel.play(playerEpisode)
+                            }
+                        },
+                        onAddToQueue = { playerEpisode -> run {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(snackBarText)
+                            }
+
+                            viewModel.onAddToQueue(playerEpisode)
+                        } }
+                    ) {
+                        FollowedPodcasts(
+                            podcasts = episodeOfPodcasts.map { it.podcast }
+                                .distinctBy { it.uri },
+                            navigateToPodcast = navigateToPodcast,
+                            onPodcastUnfollowed = viewModel::onPodcastUnfollowed
+                        )
+                    }
                 }
             }
         }
