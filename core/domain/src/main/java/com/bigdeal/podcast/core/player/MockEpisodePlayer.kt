@@ -128,6 +128,7 @@ class MockEpisodePlayer(
     override fun play(playerEpisode: PlayerEpisode) {
         if (_currentEpisode.value?.id != playerEpisode.id) {
             _currentEpisode.value = playerEpisode
+            isPlaying.value = false
         }
         play()
     }

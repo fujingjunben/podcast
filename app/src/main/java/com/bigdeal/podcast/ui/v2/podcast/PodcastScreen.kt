@@ -19,6 +19,7 @@ import com.bigdeal.podcast.ui.v2.common.EpisodeList
 import com.bigdeal.podcast.ui.v2.common.PodcastTitleCard
 import com.bigdeal.podcast.R
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
+import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.ui.v2.favourite.EpisodeActions
 import kotlinx.coroutines.launch
 
@@ -40,6 +41,7 @@ fun PodcastScreen(
             onBackPress
         )
         EpisodeList(
+            episodePlayerState = EpisodePlayerState(),
             episodes = uiState.episodeOfPodcasts,
             navigateToEpisode = navigateToEpisode,
             showPodcastImage = false,

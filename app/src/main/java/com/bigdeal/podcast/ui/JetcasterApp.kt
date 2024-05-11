@@ -32,7 +32,7 @@ fun PodcastApp() {
         val episodeId = remember {
             mutableStateOf("")
         }
-        val showPlayerBar = remember(episodeId) { mutableStateOf(false) }
+        val showPlayerBar = remember { mutableStateOf(false) }
 
         Scaffold(
             bottomBar = {

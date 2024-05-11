@@ -57,15 +57,15 @@ fun Favourite(
     viewModel: FavouriteViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
-    val snackBarText = stringResource(id = R.string.episode_added_to_your_queue)
-    val snackbarHostState = remember { SnackbarHostState() }
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
-        modifier = modifier
-    ) { contentPadding ->
+//    val coroutineScope = rememberCoroutineScope()
+//    val snackBarText = stringResource(id = R.string.episode_added_to_your_queue)
+//    val snackbarHostState = remember { SnackbarHostState() }
+//    Scaffold(
+//        snackbarHost = {
+//            SnackbarHost(hostState = snackbarHostState)
+//        },
+//        modifier = modifier
+//    ) { contentPadding ->
         Column(
             modifier = modifier.systemBarsPadding()
         ) {
@@ -89,6 +89,7 @@ fun Favourite(
                     val episodeOfPodcasts = (uiState as FavouriteUiState.Success).episodeOfPodcasts
 
                     EpisodeList(
+                        (uiState as FavouriteUiState.Success).episodePlayerState!!,
                         episodeOfPodcasts,
                         navigateToEpisode,
                         episodeActions = EpisodeActions(
@@ -101,9 +102,9 @@ fun Favourite(
                             onPause = viewModel::pause,
                             onAddToQueue = { playerEpisode ->
                                 run {
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar(snackBarText)
-                                    }
+//                                    coroutineScope.launch {
+//                                        snackbarHostState.showSnackbar(snackBarText)
+//                                    }
                                     viewModel.addToQueue(playerEpisode)
                                 }
                             },
@@ -122,7 +123,7 @@ fun Favourite(
                 }
             }
         }
-    }
+//    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

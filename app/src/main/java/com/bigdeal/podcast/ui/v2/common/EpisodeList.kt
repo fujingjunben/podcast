@@ -48,11 +48,14 @@ import timber.log.Timber
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import com.bigdeal.podcast.R
+import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
+import com.bigdeal.podcast.ui.v2.episode.PlayerUiState
 import com.bigdeal.podcast.ui.v2.favourite.EpisodeActions
 
 @Composable
 fun EpisodeList(
+    episodePlayerState: EpisodePlayerState,
     episodes: List<EpisodeOfPodcast>,
     navigateToEpisode: (String, String) -> Unit,
     episodeActions: EpisodeActions,
@@ -68,11 +71,12 @@ fun EpisodeList(
         }
         items(episodes, key = { it.episode.id }) { item ->
             EpisodeListItem(
-                playerEpisode = item.toEpisode() ,
+                episodePlayerState = episodePlayerState,
+                playerEpisode = item.toEpisode(),
                 onClick = navigateToEpisode,
                 onPlay = { episodeActions.onPlay(item.toEpisode()) },
                 onPause = episodeActions.onPause,
-                onAddToQueue = {episodeActions.onAddToQueue(item.toEpisode())},
+                onAddToQueue = { episodeActions.onAddToQueue(item.toEpisode()) },
                 onDownload = { episodeActions.onDownload(item.episode) },
                 onCancelDownload = { episodeActions.onCancelDownload(item.episode) },
                 showPodcastImage = showPodcastImage,
@@ -84,6 +88,7 @@ fun EpisodeList(
 
 @Composable
 fun EpisodeListItem(
+    episodePlayerState: EpisodePlayerState,
     playerEpisode: PlayerEpisode,
     onClick: (String, String) -> Unit,
     onPlay: () -> Unit,
@@ -93,10 +98,10 @@ fun EpisodeListItem(
     onCancelDownload: () -> Unit,
     showPodcastImage: Boolean,
     modifier: Modifier = Modifier,
-    isPlaying: Boolean = false
 ) {
     ConstraintLayout(modifier = modifier.clickable {
-        onClick(playerEpisode.podcastId, playerEpisode.id) }) {
+        onClick(playerEpisode.podcastId, playerEpisode.id)
+    }) {
         val (
             divider, publishDate, episodeTitle, podcastTitle, image, playIcon,
             date, downloadIcon, addPlaylist, overflow
@@ -191,7 +196,10 @@ fun EpisodeListItem(
                 }
             )
         }
-        val icon = if (isPlaying) Icons.Filled.PauseCircleOutline else Icons.Default.PlayCircleOutline
+        val isPlaying =
+            episodePlayerState.currentEpisode?.id == playerEpisode.id && episodePlayerState.isPlaying
+        val icon =
+            if (isPlaying) Icons.Filled.PauseCircleOutline else Icons.Default.PlayCircleOutline
         val onClickEvent = if (isPlaying) onPause else onPlay
         Image(
             imageVector = icon,
@@ -212,15 +220,25 @@ fun EpisodeListItem(
                     bottom.linkTo(parent.bottom, 10.dp)
                 }
         )
+        val text = if (episodePlayerState.currentEpisode?.id == playerEpisode.id
+            && !episodePlayerState.timeElapsed.isZero
+        ) {
+            stringResource(
+                R.string.episode_left_duration,
+                playerEpisode.duration!!.minus(episodePlayerState.timeElapsed).toMinutes().toInt())
+
+        } else {
+            stringResource(
+                R.string.episode_duration,
+                playerEpisode.duration!!.toMinutes().toInt()
+
+            )
+        }
 
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             if (playerEpisode.duration != null) {
                 Text(
-                    text =
-                        stringResource(
-                            R.string.episode_duration,
-                            playerEpisode.duration!!.toMinutes().toInt()
-                        ),
+                    text = text,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodySmall,

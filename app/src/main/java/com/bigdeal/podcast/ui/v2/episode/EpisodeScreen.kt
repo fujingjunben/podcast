@@ -40,6 +40,7 @@ fun EpisodeScreen(
         if (playerEpisode != null) {
             PodcastTitleCard(playerEpisode)
             EpisodeListItem(
+                episodePlayerState = viewModel.uiState.episodePlayerState,
                 playerEpisode = playerEpisode,
                 onClick = { podcastId, _ -> navigateToPodcast(podcastId) },
                 onPlay = {
@@ -52,7 +53,6 @@ fun EpisodeScreen(
                 onCancelDownload = {},
                 showPodcastImage = false,
                 modifier = Modifier.fillMaxWidth(),
-                isPlaying = uiState.episodePlayerState.isPlaying
             )
 
             if (playerEpisode.summary.isNotEmpty()) {

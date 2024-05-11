@@ -14,6 +14,7 @@ import com.bigdeal.core.download.PodcastDownloader
 import com.bigdeal.podcast.core.player.EpisodePlayer
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
+import com.bigdeal.podcast.core.player.EpisodePlayerState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -32,7 +33,7 @@ class FavouriteViewModel @Inject constructor(
     private val podcastDownloader: PodcastDownloader,
 ) : ViewModel() {
 
-    private val viewModelState = MutableStateFlow(FavouriteViewModelState(isLoading = true))
+    private var viewModelState = MutableStateFlow(FavouriteViewModelState(isLoading = true))
 
     val uiState = viewModelState
         .map { it.toUiState() }
@@ -68,13 +69,15 @@ class FavouriteViewModel @Inject constructor(
                         }.flatten()
                             .sortedByDescending { episodeOfPodcast -> episodeOfPodcast.episode.published }
                     }
-                }.collect { episodeOfPodcasts ->
-                    viewModelState.update {
-                        it.copy(
-                            episodeOfPodcasts = episodeOfPodcasts,
-                            isLoading = false
-                        )
-                    }
+                }
+                .combine(episodePlayer.playerState) { episodes: List<EpisodeOfPodcast>, playerState: EpisodePlayerState ->
+                    FavouriteViewModelState(
+                        episodeOfPodcasts = episodes,
+                        episodePlayerState = playerState,
+                        isLoading = false
+                    )
+                }.collect { state ->
+                    viewModelState.value = state
                 }
         }
     }
@@ -102,6 +105,7 @@ class FavouriteViewModel @Inject constructor(
     fun pause() {
         episodePlayer.pause()
     }
+
     fun addToQueue(playerEpisode: PlayerEpisode) {
         episodePlayer.addToQueue(playerEpisode)
     }
@@ -122,6 +126,7 @@ class FavouriteViewModel @Inject constructor(
 
 data class FavouriteViewModelState(
     val episodeOfPodcasts: List<EpisodeOfPodcast>? = null,
+    var episodePlayerState: EpisodePlayerState? = null,
     val isLoading: Boolean = false
 ) {
     fun toUiState(): FavouriteUiState {
@@ -129,7 +134,7 @@ data class FavouriteViewModelState(
         return if (episodeOfPodcasts.isNullOrEmpty()) {
             FavouriteUiState.Loading
         } else {
-            FavouriteUiState.Success(episodeOfPodcasts)
+            FavouriteUiState.Success(episodeOfPodcasts, episodePlayerState = episodePlayerState)
         }
     }
 }
@@ -137,7 +142,8 @@ data class FavouriteViewModelState(
 sealed interface FavouriteUiState {
     @Immutable
     data class Success(
-        val episodeOfPodcasts: List<EpisodeOfPodcast> = listOf()
+        val episodeOfPodcasts: List<EpisodeOfPodcast> = listOf(),
+        var episodePlayerState: EpisodePlayerState?
     ) : FavouriteUiState
 
     data object Loading : FavouriteUiState

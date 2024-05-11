@@ -24,6 +24,7 @@
     <string name="your_podcasts">Your podcasts</string>
     <string name="latest_episodes">Latest episodes</string>
     <string name="episode_duration">%1$d mins</string>
+    <string name="episode_left_duration">left %1$d mins</string>
     <string name="home_library">Your library</string>
     <string name="home_discover">Discover</string>
     <string name="favourite">Favourite</string>
