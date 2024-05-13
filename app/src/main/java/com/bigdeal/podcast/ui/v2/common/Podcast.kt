@@ -14,7 +14,7 @@ import com.bigdeal.core.data.Podcast
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 
 @Composable
-fun PodcastTitleCard(playerEpisode: PlayerEpisode) {
+fun PodcastTitleCard(playerEpisode: PlayerEpisode, onClick : () -> Unit = {}) {
     Row(horizontalArrangement = Arrangement.Start,
         modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
@@ -25,7 +25,7 @@ fun PodcastTitleCard(playerEpisode: PlayerEpisode) {
             modifier = Modifier
                 .size(100.dp)
                 .clip(MaterialTheme.shapes.medium)
-                .clickable { }
+                .clickable { onClick() }
         )
 
         Text(text = playerEpisode.podcastName, modifier = Modifier.padding(12.dp))
