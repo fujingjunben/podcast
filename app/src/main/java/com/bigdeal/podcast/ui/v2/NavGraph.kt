@@ -46,7 +46,7 @@ fun NavGraph(
                 },
 
                 onPlay = onPlay,
-                modifier = Modifier
+                modifier = modifier
             )
         }
         composable(Screen.Podcast.route) { backStackEntry ->
@@ -56,7 +56,7 @@ fun NavGraph(
                     appState.navigateToEpisode(podcastId, episodeId, backStackEntry)
                 },
                 onPlay = onPlay,
-                modifier = Modifier
+                modifier = modifier
             )
         }
 
