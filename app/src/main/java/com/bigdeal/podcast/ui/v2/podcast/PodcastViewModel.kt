@@ -13,11 +13,8 @@ import com.bigdeal.podcast.ui.v2.Destination
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
 import com.bigdeal.podcast.core.player.EpisodePlayer
 import com.bigdeal.podcast.core.player.EpisodePlayerState
-import com.bigdeal.podcast.core.player.MockEpisodePlayer
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject

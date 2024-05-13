@@ -17,17 +17,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.bigdeal.core.data.Podcast
 import com.bigdeal.podcast.ui.v2.common.EpisodeList
 import com.bigdeal.podcast.ui.v2.common.PodcastTitleCard
 import com.bigdeal.podcast.R
 import com.bigdeal.podcast.core.designsystem.component.HtmlTextContainer
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
-import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.ui.v2.favourite.EpisodeActions
-import com.bigdeal.podcast.ui.v2.favourite.FavouriteUiState
-import kotlinx.coroutines.launch
 
 @Composable
 fun PodcastScreen(
