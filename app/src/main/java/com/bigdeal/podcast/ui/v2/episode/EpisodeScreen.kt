@@ -49,8 +49,10 @@ fun EpisodeScreen(
                 },
                 onPause = viewModel::pause,
                 onAddToQueue = { },
-                onDownload = {},
-                onCancelDownload = {},
+                onDownload = { viewModel.download(playerEpisode)},
+                onCancelDownload = {
+                    viewModel.cancelDownload(playerEpisode)
+                },
                 showPodcastImage = false,
                 showSummary = true,
                 modifier = Modifier.fillMaxWidth(),

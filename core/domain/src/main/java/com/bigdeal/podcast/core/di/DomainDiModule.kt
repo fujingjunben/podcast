@@ -16,6 +16,8 @@
 
 package com.bigdeal.podcast.core.di
 
+import android.app.DownloadManager
+import android.content.Context
 import com.bigdeal.core.Dispatcher
 import com.bigdeal.core.JetcasterDispatchers
 import com.bigdeal.core.data.EpisodeStore
@@ -26,6 +28,7 @@ import com.bigdeal.podcast.core.player.service.PlayerControllerImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
@@ -46,4 +49,19 @@ object DomainDiModule {
         @Dispatcher(JetcasterDispatchers.Main) mainDispatcher: CoroutineDispatcher,
         playerController: PlayerController
     ): EpisodePlayer = MockEpisodePlayer(mainDispatcher, playerController)
+
+
+    @Provides
+    @Singleton
+    fun providePodcastDownloadManager(
+        @ApplicationContext context: Context,
+        episodeStore: EpisodeStore,
+        @Dispatcher(JetcasterDispatchers.IO) ioDispatcher: CoroutineDispatcher
+    ): com.bigdeal.podcast.core.download.PodcastDownloader =
+        com.bigdeal.podcast.core.download.PodcastDownloader(
+            context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager,
+            episodeStore,
+            context.getExternalFilesDir("cache"),
+            ioDispatcher
+        )
 }

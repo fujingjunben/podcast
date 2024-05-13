@@ -100,6 +100,8 @@ class MockEpisodePlayer(
 
         val episode = _currentEpisode.value ?: return
         isPlaying.value = true
+
+        Timber.d("mockplayer play(): ${episode.title}")
         playerController.play(episode, timeElapsed.value)
 
         timerJob = coroutineScope.launch {
@@ -126,6 +128,8 @@ class MockEpisodePlayer(
     }
 
     override fun play(playerEpisode: PlayerEpisode) {
+        Timber.d("mockplayer: current episode: ${_currentEpisode.value}")
+        Timber.d("intend to play next episode: ${playerEpisode}")
         if (_currentEpisode.value?.id != playerEpisode.id) {
             _currentEpisode.value = playerEpisode
             pause()

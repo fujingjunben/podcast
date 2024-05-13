@@ -10,7 +10,7 @@ import com.bigdeal.core.data.Podcast
 import com.bigdeal.core.data.PodcastStore
 import com.bigdeal.core.data.PodcastWithExtraInfo
 import com.bigdeal.core.data.PodcastsRepository
-import com.bigdeal.core.download.PodcastDownloader
+import com.bigdeal.podcast.core.download.PodcastDownloader
 import com.bigdeal.podcast.core.player.EpisodePlayer
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
@@ -111,15 +111,15 @@ class FavouriteViewModel @Inject constructor(
     }
 
 
-    fun download(episode: EpisodeEntity) {
+    fun download(episode: PlayerEpisode) {
         podcastDownloader.downloadEpisode(episode)
     }
 
-    fun cancelDownload(episode: EpisodeEntity) {
+    fun cancelDownload(episode: PlayerEpisode) {
         podcastDownloader.cancelDownload(episode)
     }
 
-    fun deleteDownload(episode: EpisodeEntity) {
+    fun deleteDownload(episode: PlayerEpisode) {
         podcastDownloader.cancelDownload(episode)
     }
 }

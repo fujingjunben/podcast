@@ -1,4 +1,4 @@
-package com.bigdeal.core.download
+package com.bigdeal.podcast.core.download
 
 import android.app.DownloadManager
 import android.net.Uri
@@ -9,6 +9,8 @@ import com.bigdeal.core.JetcasterDispatchers
 import com.bigdeal.core.data.DownloadState
 import com.bigdeal.core.data.EpisodeEntity
 import com.bigdeal.core.data.EpisodeStore
+import com.bigdeal.core.data.Play
+import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
@@ -27,7 +29,7 @@ class PodcastDownloader (
 
     private val scope = CoroutineScope(ioDispatcher)
 
-    fun downloadEpisode(episode: EpisodeEntity) {
+    fun downloadEpisode(episode: PlayerEpisode) {
         val file = File(downloadDir, "${episode.id}.mp3")
         val request = DownloadManager.Request(Uri.parse(episode.uri))
             .setMimeType(MimeTypes.AUDIO_MPEG)
@@ -50,10 +52,10 @@ class PodcastDownloader (
         }
     }
 
-    fun cancelDownload(episode: EpisodeEntity) {
+    fun cancelDownload(episode: PlayerEpisode) {
         Timber.d("download episode: cancel")
         scope.launch {
-            queryDownloadStatus(episode)
+            queryDownloadStatus(episode.downloadId)
             val episodeEntity = episodeStore.episodeWithId(episode.id).first()
 //            downloadManager.remove(episodeEntity.downloadId)
             episodeStore.updateEpisode(
@@ -67,12 +69,12 @@ class PodcastDownloader (
 
     fun deleteDownload(episode: EpisodeEntity) {}
 
-    fun queryDownloadStatus(episode: EpisodeEntity) {
+    fun queryDownloadStatus(downloadId: Long) {
         val query = DownloadManager.Query()
-        query.setFilterById(episode.downloadId)
+        query.setFilterById(downloadId)
         val cursor = downloadManager.query(query)
         if (cursor == null) {
-            Timber.d("download manager doesn't find ${episode.downloadId}")
+            Timber.d("download manager doesn't find $downloadId")
         }
         if (cursor.moveToFirst()) {
             val status = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)

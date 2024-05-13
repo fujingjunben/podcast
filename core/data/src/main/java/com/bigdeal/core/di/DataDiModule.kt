@@ -16,7 +16,6 @@
 
 package com.bigdeal.podcast.core.data.di
 
-import android.app.DownloadManager
 import android.content.Context
 import androidx.room.Room
 import coil.ImageLoader
@@ -37,7 +36,6 @@ import com.bigdeal.core.data.room.PodcastCategoryEntryDao
 import com.bigdeal.core.data.room.PodcastFollowedEntryDao
 import com.bigdeal.core.data.room.PodcastsDao
 import com.bigdeal.core.data.room.TransactionRunner
-import com.bigdeal.core.download.PodcastDownloader
 import com.example.jetcaster.core.designsystem.BuildConfig
 import com.rometools.rome.io.SyndFeedInput
 import dagger.Module
@@ -211,17 +209,4 @@ object DataDiModule {
         mainDispatcher = mainDispatcher
     )
 
-    @Provides
-    @Singleton
-    fun providePodcastDownloadManager(
-        @ApplicationContext context: Context,
-        episodeStore: EpisodeStore,
-        @Dispatcher(JetcasterDispatchers.IO) ioDispatcher: CoroutineDispatcher
-    ): PodcastDownloader =
-        PodcastDownloader(
-            context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager,
-            episodeStore,
-            context.getExternalFilesDir("cache"),
-            ioDispatcher
-        )
 }

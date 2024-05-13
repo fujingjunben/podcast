@@ -7,8 +7,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bigdeal.core.data.EpisodeEntity
 import com.bigdeal.core.data.EpisodeStore
 import com.bigdeal.core.data.EpisodeToPodcast
+import com.bigdeal.core.data.Play
+import com.bigdeal.podcast.core.download.PodcastDownloader
 import com.bigdeal.podcast.core.player.EpisodePlayer
 import com.bigdeal.podcast.ui.v2.Destination
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
@@ -28,7 +31,8 @@ data class PlayerUiState(
 class EpisodeScreenViewModel @Inject constructor(
     val episodeStore: EpisodeStore,
     savedStateHandle: SavedStateHandle,
-    private val episodePlayer: EpisodePlayer
+    private val episodePlayer: EpisodePlayer,
+    private val podcastDownloader: PodcastDownloader
 ) : ViewModel() {
     private val episodeId: String = Uri.decode(savedStateHandle.get<String>(Destination.EPISODE)!!)
 
@@ -54,5 +58,18 @@ class EpisodeScreenViewModel @Inject constructor(
 
     fun pause() {
         episodePlayer.pause()
+    }
+
+
+    fun download(episode: PlayerEpisode) {
+        podcastDownloader.downloadEpisode(episode)
+    }
+
+    fun cancelDownload(episode: PlayerEpisode) {
+        podcastDownloader.cancelDownload(episode)
+    }
+
+    fun deleteDownload(episode: PlayerEpisode) {
+        podcastDownloader.cancelDownload(episode)
     }
 }

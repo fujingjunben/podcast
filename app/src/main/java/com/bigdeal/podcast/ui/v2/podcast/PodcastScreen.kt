@@ -47,29 +47,33 @@ fun PodcastScreen(
             onBackPress
         )
         if (!uiState.isLoading) {
-            EpisodeList(
-                episodePlayerState = EpisodePlayerState(),
-                episodes = uiState.episodeOfPodcasts,
-                navigateToEpisode = navigateToEpisode,
-                showPodcastImage = false,
-                showSummary = true,
-                episodeActions = EpisodeActions(
-                    onPlay = { playerEpisode ->
-                        run {
-                            onPlay(playerEpisode.id)
-                        }
-                    },
-                    onPause = {},
-                    onAddToQueue = {
-                    },
-                    onDownload = {},
-                    onCancelDownload = {},
-                    onDeleteDownload = {},
-                ),
+            uiState.episodePlayerState?.let {
+                EpisodeList(
+                    episodePlayerState = it,
+                    episodes = uiState.episodeOfPodcasts,
+                    navigateToEpisode = navigateToEpisode,
+                    showPodcastImage = false,
+                    showSummary = true,
+                    episodeActions = EpisodeActions(
+                        onPlay = { playerEpisode ->
+                            run {
+                                onPlay(playerEpisode.id)
+                                viewModel.play(playerEpisode)
+                            }
+                        },
+                        onPause = viewModel::pause,
+                        onAddToQueue = {playerEpisode ->
+                                       viewModel.addToQueue(playerEpisode)
+                        },
+                        onDownload = { playerEpisode ->  viewModel.download(playerEpisode)},
+                        onCancelDownload = { playerEpisode ->  viewModel.cancelDownload(playerEpisode) },
+                        onDeleteDownload = { playerEpisode ->  viewModel.deleteDownload(playerEpisode)},
+                    ),
 
-                header = {
-                    PodcastInfo(uiState.episodeOfPodcasts[0])
-                })
+                    header = {
+                        PodcastInfo(uiState.episodeOfPodcasts[0])
+                    })
+            }
         } else {
                 Box(
                     modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center

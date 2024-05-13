@@ -37,8 +37,8 @@ fun EpisodeList(
                 onPlay = { episodeActions.onPlay(item.toEpisode()) },
                 onPause = episodeActions.onPause,
                 onAddToQueue = { episodeActions.onAddToQueue(item.toEpisode()) },
-                onDownload = { episodeActions.onDownload(item.episode) },
-                onCancelDownload = { episodeActions.onCancelDownload(item.episode) },
+                onDownload = { episodeActions.onDownload(item.toEpisode()) },
+                onCancelDownload = { episodeActions.onCancelDownload(item.toEpisode()) },
                 showPodcastImage = showPodcastImage,
                 showSummary = showSummary,
                 modifier = Modifier.fillParentMaxWidth()

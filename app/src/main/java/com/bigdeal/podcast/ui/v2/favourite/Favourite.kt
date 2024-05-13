@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.bigdeal.core.data.EpisodeEntity
+import com.bigdeal.core.data.Play
 import com.bigdeal.podcast.R
 import com.bigdeal.core.data.Podcast
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
@@ -43,9 +44,9 @@ data class EpisodeActions(
     val onPlay: (playerEpisode: PlayerEpisode) -> Unit,
     val onPause: () -> Unit,
     val onAddToQueue: (playerEpisode: PlayerEpisode) -> Unit,
-    val onDownload: (episode: EpisodeEntity) -> Unit,
-    val onCancelDownload: (episode: EpisodeEntity) -> Unit,
-    val onDeleteDownload: (episode: EpisodeEntity) -> Unit,
+    val onDownload: (playerEpisode: PlayerEpisode) -> Unit,
+    val onCancelDownload: (playerEpisode: PlayerEpisode) -> Unit,
+    val onDeleteDownload: (playerEpisode: PlayerEpisode) -> Unit,
 )
 
 @Composable
