@@ -44,10 +44,18 @@ class FavouriteViewModel @Inject constructor(
             viewModelState.value.toUiState()
         )
 
+    val _isRefreshing = MutableStateFlow(false)
 
-    val pageSize = 5
+    val isRefreshing: StateFlow<Boolean>
+        get() = _isRefreshing.asStateFlow()
+
+    private var pageSize = 5
 
     init {
+        refresh()
+    }
+
+    fun refresh() {
         viewModelScope.launch {
             podcastStore.followedPodcastsSortedByLastEpisode()
                 .flatMapLatest { podcastWithExtraInfoList: List<PodcastWithExtraInfo> ->
@@ -73,12 +81,14 @@ class FavouriteViewModel @Inject constructor(
                 }
                 .combine(episodePlayer.playerState) { episodes: List<EpisodeOfPodcast>, playerState: EpisodePlayerState ->
                     FavouriteViewModelState(
-                        episodeOfPodcasts = episodes,
+                        episodeOfPodcasts = viewModelState.value.episodeOfPodcasts + episodes,
                         episodePlayerState = playerState,
                         isLoading = false
                     )
                 }.collect { state ->
                     viewModelState.value = state
+                    pageSize += 5
+                    _isRefreshing.emit(false)
                 }
         }
     }
@@ -101,13 +111,13 @@ class FavouriteViewModel @Inject constructor(
 }
 
 data class FavouriteViewModelState(
-    val episodeOfPodcasts: List<EpisodeOfPodcast>? = null,
+    val episodeOfPodcasts: List<EpisodeOfPodcast> = listOf(),
     var episodePlayerState: EpisodePlayerState? = null,
     val isLoading: Boolean = false
 ) {
     fun toUiState(): FavouriteUiState {
-        println("episodeOfPodcasts: ${episodeOfPodcasts?.size}")
-        return if (episodeOfPodcasts.isNullOrEmpty()) {
+        println("FavouriteUiState episodeOfPodcasts: ${episodeOfPodcasts.size}")
+        return if (episodeOfPodcasts.isEmpty()) {
             FavouriteUiState.Loading
         } else {
             FavouriteUiState.Success(episodeOfPodcasts, episodePlayerState = episodePlayerState)

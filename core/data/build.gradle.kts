@@ -96,6 +96,9 @@ dependencies {
 
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+    implementation(libs.androidx.paging)
+    implementation(libs.androidx.paging.compose)
+
 
     coreLibraryDesugaring(libs.core.jdk.desugaring)
 

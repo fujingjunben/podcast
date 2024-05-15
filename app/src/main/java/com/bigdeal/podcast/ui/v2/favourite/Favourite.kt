@@ -13,8 +13,11 @@ import androidx.compose.material.icons.filled.Podcasts
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,11 +28,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.bigdeal.core.data.EpisodeEntity
 import com.bigdeal.core.data.Play
@@ -49,6 +54,7 @@ data class EpisodeActions(
     val onDeleteDownload: (playerEpisode: PlayerEpisode) -> Unit,
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Favourite(
     modifier: Modifier,
@@ -58,6 +64,8 @@ fun Favourite(
     viewModel: FavouriteViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val refreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
+    val pullRefreshState = rememberPullToRefreshState()
 //    val coroutineScope = rememberCoroutineScope()
 //    val snackBarText = stringResource(id = R.string.episode_added_to_your_queue)
 //    val snackbarHostState = remember { SnackbarHostState() }
@@ -67,8 +75,17 @@ fun Favourite(
 //        },
 //        modifier = modifier
 //    ) { contentPadding ->
+
+    if (pullRefreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            viewModel.refresh()
+            pullRefreshState.endRefresh()
+        }
+    }
     Column(
-        modifier = modifier.systemBarsPadding()
+        modifier = modifier
+            .systemBarsPadding()
+            .nestedScroll(pullRefreshState.nestedScrollConnection)
     ) {
         val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
         FavouriteAppBar(
@@ -89,40 +106,49 @@ fun Favourite(
             is FavouriteUiState.Success -> {
                 val episodeOfPodcasts = (uiState as FavouriteUiState.Success).episodeOfPodcasts
 
-                EpisodeList(
-                    (uiState as FavouriteUiState.Success).episodePlayerState!!,
-                    episodeOfPodcasts,
-                    navigateToEpisode,
-                    showSummary = false,
-                    episodeActions = EpisodeActions(
-                        onPlay = { playerEpisode ->
-                            run {
-                                onPlay(playerEpisode.id)
-                                viewModel.play(playerEpisode)
-                            }
-                        },
-                        onPause = viewModel::pause,
-                        onAddToQueue = { playerEpisode ->
-                            run {
+                if (!pullRefreshState.isRefreshing) {
+                    EpisodeList(
+                        (uiState as FavouriteUiState.Success).episodePlayerState!!,
+                        episodeOfPodcasts,
+                        navigateToEpisode,
+                        showSummary = false,
+                        episodeActions = EpisodeActions(
+                            onPlay = { playerEpisode ->
+                                run {
+                                    onPlay(playerEpisode.id)
+                                    viewModel.play(playerEpisode)
+                                }
+                            },
+                            onPause = viewModel::pause,
+                            onAddToQueue = { playerEpisode ->
+                                run {
 //                                    coroutineScope.launch {
 //                                        snackbarHostState.showSnackbar(snackBarText)
 //                                    }
-                                viewModel.addToQueue(playerEpisode)
-                            }
-                        },
-                        onDownload = viewModel::download,
-                        onCancelDownload = viewModel::cancelDownload,
-                        onDeleteDownload = viewModel::deleteDownload,
-                    )
-                ) {
-                    FollowedPodcasts(
-                        podcasts = episodeOfPodcasts.map { it.podcast }
-                            .distinctBy { it.uri },
-                        navigateToPodcast = navigateToPodcast,
-                        onPodcastUnfollowed = viewModel::onPodcastUnfollowed
-                    )
+                                    viewModel.addToQueue(playerEpisode)
+                                }
+                            },
+                            onDownload = viewModel::download,
+                            onCancelDownload = viewModel::cancelDownload,
+                            onDeleteDownload = viewModel::deleteDownload,
+                        )
+                    ) {
+                        FollowedPodcasts(
+                            podcasts = episodeOfPodcasts.map { it.podcast }
+                                .distinctBy { it.uri },
+                            navigateToPodcast = navigateToPodcast,
+                            onPodcastUnfollowed = viewModel::onPodcastUnfollowed
+                        )
+                    }
+                }
+
+                if (pullRefreshState.isRefreshing) {
+                    LinearProgressIndicator()
+                } else {
+                    LinearProgressIndicator(progress = { pullRefreshState.progress })
                 }
             }
+
         }
     }
 //    }

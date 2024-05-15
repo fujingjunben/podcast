@@ -18,11 +18,13 @@ fun EpisodeList(
     episodes: List<EpisodeOfPodcast>,
     navigateToEpisode: (String, String) -> Unit,
     episodeActions: EpisodeActions,
+    modifier: Modifier = Modifier,
     showPodcastImage: Boolean = true,
     showSummary: Boolean = true,
     header: @Composable LazyItemScope.() -> Unit = {},
 ) {
     LazyColumn(
+        modifier = modifier,
         contentPadding = PaddingValues(0.dp),
         verticalArrangement = Arrangement.Center
     ) {
