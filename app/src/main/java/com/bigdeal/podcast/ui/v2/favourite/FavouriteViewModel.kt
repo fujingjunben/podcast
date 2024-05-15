@@ -15,6 +15,7 @@ import com.bigdeal.podcast.core.player.EpisodePlayer
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
 import com.bigdeal.podcast.core.player.EpisodePlayerState
+import com.bigdeal.podcast.core.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -30,8 +31,8 @@ class FavouriteViewModel @Inject constructor(
     private val feedRepository: FeedRepository,
     private val podcastsRepository: PodcastsRepository,
     private val episodePlayer: EpisodePlayer,
-    private val podcastDownloader: PodcastDownloader,
-) : ViewModel() {
+    podcastDownloader: PodcastDownloader,
+) : BaseViewModel(episodePlayer, podcastDownloader) {
 
     private var viewModelState = MutableStateFlow(FavouriteViewModelState(isLoading = true))
 
@@ -96,31 +97,6 @@ class FavouriteViewModel @Inject constructor(
                 async { podcastStore.followPodcast(feedEntity.id) }
             )
         }
-    }
-
-    fun play(playerEpisode: PlayerEpisode) {
-        episodePlayer.play(playerEpisode)
-    }
-
-    fun pause() {
-        episodePlayer.pause()
-    }
-
-    fun addToQueue(playerEpisode: PlayerEpisode) {
-        episodePlayer.addToQueue(playerEpisode)
-    }
-
-
-    fun download(episode: PlayerEpisode) {
-        podcastDownloader.downloadEpisode(episode)
-    }
-
-    fun cancelDownload(episode: PlayerEpisode) {
-        podcastDownloader.cancelDownload(episode)
-    }
-
-    fun deleteDownload(episode: PlayerEpisode) {
-        podcastDownloader.cancelDownload(episode)
     }
 }
 

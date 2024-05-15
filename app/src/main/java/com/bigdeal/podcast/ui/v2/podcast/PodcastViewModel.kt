@@ -14,6 +14,7 @@ import com.bigdeal.podcast.core.model.EpisodeOfPodcast
 import com.bigdeal.podcast.core.player.EpisodePlayer
 import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
+import com.bigdeal.podcast.core.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -26,7 +27,7 @@ class PodcastViewModel @Inject constructor(
     private val episodePlayer: EpisodePlayer,
     private val podcastDownloader: PodcastDownloader,
     savedStateHandle: SavedStateHandle,
-) : ViewModel() {
+) : BaseViewModel(episodePlayer, podcastDownloader) {
     private val podcastId = Uri.decode(savedStateHandle.get<String>(Destination.PODCAST))
 
     var uiState by mutableStateOf(PodcastUiState(isLoading = true))
@@ -49,32 +50,6 @@ class PodcastViewModel @Inject constructor(
                     episodePlayerState = playerState)
             }
         }
-    }
-
-
-    fun play(playerEpisode: PlayerEpisode) {
-        episodePlayer.play(playerEpisode)
-    }
-
-    fun pause() {
-        episodePlayer.pause()
-    }
-
-    fun addToQueue(playerEpisode: PlayerEpisode) {
-        episodePlayer.addToQueue(playerEpisode)
-    }
-
-
-    fun download(episode: PlayerEpisode) {
-        podcastDownloader.downloadEpisode(episode)
-    }
-
-    fun cancelDownload(episode: PlayerEpisode) {
-        podcastDownloader.cancelDownload(episode)
-    }
-
-    fun deleteDownload(episode: PlayerEpisode) {
-        podcastDownloader.cancelDownload(episode)
     }
 }
 
