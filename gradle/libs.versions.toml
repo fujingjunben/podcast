@@ -200,6 +200,7 @@ androidx-work-ktx = { group = "androidx.work", name = "work-runtime-ktx", versio
 hilt-ext-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltExt" }
 androidx-paging = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging-version"}
 androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging-version"}
+androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

@@ -1,6 +1,11 @@
 package com.bigdeal.core.data
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.PagingSource
 import com.bigdeal.core.data.database.dao.EpisodeRecordDao
+import com.bigdeal.core.data.model.EpisodeWithPodcast
 import com.bigdeal.core.data.room.EpisodesDao
 import kotlinx.coroutines.flow.Flow
 
@@ -31,6 +36,14 @@ class EpisodeStore(
         limit: Int = Integer.MAX_VALUE
     ): Flow<List<EpisodeEntity>> {
         return episodesDao.episodesForPodcastId(podcastId, limit)
+    }
+
+    fun followedEpisodesPagingData(
+    ): Flow<PagingData<EpisodeWithPodcast>> {
+        return Pager(
+            config = PagingConfig(pageSize = 20),
+            pagingSourceFactory = { episodesDao.getFollowedEpisodes()}
+        ).flow
     }
 
     fun episodeWhichIsPlaying(): Flow<List<EpisodeToPodcast>> {

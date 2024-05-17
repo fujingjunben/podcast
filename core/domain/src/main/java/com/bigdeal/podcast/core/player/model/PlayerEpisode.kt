@@ -2,6 +2,7 @@ package com.bigdeal.podcast.core.player.model
 
 import com.bigdeal.core.data.DownloadState
 import com.bigdeal.core.data.EpisodeToPodcast
+import com.bigdeal.core.data.model.EpisodeWithPodcast
 import com.bigdeal.core.data.url
 import com.bigdeal.podcast.core.model.EpisodeInfo
 import com.bigdeal.podcast.core.model.PodcastInfo
@@ -58,3 +59,20 @@ fun EpisodeToPodcast.toPlayerEpisode(): PlayerEpisode =
         downloadId = episode.downloadId
     )
 
+
+fun EpisodeWithPodcast.toPlayerEpisode(): PlayerEpisode =
+    PlayerEpisode(
+        id = episode.id,
+        uri = episode.url(),
+        title = episode.title,
+        subTitle = episode.subtitle ?: "",
+        published = episode.published,
+        duration = episode.duration,
+        podcastName = podcast.title,
+        author = episode.author ?: podcast.author ?: "",
+        summary = episode.summary ?: "",
+        podcastImageUrl = podcast.imageUrl ?: "",
+        podcastId = podcast.id,
+        downloadState = episode.downloadState,
+        downloadId = episode.downloadId
+    )

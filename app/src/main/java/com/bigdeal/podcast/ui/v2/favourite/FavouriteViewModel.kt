@@ -3,13 +3,18 @@ package com.bigdeal.podcast.ui.v2.favourite
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.bigdeal.core.data.EpisodeEntity
 import com.bigdeal.core.data.EpisodeStore
+import com.bigdeal.core.data.EpisodeToPodcast
 import com.bigdeal.core.data.FeedRepository
+import com.bigdeal.core.data.FollowedEpisodesToPodcast
 import com.bigdeal.core.data.Podcast
 import com.bigdeal.core.data.PodcastStore
 import com.bigdeal.core.data.PodcastWithExtraInfo
 import com.bigdeal.core.data.PodcastsRepository
+import com.bigdeal.core.data.model.EpisodeWithPodcast
 import com.bigdeal.podcast.core.download.PodcastDownloader
 import com.bigdeal.podcast.core.player.EpisodePlayer
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
@@ -34,61 +39,23 @@ class FavouriteViewModel @Inject constructor(
     podcastDownloader: PodcastDownloader,
 ) : BaseViewModel(episodePlayer, podcastDownloader) {
 
-    private var viewModelState = MutableStateFlow(FavouriteViewModelState(isLoading = true))
+    val followedEpisodes: Flow<PagingData<EpisodeWithPodcast>> =
+        episodeStore.followedEpisodesPagingData().cachedIn(viewModelScope)
+    val episodePlayerState = episodePlayer.playerState
 
-    val uiState = viewModelState
-        .map { it.toUiState() }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.Eagerly,
-            viewModelState.value.toUiState()
-        )
-
-    val _isRefreshing = MutableStateFlow(false)
-
-    val isRefreshing: StateFlow<Boolean>
-        get() = _isRefreshing.asStateFlow()
-
-    private var pageSize = 5
+    var followedPodcasts: MutableStateFlow<List<Podcast>> = MutableStateFlow<List<Podcast>>(
+        emptyList()
+    )
 
     init {
-        refresh()
-    }
-
-    fun refresh() {
         viewModelScope.launch {
             podcastStore.followedPodcastsSortedByLastEpisode()
-                .flatMapLatest { podcastWithExtraInfoList: List<PodcastWithExtraInfo> ->
-                    Timber.d("podcastWithExtra: ${podcastWithExtraInfoList.size}")
-                    val episodeToPodcasts: List<Flow<Pair<Podcast, List<EpisodeEntity>>>> =
-                        podcastWithExtraInfoList.map { podcastWithExtraInfo ->
-                            episodeStore.episodesInPodcast(
-                                podcastWithExtraInfo.podcast.id,
-                                limit = pageSize
-                            )
-                                .map { episodeEntities: List<EpisodeEntity> ->
-                                    podcastWithExtraInfo.podcast to episodeEntities
-                                }
-                        }
-                    combine(episodeToPodcasts) { combined: Array<Pair<Podcast, List<EpisodeEntity>>> ->
-                        combined.map { (podcast, episodes) ->
-                            episodes.map { episodeEntity ->
-                                EpisodeOfPodcast(podcast, episodeEntity)
-                            }
-                        }.flatten()
-                            .sortedByDescending { episodeOfPodcast -> episodeOfPodcast.episode.published }
+                .map { podcastsWithExtraInfoList ->
+                    podcastsWithExtraInfoList.map { podcastWithExtraInfo ->
+                        podcastWithExtraInfo.podcast
                     }
-                }
-                .combine(episodePlayer.playerState) { episodes: List<EpisodeOfPodcast>, playerState: EpisodePlayerState ->
-                    FavouriteViewModelState(
-                        episodeOfPodcasts = viewModelState.value.episodeOfPodcasts + episodes,
-                        episodePlayerState = playerState,
-                        isLoading = false
-                    )
-                }.collect { state ->
-                    viewModelState.value = state
-                    pageSize += 5
-                    _isRefreshing.emit(false)
+                }.collect {podcasts ->
+                    followedPodcasts.value = podcasts
                 }
         }
     }

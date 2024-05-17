@@ -2,6 +2,7 @@
 
 package com.bigdeal.core.data.room
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -11,7 +12,9 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.bigdeal.core.data.EpisodeEntity
 import com.bigdeal.core.data.EpisodeToPodcast
+import com.bigdeal.core.data.FollowedEpisodesToPodcast
 import com.bigdeal.core.data.database.dao.BaseDao
+import com.bigdeal.core.data.model.EpisodeWithPodcast
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -45,6 +48,17 @@ abstract class EpisodesDao : BaseDao<EpisodeEntity> {
         podcastId: String,
         limit: Int
     ): Flow<List<EpisodeEntity>>
+
+    @Transaction
+    @Query("SELECT * FROM podcasts WHERE id IN (SELECT podcast_id FROM podcast_followed_entries)")
+    abstract fun getFollowedEpisodesWithPodcast(): PagingSource<Int, FollowedEpisodesToPodcast>
+
+    @Transaction
+    @Query("""
+            SELECT * FROM episodes INNER JOIN podcasts ON episodes.podcast_id = podcasts.id WHERE episodes.podcast_id IN (SELECT podcast_id FROM podcast_followed_entries) ORDER BY episodes.published DESC
+        """
+    )
+    abstract fun getFollowedEpisodes(): PagingSource<Int, EpisodeWithPodcast>
 
 
     @Transaction

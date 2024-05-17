@@ -3,6 +3,8 @@ package com.bigdeal.podcast.ui.v2.favourite
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
@@ -13,37 +15,37 @@ import androidx.compose.material.icons.filled.Podcasts
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.pulltorefresh.PullToRefreshState
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.bigdeal.core.data.EpisodeEntity
-import com.bigdeal.core.data.Play
+import com.bigdeal.core.data.EpisodeToPodcast
+import com.bigdeal.core.data.FollowedEpisodesToPodcast
 import com.bigdeal.podcast.R
 import com.bigdeal.core.data.Podcast
+import com.bigdeal.core.data.model.EpisodeWithPodcast
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
+import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
-import com.bigdeal.podcast.ui.v2.common.EpisodeList
-import kotlinx.coroutines.launch
+import com.bigdeal.podcast.core.player.model.toPlayerEpisode
+import com.bigdeal.podcast.ui.v2.common.EpisodeListItem
 
 data class EpisodeActions(
     val onPlay: (playerEpisode: PlayerEpisode) -> Unit,
@@ -63,29 +65,13 @@ fun Favourite(
     onPlay: (String) -> Unit,
     viewModel: FavouriteViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val refreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
-    val pullRefreshState = rememberPullToRefreshState()
-//    val coroutineScope = rememberCoroutineScope()
-//    val snackBarText = stringResource(id = R.string.episode_added_to_your_queue)
-//    val snackbarHostState = remember { SnackbarHostState() }
-//    Scaffold(
-//        snackbarHost = {
-//            SnackbarHost(hostState = snackbarHostState)
-//        },
-//        modifier = modifier
-//    ) { contentPadding ->
+    val followedEpisodes = viewModel.followedEpisodes.collectAsLazyPagingItems()
+    val playState = viewModel.episodePlayerState.collectAsState()
+    val followedPodcasts = viewModel.followedPodcasts.collectAsState()
 
-    if (pullRefreshState.isRefreshing) {
-        LaunchedEffect(true) {
-            viewModel.refresh()
-            pullRefreshState.endRefresh()
-        }
-    }
     Column(
         modifier = modifier
             .systemBarsPadding()
-            .nestedScroll(pullRefreshState.nestedScrollConnection)
     ) {
         val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
         FavouriteAppBar(
@@ -94,65 +80,38 @@ fun Favourite(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        when (uiState) {
-            is FavouriteUiState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-                ) {
-                    Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
-                }
-            }
-
-            is FavouriteUiState.Success -> {
-                val episodeOfPodcasts = (uiState as FavouriteUiState.Success).episodeOfPodcasts
-
-                if (!pullRefreshState.isRefreshing) {
-                    EpisodeList(
-                        (uiState as FavouriteUiState.Success).episodePlayerState!!,
-                        episodeOfPodcasts,
-                        navigateToEpisode,
-                        showSummary = false,
-                        episodeActions = EpisodeActions(
-                            onPlay = { playerEpisode ->
-                                run {
-                                    onPlay(playerEpisode.id)
-                                    viewModel.play(playerEpisode)
-                                }
-                            },
-                            onPause = viewModel::pause,
-                            onAddToQueue = { playerEpisode ->
-                                run {
-//                                    coroutineScope.launch {
-//                                        snackbarHostState.showSnackbar(snackBarText)
-//                                    }
-                                    viewModel.addToQueue(playerEpisode)
-                                }
-                            },
-                            onDownload = viewModel::download,
-                            onCancelDownload = viewModel::cancelDownload,
-                            onDeleteDownload = viewModel::deleteDownload,
-                        )
-                    ) {
-                        FollowedPodcasts(
-                            podcasts = episodeOfPodcasts.map { it.podcast }
-                                .distinctBy { it.uri },
-                            navigateToPodcast = navigateToPodcast,
-                            onPodcastUnfollowed = viewModel::onPodcastUnfollowed
-                        )
+        EpisodeList(
+            episodePlayerState = playState.value,
+            episodeWithPodcastsPagingItems = followedEpisodes,
+            navigateToEpisode,
+            showSummary = false,
+            episodeActions = EpisodeActions(
+                onPlay = { playerEpisode ->
+                    run {
+                        onPlay(playerEpisode.id)
+                        viewModel.play(playerEpisode)
                     }
-                }
-
-                if (pullRefreshState.isRefreshing) {
-                    LinearProgressIndicator()
-                } else {
-                    LinearProgressIndicator(progress = { pullRefreshState.progress })
-                }
-            }
-
+                },
+                onPause = viewModel::pause,
+                onAddToQueue = { playerEpisode ->
+                    run {
+                        viewModel.addToQueue(playerEpisode)
+                    }
+                },
+                onDownload = viewModel::download,
+                onCancelDownload = viewModel::cancelDownload,
+                onDeleteDownload = viewModel::deleteDownload,
+            )
+        ) {
+            FollowedPodcasts(
+                podcasts = followedPodcasts.value,
+                navigateToPodcast = navigateToPodcast,
+                onPodcastUnfollowed = viewModel::onPodcastUnfollowed
+            )
         }
     }
-//    }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -318,4 +277,65 @@ fun AlertDialogExample(
             Text("Dismiss")
         }
     })
+}
+
+@Composable
+fun EpisodeList(
+    episodePlayerState: EpisodePlayerState,
+    episodeWithPodcastsPagingItems: LazyPagingItems<EpisodeWithPodcast>,
+    navigateToEpisode: (String, String) -> Unit,
+    episodeActions: EpisodeActions,
+    modifier: Modifier = Modifier,
+    showPodcastImage: Boolean = true,
+    showSummary: Boolean = true,
+    header: @Composable LazyItemScope.() -> Unit = {},
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(0.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        item {
+            header(this)
+        }
+        items(episodeWithPodcastsPagingItems.itemCount) { index ->
+            val episodeWithPodcast = episodeWithPodcastsPagingItems[index]
+            episodeWithPodcast?.let {item ->
+                EpisodeListItem(
+                    episodePlayerState = episodePlayerState,
+                    playerEpisode = item.toPlayerEpisode(),
+                    onClick = navigateToEpisode,
+                    onPlay = { episodeActions.onPlay(item.toPlayerEpisode()) },
+                    onPause = episodeActions.onPause,
+                    onAddToQueue = { episodeActions.onAddToQueue(item.toPlayerEpisode()) },
+                    onDownload = { episodeActions.onDownload(item.toPlayerEpisode()) },
+                    onCancelDownload = { episodeActions.onCancelDownload(item.toPlayerEpisode()) },
+                    showPodcastImage = showPodcastImage,
+                    showSummary = showSummary,
+                    modifier = Modifier.fillParentMaxWidth()
+                )
+            }
+        }
+
+        episodeWithPodcastsPagingItems.apply {
+            when {
+                loadState.refresh is LoadState.Loading -> {
+                    item {
+                        CircularProgressIndicator(modifier = Modifier.fillParentMaxSize())
+                    }
+                }
+                loadState.append is LoadState.Loading -> {
+                    item {
+                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                    }
+                }
+                loadState.append is LoadState.Error -> {
+                    item {
+                        Text(text = "Error loading data")
+                    }
+                }
+            }
+        }
+
+    }
 }
