@@ -14,13 +14,13 @@ import com.bigdeal.core.data.Podcast
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 
 @Composable
-fun PodcastTitleCard(playerEpisode: PlayerEpisode, onClick : () -> Unit = {}) {
+fun PodcastTitleCard(podcastName: String, podcastImageUrl: String, onClick : () -> Unit = {}) {
     Row(horizontalArrangement = Arrangement.Start,
         modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
         AsyncImage(
-            model = playerEpisode.podcastImageUrl,
-            contentDescription = playerEpisode.podcastName,
+            model = podcastImageUrl,
+            contentDescription = podcastName,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(100.dp)
@@ -28,6 +28,6 @@ fun PodcastTitleCard(playerEpisode: PlayerEpisode, onClick : () -> Unit = {}) {
                 .clickable { onClick() }
         )
 
-        Text(text = playerEpisode.podcastName, modifier = Modifier.padding(12.dp))
+        Text(text = podcastName, modifier = Modifier.padding(12.dp))
     }
 }

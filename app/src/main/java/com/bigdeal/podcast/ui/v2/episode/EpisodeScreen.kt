@@ -42,7 +42,8 @@ fun EpisodeScreen(
         )
         if (playerEpisode != null) {
             PodcastTitleCard(
-                playerEpisode,
+                podcastName = playerEpisode.podcastName,
+                podcastImageUrl = playerEpisode.podcastImageUrl,
                 onClick = { navigateToPodcast(playerEpisode.podcastId) })
             EpisodeListItem(
                 episodePlayerState = viewModel.uiState.episodePlayerState,

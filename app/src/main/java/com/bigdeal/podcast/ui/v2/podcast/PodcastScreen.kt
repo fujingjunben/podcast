@@ -11,17 +11,22 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.bigdeal.core.data.Podcast
+import com.bigdeal.core.data.model.EpisodeWithPodcast
 import com.bigdeal.podcast.ui.v2.common.EpisodeList
 import com.bigdeal.podcast.ui.v2.common.PodcastTitleCard
 import com.bigdeal.podcast.R
 import com.bigdeal.podcast.core.designsystem.component.HtmlTextContainer
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
+import com.bigdeal.podcast.core.player.model.toPlayerEpisode
 import com.bigdeal.podcast.ui.v2.favourite.EpisodeActions
 
 @Composable
@@ -33,7 +38,10 @@ fun PodcastScreen(
     viewModel: PodcastViewModel = hiltViewModel()
 ) {
 
-    val uiState = viewModel.uiState
+    val episodesPagingItems = viewModel.episodesPagingData.collectAsLazyPagingItems()
+    val episodePlayerState = viewModel.episodePlayerState.collectAsState()
+    val podcast = viewModel.uiState.podcast
+
     val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
     Column(modifier = modifier.systemBarsPadding()) {
         PodcastAppBar(
@@ -41,40 +49,36 @@ fun PodcastScreen(
             modifier = Modifier.fillMaxWidth(),
             onBackPress
         )
-        if (!uiState.isLoading) {
-            uiState.episodePlayerState?.let {
-                EpisodeList(
-                    episodePlayerState = it,
-                    episodes = uiState.episodeOfPodcasts,
-                    navigateToEpisode = navigateToEpisode,
-                    showPodcastImage = false,
-                    showSummary = true,
-                    episodeActions = EpisodeActions(
-                        onPlay = { playerEpisode ->
-                            run {
-                                onPlay(playerEpisode.id)
-                                viewModel.play(playerEpisode)
-                            }
-                        },
-                        onPause = viewModel::pause,
-                        onAddToQueue = {playerEpisode ->
-                                       viewModel.addToQueue(playerEpisode)
-                        },
-                        onDownload = { playerEpisode ->  viewModel.download(playerEpisode)},
-                        onCancelDownload = { playerEpisode ->  viewModel.cancelDownload(playerEpisode) },
-                        onDeleteDownload = { playerEpisode ->  viewModel.deleteDownload(playerEpisode)},
-                    ),
 
-                    header = {
-                        PodcastInfo(uiState.episodeOfPodcasts[0])
-                    })
-            }
+        if (podcast != null) {
+            EpisodeList(
+                episodePlayerState = episodePlayerState.value,
+                episodeWithPodcastsPagingItems = episodesPagingItems,
+                navigateToEpisode = navigateToEpisode,
+                showPodcastImage = false,
+                showSummary = true,
+                episodeActions = EpisodeActions(
+                    onPlay = { playerEpisode ->
+                        run {
+                            onPlay(playerEpisode.id)
+                            viewModel.play(playerEpisode)
+                        }
+                    },
+                    onPause = viewModel::pause,
+                    onAddToQueue = { playerEpisode ->
+                        viewModel.addToQueue(playerEpisode)
+                    },
+                    onDownload = { playerEpisode -> viewModel.download(playerEpisode) },
+                    onCancelDownload = { playerEpisode -> viewModel.cancelDownload(playerEpisode) },
+                    onDeleteDownload = { playerEpisode -> viewModel.deleteDownload(playerEpisode) },
+                ),
+
+                header = {
+                    PodcastInfo(podcast)
+                })
+
         } else {
-                Box(
-                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
-                ) {
-                    Icon(imageVector = Icons.Filled.Refresh, contentDescription = null)
-                }
+            CircularProgressIndicator(modifier = Modifier.padding(16.dp))
         }
     }
 }
@@ -100,10 +104,11 @@ fun PodcastAppBar(
 }
 
 @Composable
-fun PodcastInfo(episodeOfPodcast: EpisodeOfPodcast) {
-    PodcastTitleCard(episodeOfPodcast.toEpisode())
+fun PodcastInfo(podcast: Podcast) {
+    podcast.imageUrl?.let {
+        PodcastTitleCard(podcastName = podcast.title, podcastImageUrl = it) }
     PodcastStatusBar()
-    PodcastDescription(description = episodeOfPodcast.podcast.description)
+    PodcastDescription(description = podcast.description)
 }
 
 @Composable

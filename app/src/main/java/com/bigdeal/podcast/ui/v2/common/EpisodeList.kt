@@ -2,20 +2,25 @@ package com.bigdeal.podcast.ui.v2.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.bigdeal.podcast.core.model.EpisodeOfPodcast
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import com.bigdeal.core.data.model.EpisodeWithPodcast
 import com.bigdeal.podcast.core.player.EpisodePlayerState
+import com.bigdeal.podcast.core.player.model.toPlayerEpisode
 import com.bigdeal.podcast.ui.v2.favourite.EpisodeActions
 
 @Composable
 fun EpisodeList(
     episodePlayerState: EpisodePlayerState,
-    episodes: List<EpisodeOfPodcast>,
+    episodeWithPodcastsPagingItems: LazyPagingItems<EpisodeWithPodcast>,
     navigateToEpisode: (String, String) -> Unit,
     episodeActions: EpisodeActions,
     modifier: Modifier = Modifier,
@@ -31,20 +36,44 @@ fun EpisodeList(
         item {
             header(this)
         }
-        items(episodes, key = { it.episode.id }) { item ->
-            EpisodeListItem(
-                episodePlayerState = episodePlayerState,
-                playerEpisode = item.toEpisode(),
-                onClick = navigateToEpisode,
-                onPlay = { episodeActions.onPlay(item.toEpisode()) },
-                onPause = episodeActions.onPause,
-                onAddToQueue = { episodeActions.onAddToQueue(item.toEpisode()) },
-                onDownload = { episodeActions.onDownload(item.toEpisode()) },
-                onCancelDownload = { episodeActions.onCancelDownload(item.toEpisode()) },
-                showPodcastImage = showPodcastImage,
-                showSummary = showSummary,
-                modifier = Modifier.fillParentMaxWidth()
-            )
+        items(episodeWithPodcastsPagingItems.itemCount) { index ->
+            val episodeWithPodcast = episodeWithPodcastsPagingItems[index]
+            episodeWithPodcast?.let {item ->
+                EpisodeListItem(
+                    episodePlayerState = episodePlayerState,
+                    playerEpisode = item.toPlayerEpisode(),
+                    onClick = navigateToEpisode,
+                    onPlay = { episodeActions.onPlay(item.toPlayerEpisode()) },
+                    onPause = episodeActions.onPause,
+                    onAddToQueue = { episodeActions.onAddToQueue(item.toPlayerEpisode()) },
+                    onDownload = { episodeActions.onDownload(item.toPlayerEpisode()) },
+                    onCancelDownload = { episodeActions.onCancelDownload(item.toPlayerEpisode()) },
+                    showPodcastImage = showPodcastImage,
+                    showSummary = showSummary,
+                    modifier = Modifier.fillParentMaxWidth()
+                )
+            }
         }
+
+        episodeWithPodcastsPagingItems.apply {
+            when {
+                loadState.refresh is LoadState.Loading -> {
+                    item {
+                        CircularProgressIndicator(modifier = Modifier.fillParentMaxSize())
+                    }
+                }
+                loadState.append is LoadState.Loading -> {
+                    item {
+                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                    }
+                }
+                loadState.append is LoadState.Error -> {
+                    item {
+                        Text(text = "Error loading data")
+                    }
+                }
+            }
+        }
+
     }
 }

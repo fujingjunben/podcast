@@ -1,9 +1,11 @@
 package com.bigdeal.core.data
 
+import androidx.paging.Config
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
+import com.bigdeal.core.data.config.PAGE_SIZE
 import com.bigdeal.core.data.database.dao.EpisodeRecordDao
 import com.bigdeal.core.data.model.EpisodeWithPodcast
 import com.bigdeal.core.data.room.EpisodesDao
@@ -38,10 +40,18 @@ class EpisodeStore(
         return episodesDao.episodesForPodcastId(podcastId, limit)
     }
 
+    fun episodesInPodcastPagingData(podcastId: String ): Flow<PagingData<EpisodeWithPodcast>> {
+        return Pager(
+            config = PagingConfig(pageSize = PAGE_SIZE),
+            pagingSourceFactory = { episodesDao.getEpisodesInPodcast(podcastId)}
+        ).flow
+    }
+
+
     fun followedEpisodesPagingData(
     ): Flow<PagingData<EpisodeWithPodcast>> {
         return Pager(
-            config = PagingConfig(pageSize = 20),
+            config = PagingConfig(pageSize = PAGE_SIZE),
             pagingSourceFactory = { episodesDao.getFollowedEpisodes()}
         ).flow
     }

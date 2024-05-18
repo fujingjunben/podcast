@@ -49,6 +49,14 @@ abstract class EpisodesDao : BaseDao<EpisodeEntity> {
         limit: Int
     ): Flow<List<EpisodeEntity>>
 
+
+    @Transaction
+    @Query("""
+            SELECT * FROM episodes INNER JOIN podcasts ON episodes.podcast_id = podcasts.id WHERE episodes.podcast_id =:podcastId ORDER BY episodes.published DESC
+        """
+    )
+    abstract fun getEpisodesInPodcast(podcastId: String): PagingSource<Int, EpisodeWithPodcast>
+
     @Transaction
     @Query("SELECT * FROM podcasts WHERE id IN (SELECT podcast_id FROM podcast_followed_entries)")
     abstract fun getFollowedEpisodesWithPodcast(): PagingSource<Int, FollowedEpisodesToPodcast>
