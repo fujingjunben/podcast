@@ -16,7 +16,7 @@ import com.bigdeal.podcast.core.player.model.PlayerEpisode
 @Composable
 fun PodcastTitleCard(podcastName: String, podcastImageUrl: String, onClick : () -> Unit = {}) {
     Row(horizontalArrangement = Arrangement.Start,
-        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         AsyncImage(
             model = podcastImageUrl,
