@@ -17,9 +17,9 @@ import androidx.room.PrimaryKey
 )
 @Immutable
 data class Podcast(
-    @PrimaryKey @ColumnInfo(name = "id") val id: String,
-    @ColumnInfo(name = "uri") val uri: String,
-    @ColumnInfo(name = "title") val title: String,
+    @PrimaryKey @ColumnInfo(name = "id") val id: String = "",
+    @ColumnInfo(name = "uri") val uri: String = "",
+    @ColumnInfo(name = "title") val title: String = "",
     @ColumnInfo(name = "description") val description: String? = null,
     @ColumnInfo(name = "author") val author: String? = null,
     @ColumnInfo(name = "image_url") val imageUrl: String? = null,
