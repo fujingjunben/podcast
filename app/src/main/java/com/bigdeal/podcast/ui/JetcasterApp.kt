@@ -80,7 +80,7 @@ fun PodcastBottomBar(navController: NavController,
             }
             NavigationBar(
                 Modifier.windowInsetsBottomHeight(
-                    WindowInsets.navigationBars.add(WindowInsets(bottom = 56.dp))
+                    WindowInsets.navigationBars.add(WindowInsets(bottom = 60.dp))
                 )
             ) {
                 tabs.forEach { tab ->
@@ -101,6 +101,7 @@ fun PodcastBottomBar(navController: NavController,
                         },
                         alwaysShowLabel = true,
                         modifier = Modifier.navigationBarsPadding()
+                            .padding(vertical = 3.dp)
                     )
                 }
             }

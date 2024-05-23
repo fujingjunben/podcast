@@ -37,7 +37,7 @@ fun PodcastScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
-    Column(modifier = modifier.systemBarsPadding()) {
+    Column {
         PodcastAppBar(
             backgroundColor = appBarColor,
             modifier = Modifier.fillMaxWidth(),

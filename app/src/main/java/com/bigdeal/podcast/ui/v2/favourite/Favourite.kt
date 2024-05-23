@@ -1,6 +1,7 @@
 package com.bigdeal.podcast.ui.v2.favourite
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -73,13 +74,6 @@ fun Favourite(
         modifier = modifier
             .systemBarsPadding()
     ) {
-        val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
-        FavouriteAppBar(
-            onFollow = { url -> viewModel.addFeed(url) },
-            backgroundColor = appBarColor,
-            modifier = Modifier.fillMaxWidth(),
-        )
-
         EpisodeList(
             episodePlayerState = playState.value,
             episodeWithPodcastsPagingItems = followedEpisodes,
@@ -106,7 +100,8 @@ fun Favourite(
             FollowedPodcasts(
                 podcasts = followedPodcasts.value,
                 navigateToPodcast = navigateToPodcast,
-                onPodcastUnfollowed = viewModel::onPodcastUnfollowed
+                onPodcastUnfollowed = viewModel::onPodcastUnfollowed,
+                onFollow = { url -> viewModel.addFeed(url) },
             )
         }
     }
@@ -128,13 +123,6 @@ fun FavouriteAppBar(
             Image(
                 painter = painterResource(R.drawable.ic_logo), contentDescription = null
             )
-            Icon(
-                painter = painterResource(R.drawable.ic_text_logo),
-                contentDescription = stringResource(R.string.app_name),
-                modifier = Modifier
-                    .padding(start = 4.dp)
-                    .heightIn(max = 24.dp)
-            )
         }
     }, actions = {
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
@@ -142,12 +130,6 @@ fun FavouriteAppBar(
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = stringResource(R.string.cd_add)
-                )
-            }
-            IconButton(onClick = { /* TODO: Open account? */ }) {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = stringResource(R.string.cd_account)
                 )
             }
         }
@@ -178,17 +160,47 @@ fun FollowedPodcasts(
     podcasts: List<Podcast>,
     navigateToPodcast: (String) -> Unit,
     onPodcastUnfollowed: (String) -> Unit,
+    onFollow: (String) -> Unit,
 ) {
+    val feedState = remember { mutableStateOf("") }
+    val showDialog = remember {
+        mutableStateOf(false)
+    }
+    if (showDialog.value) {
+        AlertDialogExample(
+            onDismissRequest = { showDialog.value = false },
+            onConfirmation = {
+                if (feedState.value.isNotEmpty()) {
+                    onFollow(feedState.value)
+                    showDialog.value = false
+                }
+            },
+            value = feedState.value,
+            onValueChange = { value -> feedState.value = value },
+            dialogTitle = stringResource(id = R.string.cd_add_feed_dialog_title),
+            dialogText = stringResource(id = R.string.cd_add_feed_dialog_content),
+            icon = Icons.Filled.Podcasts
+
+        )
+    }
     Column(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = stringResource(id = R.string.cd_follow))
-            Text(text = stringResource(id = R.string.cd_more))
+            IconButton(onClick = { showDialog.value = true }) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.cd_add)
+                )
+            }
         }
+        HorizontalDivider(modifier = modifier)
+
         LazyRow(modifier = modifier.height(100.dp)) {
             items(podcasts, key = { podcast -> podcast.id }) { podcast ->
                 FollowedPodcastCarouselItem(
@@ -256,7 +268,7 @@ fun AlertDialogExample(
     }, title = {
         Text(text = dialogTitle)
     }, text = {
-        Column {
+        Column(horizontalAlignment = Alignment.CenterHorizontally){
             Text(text = dialogText)
             TextField(
                 value = value, onValueChange = onValueChange

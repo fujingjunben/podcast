@@ -48,6 +48,9 @@
     <string name="cd_add">Add</string>
     <string name="cd_back">Back</string>
     <string name="cd_follow">Follow</string>
+    <string name="cd_add_feed">Add</string>
+    <string name="cd_add_feed_dialog_title">Follow Podcast</string>
+    <string name="cd_add_feed_dialog_content">Please add podcast feed url</string>
     <string name="cd_following">Following</string>
     <string name="cd_forward10">Forward 10 seconds</string>
     <string name="cd_more">More</string>

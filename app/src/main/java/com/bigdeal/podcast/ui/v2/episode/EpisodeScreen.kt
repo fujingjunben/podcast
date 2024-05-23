@@ -1,6 +1,7 @@
 package com.bigdeal.podcast.ui.v2.episode
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -63,7 +64,7 @@ fun EpisodeScreen(
 ) {
     val uiState = viewModel.uiState
     val playerEpisode = uiState.episodePlayerState.currentEpisode
-    Column(modifier = modifier.systemBarsPadding()) {
+    Column {
         AppBar(
             modifier = Modifier.fillMaxWidth(),
             onBackPress
@@ -129,6 +130,7 @@ private fun AppBar(
         },
     )
 }
+
 @Composable
 fun EpisodeCard(
     episodePlayerState: EpisodePlayerState,
@@ -145,7 +147,7 @@ fun EpisodeCard(
         Surface(
             shape = MaterialTheme.shapes.large,
             color = MaterialTheme.colorScheme.surfaceContainer,
-            onClick = { onClick(playerEpisode.podcastId, playerEpisode.id)})
+            onClick = { onClick(playerEpisode.podcastId, playerEpisode.id) })
         {
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
