@@ -1,28 +1,21 @@
-package com.bigdeal.podcast.ui.v2.episode
+package com.bigdeal.podcast.ui.episode
 
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bigdeal.core.data.EpisodeEntity
 import com.bigdeal.core.data.EpisodeStore
-import com.bigdeal.core.data.EpisodeToPodcast
-import com.bigdeal.core.data.Play
 import com.bigdeal.podcast.core.download.PodcastDownloader
 import com.bigdeal.podcast.core.player.EpisodePlayer
-import com.bigdeal.podcast.ui.v2.Destination
-import com.bigdeal.podcast.core.model.EpisodeOfPodcast
+import com.bigdeal.podcast.ui.Destination
 import com.bigdeal.podcast.core.player.EpisodePlayerState
-import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.core.player.model.toPlayerEpisode
 import com.bigdeal.podcast.core.viewmodel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 data class PlayerUiState(

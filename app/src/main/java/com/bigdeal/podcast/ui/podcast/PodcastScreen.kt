@@ -1,4 +1,4 @@
-package com.bigdeal.podcast.ui.v2.podcast
+package com.bigdeal.podcast.ui.podcast
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,13 +17,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.bigdeal.core.data.Podcast
-import com.bigdeal.podcast.ui.v2.common.EpisodeList
-import com.bigdeal.podcast.ui.v2.common.PodcastTitleCard
+import com.bigdeal.podcast.ui.common.EpisodeList
+import com.bigdeal.podcast.ui.common.PodcastTitleCard
 import com.bigdeal.podcast.R
 import com.bigdeal.podcast.core.designsystem.component.HtmlTextContainer
 import com.bigdeal.podcast.core.model.EpisodeOfPodcast
 import com.bigdeal.podcast.core.player.model.toPlayerEpisode
-import com.bigdeal.podcast.ui.v2.favourite.EpisodeActions
+import com.bigdeal.podcast.ui.favourite.EpisodeActions
 
 @Composable
 fun PodcastScreen(

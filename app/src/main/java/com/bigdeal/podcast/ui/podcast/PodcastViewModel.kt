@@ -1,22 +1,15 @@
-package com.bigdeal.podcast.ui.v2.podcast
+package com.bigdeal.podcast.ui.podcast
 
 import android.net.Uri
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.bigdeal.core.data.EpisodeEntity
 import com.bigdeal.core.data.EpisodeStore
 import com.bigdeal.core.data.Podcast
 import com.bigdeal.core.data.PodcastStore
 import com.bigdeal.core.data.model.EpisodeWithPodcast
 import com.bigdeal.podcast.core.download.PodcastDownloader
-import com.bigdeal.podcast.core.model.EpisodeInfo
-import com.bigdeal.podcast.ui.v2.Destination
-import com.bigdeal.podcast.core.model.EpisodeOfPodcast
+import com.bigdeal.podcast.ui.Destination
 import com.bigdeal.podcast.core.player.EpisodePlayer
 import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.core.viewmodel.BaseViewModel
@@ -25,7 +18,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

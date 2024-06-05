@@ -1,4 +1,4 @@
-package com.bigdeal.podcast.ui.v2
+package com.bigdeal.podcast.ui
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -8,14 +8,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.bigdeal.podcast.R
-import com.bigdeal.podcast.ui.JetcasterAppState
-import com.bigdeal.podcast.ui.Screen
 import com.bigdeal.podcast.ui.player.PlayerScreen
-import com.bigdeal.podcast.ui.rememberJetcasterAppState
-import com.bigdeal.podcast.ui.v2.episode.EpisodeScreen
-import com.bigdeal.podcast.ui.v2.favourite.Favourite
-import com.bigdeal.podcast.ui.v2.manage.Manage
-import com.bigdeal.podcast.ui.v2.podcast.PodcastScreen
+import com.bigdeal.podcast.ui.episode.EpisodeScreen
+import com.bigdeal.podcast.ui.favourite.Favourite
+import com.bigdeal.podcast.ui.discover.Discover
+import com.bigdeal.podcast.ui.podcast.PodcastScreen
 
 @Composable
 fun NavGraph(
@@ -63,8 +60,11 @@ fun NavGraph(
         composable(Screen.Player.route) { backStackEntry ->
             PlayerScreen(onBackPress = appState::navigateBack)
         }
-        composable(Destination.MANAGE_ROUTE) {
-            Manage()
+        composable(Destination.DISCOVER_ROUTE) {
+            Discover()
+        }
+        composable(Destination.LIBRARY_ROUTE) {
+            Discover()
         }
     }
 }
@@ -75,14 +75,14 @@ enum class Tabs(
     val route: String
 ) {
     FAVOURITE(R.string.favourite, R.drawable.ic_grain, Destination.FAVOURITE_ROUTE),
-    EXPLORE(R.string.discover, R.drawable.ic_search, Destination.EXPLORE_ROUTE),
-    MANAGE(R.string.library, R.drawable.ic_featured, Destination.MANAGE_ROUTE),
+    EXPLORE(R.string.discover, R.drawable.ic_search, Destination.DISCOVER_ROUTE),
+    MANAGE(R.string.library, R.drawable.ic_featured, Destination.LIBRARY_ROUTE),
 }
 
 object Destination {
     const val FAVOURITE_ROUTE = "favourite"
-    const val EXPLORE_ROUTE = "discover"
-    const val MANAGE_ROUTE = "library"
+    const val DISCOVER_ROUTE = "discover"
+    const val LIBRARY_ROUTE = "library"
     const val EPISODE = "episodeId"
     const val PODCAST = "podcastId"
 }

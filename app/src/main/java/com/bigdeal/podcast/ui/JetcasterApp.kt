@@ -15,11 +15,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.bigdeal.podcast.ui.theme.JetcasterTheme
-import com.bigdeal.podcast.ui.v2.NavGraph
-import com.bigdeal.podcast.ui.v2.Tabs
-import com.bigdeal.podcast.ui.v2.playerBar.PlayerBar
+import com.bigdeal.podcast.ui.playerBar.PlayerBar
 import com.bigdeal.core.util.LogUtil
-import com.bigdeal.podcast.ui.v2.playerBar.PlayerBarViewModel
+import com.bigdeal.podcast.ui.playerBar.PlayerBarViewModel
 
 @Composable
 fun PodcastApp() {

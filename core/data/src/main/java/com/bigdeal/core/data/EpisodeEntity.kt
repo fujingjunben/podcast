@@ -38,7 +38,7 @@ data class EpisodeEntity(
     @ColumnInfo(name = "summary") val summary: String? = null,
     @ColumnInfo(name = "author") val author: String? = null,
     @ColumnInfo(name = "published") val published: OffsetDateTime,
-    @ColumnInfo(name = "duration") val duration: Duration? = null,
+    @ColumnInfo(name = "duration") val duration: Duration = Duration.ZERO,
     @ColumnInfo(name = "file_uri") val fileUri: String = "",
     @ColumnInfo(name = "download_state") val downloadState: DownloadState = DownloadState.NONE,
     @ColumnInfo(name = "download_id") val downloadId: Long = -1L

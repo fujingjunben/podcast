@@ -1,4 +1,4 @@
-package com.bigdeal.podcast.ui.v2.common
+package com.bigdeal.podcast.ui.common
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

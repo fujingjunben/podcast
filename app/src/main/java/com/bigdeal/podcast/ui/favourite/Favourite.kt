@@ -1,4 +1,4 @@
-package com.bigdeal.podcast.ui.v2.favourite
+package com.bigdeal.podcast.ui.favourite
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -46,7 +46,7 @@ import com.bigdeal.podcast.core.model.EpisodeOfPodcast
 import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.core.player.model.toPlayerEpisode
-import com.bigdeal.podcast.ui.v2.common.EpisodeListItem
+import com.bigdeal.podcast.ui.common.EpisodeListItem
 
 data class EpisodeActions(
     val onPlay: (playerEpisode: PlayerEpisode) -> Unit,

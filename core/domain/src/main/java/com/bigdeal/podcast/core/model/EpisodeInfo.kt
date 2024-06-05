@@ -15,7 +15,7 @@ data class EpisodeInfo(
     val summary: String = "",
     val author: String = "",
     val published: OffsetDateTime = OffsetDateTime.MIN,
-    val duration: Duration? = null,
+    val duration: Duration = Duration.ZERO,
 )
 
 fun EpisodeEntity.asExternalModel(): EpisodeInfo =

@@ -1,4 +1,4 @@
-package com.bigdeal.podcast.ui.v2.playerBar
+package com.bigdeal.podcast.ui.playerBar
 
 import android.net.Uri
 import androidx.compose.foundation.Image

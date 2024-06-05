@@ -1,13 +1,15 @@
-package com.bigdeal.podcast.ui.v2.manage
+package com.bigdeal.podcast.ui.discover
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+
 
 @Composable
-fun Manage() {
+fun Discover(modifier: Modifier = Modifier) {
     Surface(
         modifier = Modifier
             .systemBarsPadding()
@@ -15,6 +17,9 @@ fun Manage() {
                 WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
             )
     ) {
-        Text(text = "Manage")
+        Box(modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center) {
+            Text(text = "Work in progress")
+        }
     }
 }

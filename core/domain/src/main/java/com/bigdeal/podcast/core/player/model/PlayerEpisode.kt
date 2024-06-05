@@ -18,7 +18,7 @@ data class PlayerEpisode(
     val title: String = "",
     val subTitle: String = "",
     val published: OffsetDateTime = OffsetDateTime.MIN,
-    val duration: Duration? = null,
+    val duration: Duration = Duration.ZERO,
     val podcastName: String = "",
     val author: String = "",
     val summary: String = "",

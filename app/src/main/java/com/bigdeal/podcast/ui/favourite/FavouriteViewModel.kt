@@ -1,4 +1,4 @@
-package com.bigdeal.podcast.ui.v2.favourite
+package com.bigdeal.podcast.ui.favourite
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel

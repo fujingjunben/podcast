@@ -1,4 +1,4 @@
-package com.bigdeal.podcast.ui.v2.common
+package com.bigdeal.podcast.ui.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,7 +15,7 @@ import androidx.paging.compose.LazyPagingItems
 import com.bigdeal.core.data.model.EpisodeWithPodcast
 import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.core.player.model.toPlayerEpisode
-import com.bigdeal.podcast.ui.v2.favourite.EpisodeActions
+import com.bigdeal.podcast.ui.favourite.EpisodeActions
 
 @Composable
 fun EpisodeList(
