@@ -2,6 +2,7 @@
 
 package com.bigdeal.core.data
 
+import com.bigdeal.core.data.model.EpisodeWithPodcast
 import com.bigdeal.core.data.room.CategoriesDao
 import com.bigdeal.core.data.room.EpisodesDao
 import com.bigdeal.core.data.room.PodcastCategoryEntryDao
@@ -47,6 +48,10 @@ class CategoryStore(
         limit: Int = Integer.MAX_VALUE
     ): Flow<List<EpisodeToPodcast>> {
         return episodesDao.episodesFromPodcastsInCategory(categoryId, limit)
+    }
+
+    fun getPodcastsAndLatestEpisodesByCategory(categoryId: Long) : Flow<List<EpisodeWithPodcast>> {
+        return episodesDao.getPodcastsAndLatestEpisodesByCategory(categoryId)
     }
 
     /**

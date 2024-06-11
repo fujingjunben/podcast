@@ -14,7 +14,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.bigdeal.podcast.ui.theme.JetcasterTheme
+import com.bigdeal.podcast.ui.theme.PodcastTheme
 import com.bigdeal.podcast.ui.playerBar.PlayerBar
 import com.bigdeal.core.util.LogUtil
 import com.bigdeal.podcast.ui.playerBar.PlayerBarViewModel
@@ -26,7 +26,7 @@ fun PodcastApp() {
     }
     val navController = rememberNavController()
 
-    JetcasterTheme {
+    PodcastTheme {
         val episodeId = remember {
             mutableStateOf("")
         }

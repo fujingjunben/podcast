@@ -12,6 +12,7 @@ import com.bigdeal.podcast.ui.player.PlayerScreen
 import com.bigdeal.podcast.ui.episode.EpisodeScreen
 import com.bigdeal.podcast.ui.favourite.Favourite
 import com.bigdeal.podcast.ui.discover.Discover
+import com.bigdeal.podcast.ui.library.Library
 import com.bigdeal.podcast.ui.podcast.PodcastScreen
 
 @Composable
@@ -19,7 +20,7 @@ fun NavGraph(
     navController: NavHostController,
     modifier: Modifier,
     onPlay: (String) -> Unit,
-    appState: JetcasterAppState = rememberJetcasterAppState(navController = navController)
+    appState: PodcastAppState = rememberPodcastAppState(navController = navController)
 ) {
     NavHost(navController = navController, startDestination = Destination.FAVOURITE_ROUTE) {
         composable(Destination.FAVOURITE_ROUTE) { backStackEntry ->
@@ -64,7 +65,7 @@ fun NavGraph(
             Discover()
         }
         composable(Destination.LIBRARY_ROUTE) {
-            Discover()
+            Library()
         }
     }
 }

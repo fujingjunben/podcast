@@ -19,8 +19,9 @@ package com.bigdeal.podcast.core.di
 import android.app.DownloadManager
 import android.content.Context
 import com.bigdeal.core.Dispatcher
-import com.bigdeal.core.JetcasterDispatchers
+import com.bigdeal.core.PodcastDispatchers
 import com.bigdeal.core.data.EpisodeStore
+import com.bigdeal.podcast.core.download.PodcastDownloader
 import com.bigdeal.podcast.core.player.EpisodePlayer
 import com.bigdeal.podcast.core.player.MockEpisodePlayer
 import com.bigdeal.podcast.core.player.service.PlayerController
@@ -46,7 +47,7 @@ object DomainDiModule {
     @Provides
     @Singleton
     fun provideEpisodePlayer(
-        @Dispatcher(JetcasterDispatchers.Main) mainDispatcher: CoroutineDispatcher,
+        @Dispatcher(PodcastDispatchers.Main) mainDispatcher: CoroutineDispatcher,
         playerController: PlayerController
     ): EpisodePlayer = MockEpisodePlayer(mainDispatcher, playerController)
 
@@ -56,9 +57,9 @@ object DomainDiModule {
     fun providePodcastDownloadManager(
         @ApplicationContext context: Context,
         episodeStore: EpisodeStore,
-        @Dispatcher(JetcasterDispatchers.IO) ioDispatcher: CoroutineDispatcher
-    ): com.bigdeal.podcast.core.download.PodcastDownloader =
-        com.bigdeal.podcast.core.download.PodcastDownloader(
+        @Dispatcher(PodcastDispatchers.IO) ioDispatcher: CoroutineDispatcher
+    ): PodcastDownloader =
+        PodcastDownloader(
             context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager,
             episodeStore,
             context.getExternalFilesDir("cache"),

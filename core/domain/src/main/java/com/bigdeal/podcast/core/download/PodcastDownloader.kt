@@ -5,11 +5,10 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.media3.common.MimeTypes
 import com.bigdeal.core.Dispatcher
-import com.bigdeal.core.JetcasterDispatchers
+import com.bigdeal.core.PodcastDispatchers
 import com.bigdeal.core.data.DownloadState
 import com.bigdeal.core.data.EpisodeEntity
 import com.bigdeal.core.data.EpisodeStore
-import com.bigdeal.core.data.Play
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -17,13 +16,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
-import java.net.URLEncoder
 
 class PodcastDownloader (
     private val downloadManager: DownloadManager,
     private val episodeStore: EpisodeStore,
     private val downloadDir: File?,
-    @Dispatcher(JetcasterDispatchers.IO) ioDispatcher: CoroutineDispatcher
+    @Dispatcher(PodcastDispatchers.IO) ioDispatcher: CoroutineDispatcher
 ) {
 
 

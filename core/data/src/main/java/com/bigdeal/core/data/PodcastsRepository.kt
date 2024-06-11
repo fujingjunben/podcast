@@ -1,46 +1,46 @@
-
-
 package com.bigdeal.core.data
 
 import com.bigdeal.core.Dispatcher
-import com.bigdeal.core.JetcasterDispatchers
+import com.bigdeal.core.PodcastDispatchers
+import com.bigdeal.core.data.extension.toSHA256
 import com.bigdeal.core.data.room.FeedDao
 import com.bigdeal.core.data.room.TransactionRunner
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Data repository for Podcasts.
  */
-class PodcastsRepository (
+class PodcastsRepository(
     private val podcastsFetcher: PodcastsFetcher,
     private val podcastStore: PodcastStore,
     private val episodeStore: EpisodeStore,
     private val categoryStore: CategoryStore,
     private val feedDao: FeedDao,
     private val transactionRunner: TransactionRunner,
-    @Dispatcher(JetcasterDispatchers.Main) mainDispatcher: CoroutineDispatcher
+    @Dispatcher(PodcastDispatchers.Main) mainDispatcher: CoroutineDispatcher
 ) {
     private var refreshingJob: Job? = null
 
     private val scope = CoroutineScope(mainDispatcher)
 
-    suspend fun sync():Boolean {
+    suspend fun fetchFeeds(): Boolean {
+        feedDao.insertAll(SampleFeeds.map { url ->
+            FeedEntity(id = url.toSHA256(), url = url)
+        })
+        return true
+    }
+
+    suspend fun sync(): Boolean {
         feedDao.queryAll()
             .map { feeds -> feeds.map { feed -> feed.url } }
-            .take(1).collect {feedUrls ->
+            .take(1).collect { feedUrls ->
                 Timber.d("sync podcast: $feedUrls")
                 fetchPodcasts(feedUrls)
             }

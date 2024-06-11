@@ -29,7 +29,7 @@ import com.bigdeal.core.data.database.dao.EpisodeRecordDao
     exportSchema = false
 )
 @TypeConverters(DateTimeTypeConverters::class, PlayStateTypeConverters::class)
-abstract class JetcasterDatabase : RoomDatabase() {
+abstract class PodcastDatabase : RoomDatabase() {
     abstract fun podcastsDao(): PodcastsDao
     abstract fun episodesDao(): EpisodesDao
     abstract fun categoriesDao(): CategoriesDao

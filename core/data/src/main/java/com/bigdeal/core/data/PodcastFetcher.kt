@@ -4,7 +4,7 @@ package com.bigdeal.core.data
 
 import coil.network.HttpException
 import com.bigdeal.core.Dispatcher
-import com.bigdeal.core.JetcasterDispatchers
+import com.bigdeal.core.PodcastDispatchers
 import com.bigdeal.core.data.extension.toSHA256
 import com.rometools.modules.itunes.EntryInformation
 import com.rometools.modules.itunes.FeedInformation
@@ -26,7 +26,6 @@ import java.time.Instant
 import java.time.ZoneOffset
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.io.encoding.Base64
 
 /**
  * A class which fetches some selected podcast RSS feeds.
@@ -38,7 +37,7 @@ import kotlin.io.encoding.Base64
 class PodcastsFetcher @Inject constructor(
     private val okHttpClient: OkHttpClient,
     private val syndFeedInput: SyndFeedInput,
-    @Dispatcher(JetcasterDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
+    @Dispatcher(PodcastDispatchers.IO) private val ioDispatcher: CoroutineDispatcher
 ) {
 
     /**

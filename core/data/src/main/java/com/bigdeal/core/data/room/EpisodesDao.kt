@@ -95,6 +95,24 @@ abstract class EpisodesDao : BaseDao<EpisodeEntity> {
         limit: Int
     ): Flow<List<EpisodeToPodcast>>
 
+
+    @Transaction
+    @Query("""
+        SELECT podcasts.*, episodes.*
+        FROM podcasts
+        INNER JOIN episodes ON podcasts.id = episodes.podcast_id
+        INNER JOIN (
+            SELECT podcast_category_entries.podcast_id, MAX(datetime(published)) as latest_published
+            FROM episodes
+            INNER JOIN podcast_category_entries ON episodes.podcast_id = podcast_category_entries.podcast_id
+            WHERE category_id = :categoryId
+            GROUP BY podcast_category_entries.podcast_id
+        ) latest_episodes
+        ON episodes.podcast_id = latest_episodes.podcast_id AND datetime(episodes.published) = latest_episodes.latest_published
+        ORDER BY datetime(episodes.published) DESC
+    """)
+    abstract fun getPodcastsAndLatestEpisodesByCategory(categoryId: Long): Flow<List<EpisodeWithPodcast>>
+
     @Query(
         """
         SELECT episodes.* FROM episodes

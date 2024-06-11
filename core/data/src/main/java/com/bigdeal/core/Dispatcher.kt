@@ -20,9 +20,9 @@ import javax.inject.Qualifier
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Dispatcher(val jetcasterDispatcher: com.bigdeal.core.JetcasterDispatchers)
+annotation class Dispatcher(val dispatcher: PodcastDispatchers)
 
-enum class JetcasterDispatchers {
+enum class PodcastDispatchers {
     Main,
     IO,
 }

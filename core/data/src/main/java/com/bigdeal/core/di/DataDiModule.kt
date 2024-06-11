@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.bigdeal.podcast.core.data.di
+package com.bigdeal.core.di
 
 import android.content.Context
 import androidx.room.Room
 import coil.ImageLoader
 import com.bigdeal.core.Dispatcher
-import com.bigdeal.core.JetcasterDispatchers
+import com.bigdeal.core.PodcastDispatchers
 import com.bigdeal.core.data.CategoryStore
 import com.bigdeal.core.data.EpisodeStore
 import com.bigdeal.core.data.FeedRepository
@@ -31,12 +31,12 @@ import com.bigdeal.core.data.database.dao.EpisodeRecordDao
 import com.bigdeal.core.data.room.CategoriesDao
 import com.bigdeal.core.data.room.EpisodesDao
 import com.bigdeal.core.data.room.FeedDao
-import com.bigdeal.core.data.room.JetcasterDatabase
+import com.bigdeal.core.data.room.PodcastDatabase
 import com.bigdeal.core.data.room.PodcastCategoryEntryDao
 import com.bigdeal.core.data.room.PodcastFollowedEntryDao
 import com.bigdeal.core.data.room.PodcastsDao
 import com.bigdeal.core.data.room.TransactionRunner
-import com.example.jetcaster.core.designsystem.BuildConfig
+import com.bigdeal.podcast.core.designsystem.BuildConfig
 import com.rometools.rome.io.SyndFeedInput
 import dagger.Module
 import dagger.Provides
@@ -70,8 +70,8 @@ object DataDiModule {
     @Singleton
     fun provideDatabase(
         @ApplicationContext context: Context
-    ): JetcasterDatabase =
-        Room.databaseBuilder(context, JetcasterDatabase::class.java, "data.db")
+    ): PodcastDatabase =
+        Room.databaseBuilder(context, PodcastDatabase::class.java, "data.db")
             // This is not recommended for normal apps, but the goal of this sample isn't to
             // showcase all of Room.
             .fallbackToDestructiveMigration()
@@ -89,50 +89,50 @@ object DataDiModule {
     @Provides
     @Singleton
     fun provideCategoriesDao(
-        database: JetcasterDatabase
+        database: PodcastDatabase
     ): CategoriesDao = database.categoriesDao()
 
     @Provides
     @Singleton
     fun providePodcastCategoryEntryDao(
-        database: JetcasterDatabase
+        database: PodcastDatabase
     ): PodcastCategoryEntryDao = database.podcastCategoryEntryDao()
 
     @Provides
     @Singleton
     fun providePodcastsDao(
-        database: JetcasterDatabase
+        database: PodcastDatabase
     ): PodcastsDao = database.podcastsDao()
 
     @Provides
     @Singleton
     fun provideEpisodesDao(
-        database: JetcasterDatabase
+        database: PodcastDatabase
     ): EpisodesDao = database.episodesDao()
 
     @Provides
     @Singleton
     fun providePodcastFollowedEntryDao(
-        database: JetcasterDatabase
+        database: PodcastDatabase
     ): PodcastFollowedEntryDao = database.podcastFollowedEntryDao()
 
     @Provides
     @Singleton
     fun provideEpisodeRecordDao(
-        database: JetcasterDatabase
+        database: PodcastDatabase
     ): EpisodeRecordDao = database.episodeRecordDao()
 
     @Provides
     @Singleton
     fun provideFeedDao(
-        database: JetcasterDatabase
+        database: PodcastDatabase
     ): FeedDao = database.feedDao()
 
 
     @Provides
     @Singleton
     fun provideTransactionRunner(
-        database: JetcasterDatabase
+        database: PodcastDatabase
     ): TransactionRunner = database.transactionRunnerDao()
 
     @Provides
@@ -140,12 +140,12 @@ object DataDiModule {
     fun provideSyndFeedInput() = SyndFeedInput()
 
     @Provides
-    @Dispatcher(JetcasterDispatchers.IO)
+    @Dispatcher(PodcastDispatchers.IO)
     @Singleton
     fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 
     @Provides
-    @Dispatcher(JetcasterDispatchers.Main)
+    @Dispatcher(PodcastDispatchers.Main)
     @Singleton
     fun provideMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
 
@@ -186,7 +186,7 @@ object DataDiModule {
     @Singleton
     fun provideFeedRepository(
         feedDao: FeedDao,
-        @Dispatcher(JetcasterDispatchers.IO) ioDispatcher: CoroutineDispatcher
+        @Dispatcher(PodcastDispatchers.IO) ioDispatcher: CoroutineDispatcher
     ): FeedRepository = FeedRepository(feedDao, ioDispatcher)
 
     @Provides
@@ -198,7 +198,7 @@ object DataDiModule {
         categoryStore: CategoryStore,
         feedDao: FeedDao,
         transactionRunner: TransactionRunner,
-        @Dispatcher(JetcasterDispatchers.Main) mainDispatcher: CoroutineDispatcher
+        @Dispatcher(PodcastDispatchers.Main) mainDispatcher: CoroutineDispatcher
     ): PodcastsRepository = PodcastsRepository(
         podcastsFetcher = podcastsFetcher,
         podcastStore = podcastStore,

@@ -39,7 +39,7 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter.State.Error
 import coil.compose.AsyncImagePainter.State.Loading
 import coil.compose.rememberAsyncImagePainter
-import com.example.jetcaster.core.designsystem.R
+import com.bigdeal.podcast.core.designsystem.R
 import com.google.samples.apps.nowinandroid.core.designsystem.theme.LocalTintTheme
 
 /**

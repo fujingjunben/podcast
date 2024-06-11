@@ -32,10 +32,10 @@ import javax.inject.Inject
 @HiltViewModel
 class FavouriteViewModel @Inject constructor(
     private val podcastStore: PodcastStore,
-    private val episodeStore: EpisodeStore,
     private val feedRepository: FeedRepository,
     private val podcastsRepository: PodcastsRepository,
-    private val episodePlayer: EpisodePlayer,
+    episodeStore: EpisodeStore,
+    episodePlayer: EpisodePlayer,
     podcastDownloader: PodcastDownloader,
 ) : BaseViewModel(episodePlayer, podcastDownloader) {
 

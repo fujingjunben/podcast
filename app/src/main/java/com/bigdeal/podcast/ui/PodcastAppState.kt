@@ -10,7 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 
 /**
- * List of screens for [JetcasterApp]
+ * List of screens for podcastApp
  */
 sealed class Screen(val route: String) {
     object Home : Screen("home")
@@ -31,14 +31,14 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun rememberJetcasterAppState(
+fun rememberPodcastAppState(
     navController: NavHostController = rememberNavController(),
     context: Context = LocalContext.current
 ) = remember(navController, context) {
-    JetcasterAppState(navController, context)
+    PodcastAppState(navController, context)
 }
 
-class JetcasterAppState(
+class PodcastAppState(
     val navController: NavHostController,
     private val context: Context
 ) {

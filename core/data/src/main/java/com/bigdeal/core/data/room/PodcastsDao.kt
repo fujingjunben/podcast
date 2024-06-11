@@ -52,7 +52,7 @@ abstract class PodcastsDao: BaseDao<Podcast>{
             INNER JOIN podcast_category_entries ON episodes.podcast_id = podcast_category_entries.podcast_id
             WHERE category_id = :categoryId
             GROUP BY episodes.podcast_id
-        ) inner_query ON podcasts.uri = inner_query.podcast_id
+        ) inner_query ON podcasts.id = inner_query.podcast_id
         LEFT JOIN podcast_followed_entries AS followed_entries ON followed_entries.podcast_id = inner_query.podcast_id
         ORDER BY datetime(last_episode_date) DESC
         LIMIT :limit

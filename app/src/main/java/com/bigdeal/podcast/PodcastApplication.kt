@@ -12,7 +12,7 @@ import javax.inject.Inject
  * Application which sets up our dependency [Graph] with a context.
  */
 @HiltAndroidApp
-class JetcasterApplication : Application(), ImageLoaderFactory {
+class PodcastApplication : Application(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
 

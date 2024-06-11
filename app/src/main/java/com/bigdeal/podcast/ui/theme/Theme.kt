@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import com.google.samples.apps.nowinandroid.core.designsystem.theme.NiaTheme
 
 @Composable
-fun JetcasterTheme(
+fun PodcastTheme(
     content: @Composable () -> Unit
 ) {
 

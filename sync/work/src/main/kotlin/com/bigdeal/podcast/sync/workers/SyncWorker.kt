@@ -24,7 +24,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkerParameters
 import com.bigdeal.core.Dispatcher
-import com.bigdeal.core.JetcasterDispatchers
+import com.bigdeal.core.PodcastDispatchers
 import com.bigdeal.core.data.PodcastsRepository
 import com.bigdeal.podcast.sync.initializers.SyncConstraints
 import com.bigdeal.podcast.sync.initializers.syncForegroundInfo
@@ -32,7 +32,6 @@ import com.bigdeal.podcast.sync.status.SyncSubscriber
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
@@ -47,7 +46,7 @@ internal class SyncWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val podcastRepository: PodcastsRepository,
-    @Dispatcher(JetcasterDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
+    @Dispatcher(PodcastDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
     private val syncSubscriber: SyncSubscriber,
 ) : CoroutineWorker(appContext, workerParams) {
 
@@ -60,6 +59,7 @@ internal class SyncWorker @AssistedInject constructor(
         Timber.d("sync doWork")
             // First sync the repositories in parallel
             val syncedSuccessfully = awaitAll(
+                async { podcastRepository.fetchFeeds() },
                 async { podcastRepository.sync() },
             ).all { it }
 

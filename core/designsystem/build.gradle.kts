@@ -5,7 +5,7 @@ plugins {
 
 // TODO(chris): Set up convention plugin
 android {
-    namespace = "com.example.jetcaster.core.designsystem"
+    namespace = "com.bigdeal.podcast.core.designsystem"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {

@@ -16,7 +16,7 @@
   -->
 <resources>
 
-    <style name="Theme.Jetcaster" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.Podcast" parent="android:Theme.Material.NoActionBar">
         <item name="android:colorPrimary">#ff00ff</item>
         <item name="android:colorAccent">#ff00ff</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
