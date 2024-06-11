@@ -1,8 +1,8 @@
 a podcast application to provide a seamless user experience, built entirely with Kotlin and Jetpack Compose.
-![follow_screen](screenshot/follow_screen.jpg)
-![episode_screen](screenshot/episode_screen.jpg)
-![player_screen](screenshot/player_screen.jpg)
-![podcast_screen](screenshot/podcast_screen.jpg)
+<img src="/screenshot/follow_screen.jpg" width="200"/>
+<img src="/screenshot/episode_screen.jpg" width="200"/>
+<img src="/screenshot/player_screen.jpg" width="200"/>
+<img src="/screenshot/podcast_screen.jpg" width="200"/>
 
 ## Tech stack & Open-source libraries
 - Minimum SDK level 26
