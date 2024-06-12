@@ -60,6 +60,10 @@ class PodcastStore(
         podcastFollowedEntryDao.deleteWithPodcastId(podcastId)
     }
 
+    fun getAllPodcastFollowState(): Flow<List<PodcastFollowedEntry>> {
+        return podcastFollowedEntryDao.getAllPodcastFollowedState()
+    }
+
     /**
      * Add a new [Podcast] to this store.
      *

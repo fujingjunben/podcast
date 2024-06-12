@@ -32,12 +32,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.bigdeal.core.data.Category
-import com.bigdeal.core.data.Podcast
-import com.bigdeal.core.data.PodcastWithExtraInfo
 import com.bigdeal.core.data.model.EpisodeWithPodcast
 import com.bigdeal.podcast.R
 import com.bigdeal.podcast.core.player.EpisodePlayerState
-import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.core.player.model.toPlayerEpisode
 import com.bigdeal.podcast.ui.common.EpisodeActions
 import com.bigdeal.podcast.ui.common.EpisodeListItem
@@ -53,6 +50,7 @@ fun Discover(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val playState = viewModel.episodePlayerState.collectAsState()
+    val podcastFollowedStates = viewModel.podcastFollowedState.collectAsState(initial = listOf())
 
     when (val state = uiState) {
         is DiscoverUi.Loading -> {
@@ -71,8 +69,9 @@ fun Discover(
                         Column {
                             CategoryHeader(
                                 category = category,
-                                podcasts = episodeWithPodcasts.map { item -> item.podcast },
-                                onPodcastUnfollowed = { id ->  },
+                                episodeWithPodcasts = episodeWithPodcasts,
+                                podcastFollowedStateSet = podcastFollowedStates.value,
+                                onPodcastFollowed = viewModel::onFollowToggle,
                                 navigateToPodcast = navigateToPodcast,
                             )
                             PodcastInCategory(
@@ -132,8 +131,9 @@ fun PodcastInCategory(
 @Composable
 fun CategoryHeader(
     category: Category,
-    podcasts: List<Podcast>,
-    onPodcastUnfollowed: (id: String) -> Unit,
+    episodeWithPodcasts: List<EpisodeWithPodcast>,
+    podcastFollowedStateSet: List<String>,
+    onPodcastFollowed: (id: String) -> Unit,
     navigateToPodcast: (id: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -141,13 +141,16 @@ fun CategoryHeader(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(text = category.name)
-        LazyRow(modifier = modifier.height(100.dp)) {
-            items(podcasts, key = { podcast -> podcast.id }) { podcast ->
+        LazyRow(modifier = modifier.height(140.dp)) {
+            items(
+                episodeWithPodcasts,
+                key = { episodeWithPodcast -> episodeWithPodcast.podcast.id }) { item ->
                 PodcastCarouselItem(
-                    podcastImageUrl = podcast.imageUrl,
-                    podcastTitle = podcast.title,
-                    onUnfollowedClick = { onPodcastUnfollowed(podcast.id) },
-                    navigateToPodcast = { navigateToPodcast(podcast.id) },
+                    podcastImageUrl = item.podcast.imageUrl,
+                    podcastTitle = item.podcast.title,
+                    onFollowedClick = { onPodcastFollowed(item.podcast.id) },
+                    isFollowed = podcastFollowedStateSet.contains(item.podcast.id),
+                    navigateToPodcast = { navigateToPodcast(item.podcast.id) },
                     modifier = Modifier
                         .padding(4.dp)
                         .fillMaxHeight()
@@ -163,7 +166,8 @@ private fun PodcastCarouselItem(
     podcastImageUrl: String? = null,
     podcastTitle: String? = null,
     navigateToPodcast: () -> Unit,
-    onUnfollowedClick: () -> Unit,
+    onFollowedClick: () -> Unit,
+    isFollowed: Boolean,
 ) {
     Column(
         modifier.padding(horizontal = 12.dp, vertical = 8.dp)
@@ -185,8 +189,8 @@ private fun PodcastCarouselItem(
             }
 
             ToggleFollowPodcastIconButton(
-                onClick = onUnfollowedClick,
-                isFollowed = false, /* All podcasts are followed in this feed */
+                onClick = onFollowedClick,
+                isFollowed = isFollowed, /* All podcasts are followed in this feed */
                 modifier = Modifier.align(Alignment.BottomEnd)
             )
         }

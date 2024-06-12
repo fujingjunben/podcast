@@ -10,11 +10,16 @@ import androidx.room.Query
 import androidx.room.Update
 import com.bigdeal.core.data.PodcastFollowedEntry
 import com.bigdeal.core.data.database.dao.BaseDao
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class PodcastFollowedEntryDao : BaseDao<PodcastFollowedEntry> {
     @Query("DELETE FROM podcast_followed_entries WHERE podcast_id = :podcastId")
     abstract suspend fun deleteWithPodcastId(podcastId: String)
+
+    @Query("SELECT * FROM podcast_followed_entries")
+    abstract fun getAllPodcastFollowedState(): Flow<List<PodcastFollowedEntry>>
+
 
     @Query("SELECT COUNT(*) FROM podcast_followed_entries WHERE podcast_id = :podcastId")
     protected abstract suspend fun podcastFollowRowCount(podcastId: String): Int

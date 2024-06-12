@@ -77,29 +77,3 @@ class FavouriteViewModel @Inject constructor(
     }
 }
 
-data class FavouriteViewModelState(
-    val episodeOfPodcasts: List<EpisodeOfPodcast> = listOf(),
-    var episodePlayerState: EpisodePlayerState? = null,
-    val isLoading: Boolean = false
-) {
-    fun toUiState(): FavouriteUiState {
-        println("FavouriteUiState episodeOfPodcasts: ${episodeOfPodcasts.size}")
-        return if (episodeOfPodcasts.isEmpty()) {
-            FavouriteUiState.Loading
-        } else {
-            FavouriteUiState.Success(episodeOfPodcasts, episodePlayerState = episodePlayerState)
-        }
-    }
-}
-
-sealed interface FavouriteUiState {
-    @Immutable
-    data class Success(
-        val episodeOfPodcasts: List<EpisodeOfPodcast> = listOf(),
-        var episodePlayerState: EpisodePlayerState?
-    ) : FavouriteUiState
-
-    data object Loading : FavouriteUiState
-}
-
-
