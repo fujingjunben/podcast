@@ -39,11 +39,15 @@ import com.bigdeal.podcast.R
 import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.core.player.model.toPlayerEpisode
+import com.bigdeal.podcast.ui.common.EpisodeActions
 import com.bigdeal.podcast.ui.common.EpisodeListItem
 
 
 @Composable
 fun Discover(
+    onPlay: (String) -> Unit,
+    navigateToPodcast: (String) -> Unit,
+    navigateToEpisode: (String, String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DiscoverViewModel = hiltViewModel(),
 ) {
@@ -64,15 +68,35 @@ fun Discover(
                     val category = categories[index]
                     val episodeWithPodcasts = state.podcastAndCategory[category]
                     episodeWithPodcasts?.let {
-                        Column(modifier = modifier) {
+                        Column {
                             CategoryHeader(
                                 category = category,
-                                podcasts = episodeWithPodcasts?.map { item -> item.podcast }
-                                    ?: listOf(),
-                                onPodcastUnfollowed = { id -> {} },
-                                navigateToPodcast = { id -> {} }
+                                podcasts = episodeWithPodcasts.map { item -> item.podcast },
+                                onPodcastUnfollowed = { id ->  },
+                                navigateToPodcast = navigateToPodcast,
                             )
-                            PodcastInCategory(episodeWithPodcasts, playState.value)
+                            PodcastInCategory(
+                                episodeWithPodcasts = episodeWithPodcasts,
+                                episodePlayerState = playState.value,
+                                navigateToEpisode = navigateToEpisode,
+                                episodeActions = EpisodeActions(
+                                    onPlay = { playerEpisode ->
+                                        run {
+                                            onPlay(playerEpisode.id)
+                                            viewModel.play(playerEpisode)
+                                        }
+                                    },
+                                    onPause = viewModel::pause,
+                                    onAddToQueue = { playerEpisode ->
+                                        run {
+                                            viewModel.addToQueue(playerEpisode)
+                                        }
+                                    },
+                                    onDownload = viewModel::download,
+                                    onCancelDownload = viewModel::cancelDownload,
+                                    onDeleteDownload = viewModel::deleteDownload,
+                                )
+                            )
                         }
                     }
                 }
@@ -84,19 +108,21 @@ fun Discover(
 @Composable
 fun PodcastInCategory(
     episodeWithPodcasts: List<EpisodeWithPodcast>,
-    episodePlayerState: EpisodePlayerState
+    episodePlayerState: EpisodePlayerState,
+    episodeActions: EpisodeActions,
+    navigateToEpisode: (String, String) -> Unit,
 ) {
     Column {
-        episodeWithPodcasts.forEach { episodeWithPodcast ->
+        episodeWithPodcasts.forEach { item ->
             EpisodeListItem(
                 episodePlayerState = episodePlayerState,
-                playerEpisode = episodeWithPodcast.toPlayerEpisode(),
-                onClick = { _, _ -> },
-                onPlay = { /*TODO*/ },
-                onPause = { /*TODO*/ },
-                onAddToQueue = { /*TODO*/ },
-                onDownload = { /*TODO*/ },
-                onCancelDownload = { /*TODO*/ },
+                playerEpisode = item.toPlayerEpisode(),
+                onClick = navigateToEpisode,
+                onPlay = { episodeActions.onPlay(item.toPlayerEpisode()) },
+                onPause = episodeActions.onPause,
+                onAddToQueue = { episodeActions.onAddToQueue(item.toPlayerEpisode()) },
+                onDownload = { episodeActions.onDownload(item.toPlayerEpisode()) },
+                onCancelDownload = { episodeActions.onCancelDownload(item.toPlayerEpisode()) },
                 showPodcastImage = true
             )
         }
@@ -111,7 +137,9 @@ fun CategoryHeader(
     navigateToPodcast: (id: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column {
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
         Text(text = category.name)
         LazyRow(modifier = modifier.height(100.dp)) {
             items(podcasts, key = { podcast -> podcast.id }) { podcast ->
@@ -158,7 +186,7 @@ private fun PodcastCarouselItem(
 
             ToggleFollowPodcastIconButton(
                 onClick = onUnfollowedClick,
-                isFollowed = true, /* All podcasts are followed in this feed */
+                isFollowed = false, /* All podcasts are followed in this feed */
                 modifier = Modifier.align(Alignment.BottomEnd)
             )
         }

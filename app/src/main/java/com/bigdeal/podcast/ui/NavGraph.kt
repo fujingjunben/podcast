@@ -26,7 +26,7 @@ fun NavGraph(
         composable(Destination.FAVOURITE_ROUTE) { backStackEntry ->
             Favourite(
                 modifier = modifier,
-                navigateToEpisode = {podcastId, episodeId ->
+                navigateToEpisode = { podcastId, episodeId ->
                     appState.navigateToEpisode(podcastId, episodeId, backStackEntry)
                 },
                 navigateToPodcast = { podcastId ->
@@ -61,8 +61,17 @@ fun NavGraph(
         composable(Screen.Player.route) { backStackEntry ->
             PlayerScreen(onBackPress = appState::navigateBack)
         }
-        composable(Destination.DISCOVER_ROUTE) {
-            Discover()
+        composable(Destination.DISCOVER_ROUTE) { backStackEntry ->
+            Discover(
+                onPlay = onPlay,
+                modifier = modifier,
+                navigateToPodcast = { podcastId ->
+                    appState.navigateToPodcast(podcastId, backStackEntry)
+                },
+                navigateToEpisode = { podcastId, episodeId ->
+                    appState.navigateToEpisode(podcastId, episodeId, backStackEntry)
+                },
+            )
         }
         composable(Destination.LIBRARY_ROUTE) {
             Library()

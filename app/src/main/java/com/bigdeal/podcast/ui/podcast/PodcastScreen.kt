@@ -21,9 +21,7 @@ import com.bigdeal.podcast.ui.common.EpisodeList
 import com.bigdeal.podcast.ui.common.PodcastTitleCard
 import com.bigdeal.podcast.R
 import com.bigdeal.podcast.core.designsystem.component.HtmlTextContainer
-import com.bigdeal.podcast.core.model.EpisodeOfPodcast
-import com.bigdeal.podcast.core.player.model.toPlayerEpisode
-import com.bigdeal.podcast.ui.favourite.EpisodeActions
+import com.bigdeal.podcast.ui.common.EpisodeActions
 
 @Composable
 fun PodcastScreen(

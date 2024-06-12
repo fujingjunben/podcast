@@ -46,18 +46,9 @@ import com.bigdeal.podcast.core.model.EpisodeOfPodcast
 import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.core.player.model.toPlayerEpisode
+import com.bigdeal.podcast.ui.common.EpisodeActions
 import com.bigdeal.podcast.ui.common.EpisodeListItem
 
-data class EpisodeActions(
-    val onPlay: (playerEpisode: PlayerEpisode) -> Unit,
-    val onPause: () -> Unit,
-    val onAddToQueue: (playerEpisode: PlayerEpisode) -> Unit,
-    val onDownload: (playerEpisode: PlayerEpisode) -> Unit,
-    val onCancelDownload: (playerEpisode: PlayerEpisode) -> Unit,
-    val onDeleteDownload: (playerEpisode: PlayerEpisode) -> Unit,
-)
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Favourite(
     modifier: Modifier,

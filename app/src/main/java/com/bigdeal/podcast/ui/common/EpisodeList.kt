@@ -14,8 +14,17 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.bigdeal.core.data.model.EpisodeWithPodcast
 import com.bigdeal.podcast.core.player.EpisodePlayerState
+import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.core.player.model.toPlayerEpisode
-import com.bigdeal.podcast.ui.favourite.EpisodeActions
+
+data class EpisodeActions(
+    val onPlay: (playerEpisode: PlayerEpisode) -> Unit,
+    val onPause: () -> Unit,
+    val onAddToQueue: (playerEpisode: PlayerEpisode) -> Unit,
+    val onDownload: (playerEpisode: PlayerEpisode) -> Unit,
+    val onCancelDownload: (playerEpisode: PlayerEpisode) -> Unit,
+    val onDeleteDownload: (playerEpisode: PlayerEpisode) -> Unit,
+)
 
 @Composable
 fun EpisodeList(
