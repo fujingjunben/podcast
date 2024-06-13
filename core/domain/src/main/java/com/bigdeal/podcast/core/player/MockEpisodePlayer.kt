@@ -81,6 +81,7 @@ class MockEpisodePlayer(
     override val playerState: StateFlow<EpisodePlayerState> = _playerState.asStateFlow()
 
     override var currentEpisode: PlayerEpisode? by _currentEpisode
+
     override fun addToQueue(episode: PlayerEpisode) {
         queue.update {
             it + episode
@@ -92,7 +93,7 @@ class MockEpisodePlayer(
         queue.value = emptyList()
     }
 
-    override fun play() {
+    private fun play(isContinuePlaying: Boolean = false) {
         // Do nothing if already playing
         if (isPlaying.value) {
             return
@@ -102,7 +103,11 @@ class MockEpisodePlayer(
         isPlaying.value = true
 
         Timber.d("mockplayer play(): ${episode.title}")
-        playerController.play(episode, timeElapsed.value)
+        if (isContinuePlaying) {
+            playerController.continuePlay()
+        } else {
+            playerController.play(episode, timeElapsed.value)
+        }
 
         timerJob = coroutineScope.launch {
             // Increment timer by a second
@@ -124,7 +129,7 @@ class MockEpisodePlayer(
     }
 
     override fun continuePlay() {
-        play()
+        play(true)
     }
 
     override fun play(playerEpisode: PlayerEpisode) {

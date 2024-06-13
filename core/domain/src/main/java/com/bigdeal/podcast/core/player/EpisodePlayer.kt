@@ -42,11 +42,6 @@ interface EpisodePlayer {
     */
     fun removeAllFromQueue()
 
-    /**
-     * Plays the current episode
-     */
-    fun play()
-
     fun continuePlay()
 
     /**
