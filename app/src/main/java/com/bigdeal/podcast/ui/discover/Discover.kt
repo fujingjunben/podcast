@@ -141,7 +141,7 @@ fun CategoryHeader(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(text = category.name)
-        LazyRow(modifier = modifier.height(140.dp)) {
+        LazyRow(modifier = modifier.height(120.dp)) {
             items(
                 episodeWithPodcasts,
                 key = { episodeWithPodcast -> episodeWithPodcast.podcast.id }) { item ->
