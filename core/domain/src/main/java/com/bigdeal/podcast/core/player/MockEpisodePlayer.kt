@@ -137,6 +137,7 @@ class MockEpisodePlayer(
         Timber.d("intend to play next episode: ${playerEpisode}")
         if (_currentEpisode.value?.id != playerEpisode.id) {
             _currentEpisode.value = playerEpisode
+            timeElapsed.value = Duration.ZERO
             pause()
         }
         play()
