@@ -52,6 +52,7 @@ import com.bigdeal.podcast.core.designsystem.component.PodcastImage
 import com.bigdeal.podcast.core.player.EpisodePlayerState
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.ui.common.EpisodeListItem
+import com.bigdeal.podcast.ui.common.EpisodeListItemFooter
 import com.bigdeal.podcast.ui.common.PodcastTitleCard
 import timber.log.Timber
 
@@ -192,105 +193,105 @@ private fun EpisodeListItemImage(
     )
 }
 
-@Composable
-private fun EpisodeListItemFooter(
-    episodePlayerState: EpisodePlayerState,
-    episode: PlayerEpisode,
-    onPlay: () -> Unit,
-    onPause: () -> Unit,
-    onAddToQueue: () -> Unit,
-    onDownload: () -> Unit,
-    onCancelDownload: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val isPlaying =
-        episodePlayerState.currentEpisode?.id == episode.id && episodePlayerState.isPlaying
-    val icon =
-        if (isPlaying) Icons.Filled.PauseCircleOutline else Icons.Default.PlayCircleOutline
-    val onClickEvent = if (isPlaying) onPause else onPlay
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-    ) {
-        Image(
-            imageVector = icon,
-            contentDescription = stringResource(R.string.cd_play),
-            contentScale = ContentScale.Fit,
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-            modifier = Modifier
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = rememberRipple(bounded = false, radius = 24.dp)
-                ) { onClickEvent() }
-                .size(48.dp)
-                .padding(6.dp)
-                .semantics { role = Role.Button }
-        )
-
-        Text(
-            text = if (episodePlayerState.currentEpisode?.id == episode.id
-                && !episodePlayerState.timeElapsed.isZero
-            ) {
-                stringResource(
-                    R.string.episode_left_duration,
-                    episode.duration!!.minus(episodePlayerState.timeElapsed).toMinutes().toInt()
-                )
-
-            } else {
-                stringResource(
-                    R.string.episode_duration,
-                    episode.duration!!.toMinutes().toInt()
-
-                )
-            },
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .weight(1f)
-        )
-
-        IconButton(
-            onClick = {
-                when (episode.downloadState) {
-                    DownloadState.DOWNLOADING -> onCancelDownload()
-                    DownloadState.NONE -> onDownload()
-                    else -> Timber.d("download state is ${episode.downloadState}")
-                }
-            },
-        ) {
-            Icon(
-                imageVector = when (episode.downloadState) {
-                    DownloadState.DOWNLOADING -> Icons.Default.Downloading
-                    DownloadState.FAILED, DownloadState.NONE -> Icons.Default.Download
-                    DownloadState.SUCCESS -> Icons.Default.DownloadDone
-                },
-                contentDescription = null
-            )
-        }
-
-
-        IconButton(
-            onClick = {
-                onAddToQueue()
-            },
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.PlaylistAdd,
-                contentDescription = stringResource(R.string.cd_add),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
-        IconButton(
-            onClick = { /* TODO */ },
-        ) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = stringResource(R.string.cd_more),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
+//@Composable
+//private fun EpisodeListItemFooter(
+//    episodePlayerState: EpisodePlayerState,
+//    episode: PlayerEpisode,
+//    onPlay: () -> Unit,
+//    onPause: () -> Unit,
+//    onAddToQueue: () -> Unit,
+//    onDownload: () -> Unit,
+//    onCancelDownload: () -> Unit,
+//    modifier: Modifier = Modifier
+//) {
+//    val isPlaying =
+//        episodePlayerState.currentEpisode?.id == episode.id && episodePlayerState.isPlaying
+//    val icon =
+//        if (isPlaying) Icons.Filled.PauseCircleOutline else Icons.Default.PlayCircleOutline
+//    val onClickEvent = if (isPlaying) onPause else onPlay
+//    Row(
+//        verticalAlignment = Alignment.CenterVertically,
+//        modifier = modifier
+//    ) {
+//        Image(
+//            imageVector = icon,
+//            contentDescription = stringResource(R.string.cd_play),
+//            contentScale = ContentScale.Fit,
+//            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+//            modifier = Modifier
+//                .clickable(
+//                    interactionSource = remember { MutableInteractionSource() },
+//                    indication = rememberRipple(bounded = false, radius = 24.dp)
+//                ) { onClickEvent() }
+//                .size(48.dp)
+//                .padding(6.dp)
+//                .semantics { role = Role.Button }
+//        )
+//
+//        Text(
+//            text = if (episodePlayerState.currentEpisode?.id == episode.id
+//                && !episodePlayerState.timeElapsed.isZero
+//            ) {
+//                stringResource(
+//                    R.string.episode_left_duration,
+//                    episode.duration!!.minus(episodePlayerState.timeElapsed).toMinutes().toInt()
+//                )
+//
+//            } else {
+//                stringResource(
+//                    R.string.episode_duration,
+//                    episode.duration!!.toMinutes().toInt()
+//
+//                )
+//            },
+//            maxLines = 1,
+//            overflow = TextOverflow.Ellipsis,
+//            style = MaterialTheme.typography.bodySmall,
+//            modifier = Modifier
+//                .padding(horizontal = 8.dp)
+//                .weight(1f)
+//        )
+//
+//        IconButton(
+//            onClick = {
+//                when (episode.downloadState) {
+//                    DownloadState.DOWNLOADING -> onCancelDownload()
+//                    DownloadState.NONE -> onDownload()
+//                    else -> Timber.d("download state is ${episode.downloadState}")
+//                }
+//            },
+//        ) {
+//            Icon(
+//                imageVector = when (episode.downloadState) {
+//                    DownloadState.DOWNLOADING -> Icons.Default.Downloading
+//                    DownloadState.FAILED, DownloadState.NONE -> Icons.Default.Download
+//                    DownloadState.SUCCESS -> Icons.Default.DownloadDone
+//                },
+//                contentDescription = null
+//            )
+//        }
+//
+//
+//        IconButton(
+//            onClick = {
+//                onAddToQueue()
+//            },
+//        ) {
+//            Icon(
+//                imageVector = Icons.AutoMirrored.Filled.PlaylistAdd,
+//                contentDescription = stringResource(R.string.cd_add),
+//                tint = MaterialTheme.colorScheme.onSurfaceVariant
+//            )
+//        }
+//
+//        IconButton(
+//            onClick = { /* TODO */ },
+//        ) {
+//            Icon(
+//                imageVector = Icons.Default.MoreVert,
+//                contentDescription = stringResource(R.string.cd_more),
+//                tint = MaterialTheme.colorScheme.onSurfaceVariant
+//            )
+//        }
+//    }
+//}

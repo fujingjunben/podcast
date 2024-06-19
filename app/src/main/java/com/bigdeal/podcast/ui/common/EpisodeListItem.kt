@@ -1,5 +1,11 @@
 package com.bigdeal.podcast.ui.common
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -16,6 +22,10 @@ import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PauseCircleOutline
 import androidx.compose.material.icons.filled.PlayCircleOutline
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.ReplayCircleFilled
+import androidx.compose.material.icons.outlined.ChangeCircle
+import androidx.compose.material.icons.outlined.ReplayCircleFilled
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,11 +33,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -40,6 +53,7 @@ import com.bigdeal.podcast.R
 import com.bigdeal.podcast.core.designsystem.component.HtmlTextContainer
 import com.bigdeal.podcast.core.designsystem.component.PodcastImage
 import com.bigdeal.podcast.core.player.EpisodePlayerState
+import com.bigdeal.podcast.core.player.PlayerAction
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import timber.log.Timber
 
@@ -61,8 +75,8 @@ fun EpisodeListItem(
         Surface(
             shape = MaterialTheme.shapes.large,
             color = MaterialTheme.colorScheme.surfaceContainer,
-            onClick = { onClick(playerEpisode.podcastId, playerEpisode.id)})
-         {
+            onClick = { onClick(playerEpisode.podcastId, playerEpisode.id) })
+        {
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
@@ -88,6 +102,7 @@ fun EpisodeListItem(
         }
     }
 }
+
 @Composable
 private fun EpisodeListItemHeader(
     episode: PlayerEpisode,
@@ -155,7 +170,7 @@ private fun EpisodeListItemImage(
 }
 
 @Composable
-private fun EpisodeListItemFooter(
+fun EpisodeListItemFooter(
     episodePlayerState: EpisodePlayerState,
     episode: PlayerEpisode,
     onPlay: () -> Unit,
@@ -165,29 +180,51 @@ private fun EpisodeListItemFooter(
     onCancelDownload: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isPlaying =
-        episodePlayerState.currentEpisode?.id == episode.id && episodePlayerState.isPlaying
-    val icon =
-        if (isPlaying) Icons.Filled.PauseCircleOutline else Icons.Default.PlayCircleOutline
-    val onClickEvent = if (isPlaying) onPause else onPlay
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
     ) {
-        Image(
-            imageVector = icon,
-            contentDescription = stringResource(R.string.cd_play),
-            contentScale = ContentScale.Fit,
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-            modifier = Modifier
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = rememberRipple(bounded = false, radius = 24.dp)
-                ) { onClickEvent() }
-                .size(48.dp)
-                .padding(6.dp)
-                .semantics { role = Role.Button }
-        )
+        if (episodePlayerState.currentEpisode?.id == episode.id) {
+            when (episodePlayerState.isPlaying) {
+                is PlayerAction.LOADING -> PlayerActionLoading()
+                else -> {
+                    val isPlaying = episodePlayerState.isPlaying.isPlaying()
+                    val icon =
+                        if (isPlaying) Icons.Filled.PauseCircleOutline else Icons.Default.PlayCircleOutline
+                    val onClickEvent = if (isPlaying) onPause else onPlay
+                    Image(
+                        imageVector = icon,
+                        contentDescription = stringResource(R.string.cd_play),
+                        contentScale = ContentScale.Fit,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                        modifier = Modifier
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = rememberRipple(bounded = false, radius = 24.dp)
+                            ) { onClickEvent() }
+                            .size(48.dp)
+                            .padding(6.dp)
+                            .semantics { role = Role.Button }
+                    )
+                }
+            }
+        } else {
+            Image(
+                imageVector = Icons.Default.PlayCircleOutline,
+                contentDescription = stringResource(R.string.cd_play),
+                contentScale = ContentScale.Fit,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                modifier = Modifier
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = rememberRipple(bounded = false, radius = 24.dp)
+                    ) { onPlay() }
+                    .size(48.dp)
+                    .padding(6.dp)
+                    .semantics { role = Role.Button }
+            )
+        }
 
         Text(
             text = if (episodePlayerState.currentEpisode?.id == episode.id
@@ -255,4 +292,29 @@ private fun EpisodeListItemFooter(
             )
         }
     }
+}
+
+@Composable
+fun PlayerActionLoading() {
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+    val rotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = -360f,
+        animationSpec = infiniteRepeatable(
+            tween(durationMillis = 1000, easing = LinearEasing),
+            RepeatMode.Restart
+        ), label = ""
+    )
+    Image(
+        imageVector = Icons.Outlined.ChangeCircle,
+        contentDescription = "Loading",
+        contentScale = ContentScale.Fit,
+        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+        modifier = Modifier
+            .size(48.dp)
+            .padding(6.dp)
+            .graphicsLayer {
+                rotationZ = rotation
+            }
+    )
 }

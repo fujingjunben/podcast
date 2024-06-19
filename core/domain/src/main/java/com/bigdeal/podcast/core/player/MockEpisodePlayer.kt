@@ -28,7 +28,7 @@ class MockEpisodePlayer(
     private val _playerState = MutableStateFlow(EpisodePlayerState())
     private val _currentEpisode = MutableStateFlow<PlayerEpisode?>(null)
     private val queue = MutableStateFlow<List<PlayerEpisode>>(emptyList())
-    private val isPlaying = MutableStateFlow(false)
+    private val isPlaying = MutableStateFlow<PlayerAction>(PlayerAction.PLAY)
     private val timeElapsed = MutableStateFlow(Duration.ZERO)
     private val _playerSpeed = MutableStateFlow(DefaultPlaybackSpeed)
     private val coroutineScope = CoroutineScope(mainDispatcher)
@@ -62,10 +62,32 @@ class MockEpisodePlayer(
 
         coroutineScope.launch {
             playerController.playerState.collect { playerEvent ->
-                Timber.d("mockplayer playerstate")
+                Timber.d("mockplayer playerstate: $playerEvent")
                 when (playerEvent) {
                     is PlayerEvent.IsPlayingChanged -> {
                         if (playerEvent.isPlaying) {
+                            // playing
+                            isPlaying.value = PlayerAction.PLAYING
+                        } else {
+                            // pause
+                            isPlaying.value = PlayerAction.PAUSE
+                        }
+                    }
+                    is PlayerEvent.InitState -> {Timber.d("mockplayer: init")
+                    }
+                    is PlayerEvent.PlaybackStateChanged -> {
+                        when(playerEvent.state) {
+                            Player.STATE_READY -> Timber.d("mockplayer: ready")
+                            Player.STATE_IDLE -> Timber.d("mockplayer: idle")
+                            Player.STATE_ENDED -> {
+                                Timber.d("mockplayer: end")
+                                timeElapsed.value = Duration.ZERO
+                                isPlaying.value = PlayerAction.STOP
+                            }
+                            Player.STATE_BUFFERING -> {
+                                Timber.d("mockplayer: buffering")
+                                isPlaying.value = PlayerAction.LOADING
+                            }
 
                         }
                     }
@@ -95,12 +117,11 @@ class MockEpisodePlayer(
 
     private fun play(isContinuePlaying: Boolean = false) {
         // Do nothing if already playing
-        if (isPlaying.value) {
+        if (isPlaying.value.isPlaying()) {
             return
         }
 
         val episode = _currentEpisode.value ?: return
-        isPlaying.value = true
 
         Timber.d("mockplayer play(): ${episode.title}")
         if (isContinuePlaying) {
@@ -119,8 +140,6 @@ class MockEpisodePlayer(
             }
 
             // Once done playing, see if
-            isPlaying.value = false
-            timeElapsed.value = Duration.ZERO
 
             if (hasNext()) {
                 next()
@@ -134,17 +153,20 @@ class MockEpisodePlayer(
 
     override fun play(playerEpisode: PlayerEpisode) {
         Timber.d("mockplayer: current episode: ${_currentEpisode.value}")
-        Timber.d("intend to play next episode: ${playerEpisode}")
         if (_currentEpisode.value?.id != playerEpisode.id) {
+            Timber.d("mockplayer: play different episode")
+            pause()
             _currentEpisode.value = playerEpisode
             timeElapsed.value = Duration.ZERO
-            pause()
+            isPlaying.value = PlayerAction.LOADING
+            play()
+        } else {
+            continuePlay()
         }
-        play()
     }
 
     override fun play(playerEpisodes: List<PlayerEpisode>) {
-        if (isPlaying.value) {
+        if (isPlaying.value.isPlaying()) {
             pause()
         }
 
@@ -172,8 +194,10 @@ class MockEpisodePlayer(
     }
 
     override fun pause() {
-        isPlaying.value = false
-        playerController.pause()
+        if (isPlaying.value.isPlaying()) {
+            isPlaying.value = PlayerAction.PAUSE
+            playerController.pause()
+        }
 
         timerJob?.cancel()
         timerJob = null
@@ -238,7 +262,7 @@ class MockEpisodePlayer(
 
     override fun previous() {
         timeElapsed.value = Duration.ZERO
-        isPlaying.value = false
+        isPlaying.value = PlayerAction.STOP
         timerJob?.cancel()
         timerJob = null
     }

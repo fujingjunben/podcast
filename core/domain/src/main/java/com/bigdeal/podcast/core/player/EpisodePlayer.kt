@@ -6,11 +6,22 @@ import kotlinx.coroutines.flow.StateFlow
 
 val DefaultPlaybackSpeed = Duration.ofSeconds(1)
 val EpisodeDurationThreshold = Duration.ofMillis(500)
+sealed class PlayerAction {
+    data object LOADING: PlayerAction()
+    data object PAUSE: PlayerAction()
+    data object PLAYING: PlayerAction() {
+        override fun isPlaying(): Boolean = true
+    }
+    data object PLAY: PlayerAction()
+    data object STOP : PlayerAction()
+
+    open fun isPlaying(): Boolean = false
+}
 data class EpisodePlayerState(
     val currentEpisode: PlayerEpisode? = null,
     val queue: List<PlayerEpisode> = emptyList(),
     val playbackSpeed: Duration = DefaultPlaybackSpeed,
-    val isPlaying: Boolean = false,
+    val isPlaying: PlayerAction = PlayerAction.PLAY,
     val timeElapsed: Duration = Duration.ZERO,
 )
 

@@ -8,13 +8,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PauseCircle
+import androidx.compose.material.icons.filled.PauseCircleOutline
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.material.icons.filled.PlayCircleOutline
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,8 +40,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.bigdeal.podcast.R
+import com.bigdeal.podcast.core.player.PlayerAction
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.ui.Screen
+import com.bigdeal.podcast.ui.common.PlayerActionLoading
 import com.bigdeal.podcast.ui.player.PlayerUiState
 
 @Composable
@@ -71,7 +78,7 @@ fun PlayerBarContent(
 ) {
 
     val episode = uiState.episodePlayerState.currentEpisode
-    val isPlaying = uiState.episodePlayerState.isPlaying
+    val playerAction = uiState.episodePlayerState.isPlaying
 
     Surface {
         if (episode != null) {
@@ -105,32 +112,37 @@ fun PlayerBarContent(
                     modifier = Modifier.weight(1f)
                 )
 
-                if (isPlaying) {
-                    Image(
-                        imageVector = Icons.Filled.Pause,
-                        contentDescription = stringResource(R.string.cd_pause),
-                        contentScale = ContentScale.FillHeight,
-                        colorFilter = ColorFilter.tint(LocalContentColor.current),
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = rememberRipple(bounded = false, radius = 24.dp)
-                            ) { onPause() }
-                    )
-                } else {
-                    Image(
-                        imageVector = Icons.Filled.PlayArrow,
-                        contentDescription = stringResource(R.string.cd_play),
-                        contentScale = ContentScale.FillHeight,
-                        colorFilter = ColorFilter.tint(LocalContentColor.current),
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = rememberRipple(bounded = false, radius = 24.dp)
-                            ) { onPlay(episode) }
-                    )
+                when (playerAction) {
+                    is PlayerAction.LOADING -> PlayerActionLoading()
+                    is PlayerAction.PLAYING ->
+                        Image(
+                            imageVector = Icons.Filled.PauseCircleOutline,
+                            contentDescription = stringResource(R.string.cd_pause),
+                            contentScale = ContentScale.Fit,
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                            modifier = Modifier
+                                .size(48.dp)
+                                .padding(6.dp)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = rememberRipple(bounded = false, radius = 24.dp)
+                                ) { onPause() }
+                        )
+
+                    else ->
+                        Image(
+                            imageVector = Icons.Default.PlayCircleOutline,
+                            contentDescription = stringResource(R.string.cd_play),
+                            contentScale = ContentScale.Fit,
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                            modifier = Modifier
+                                .size(48.dp)
+                                .padding(6.dp)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = rememberRipple(bounded = false, radius = 24.dp)
+                                ) { onPlay(episode) }
+                        )
                 }
 
             }

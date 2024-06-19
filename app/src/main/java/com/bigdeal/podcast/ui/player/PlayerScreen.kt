@@ -1,10 +1,17 @@
 package com.bigdeal.podcast.ui.player
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,12 +43,14 @@ import androidx.compose.material.icons.filled.LinkOff
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.RepeatOne
-import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Replay10
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.outlined.ChangeCircle
 import androidx.compose.material.icons.outlined.Pause
 import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -65,6 +74,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -81,7 +91,9 @@ import coil.request.ImageRequest
 import com.bigdeal.podcast.R
 import com.bigdeal.podcast.core.designsystem.component.HtmlTextContainer
 import com.bigdeal.podcast.core.designsystem.component.ImageBackgroundColorScrim
+import com.bigdeal.podcast.core.player.PlayerAction
 import com.bigdeal.podcast.core.player.model.PlayerEpisode
+import com.bigdeal.podcast.ui.common.PlayerActionLoading
 import com.bigdeal.podcast.ui.verticalGradientScrim
 import java.time.Duration
 import kotlinx.coroutines.launch
@@ -281,7 +293,7 @@ private fun PlayerContentRegular(
                 )
                 PlayerButtons(
                     hasNext = playerEpisode.queue.isNotEmpty(),
-                    isPlaying = playerEpisode.isPlaying,
+                    playerAction = playerEpisode.isPlaying,
                     onPlayPress = playerControlActions.onPlayPress,
                     onPausePress = playerControlActions.onPausePress,
                     onAdvanceBy = playerControlActions.onAdvanceBy,
@@ -368,7 +380,7 @@ private fun PlayerContentTableTopBottom(
         ) {
             PlayerButtons(
                 hasNext = episodePlayerState.queue.isNotEmpty(),
-                isPlaying = episodePlayerState.isPlaying,
+                playerAction = episodePlayerState.isPlaying,
                 onPlayPress = playerControlActions.onPlayPress,
                 onPausePress = playerControlActions.onPausePress,
                 playerButtonSize = 92.dp,
@@ -447,7 +459,7 @@ private fun PlayerContentBookEnd(
         )
         PlayerButtons(
             hasNext = episodePlayerState.queue.isNotEmpty(),
-            isPlaying = episodePlayerState.isPlaying,
+            playerAction = episodePlayerState.isPlaying,
             onPlayPress = playerControlActions.onPlayPress,
             onPausePress = playerControlActions.onPausePress,
             onAdvanceBy = playerControlActions.onAdvanceBy,
@@ -608,7 +620,7 @@ private fun PlayerSlider(
 @Composable
 private fun PlayerButtons(
     hasNext: Boolean,
-    isPlaying: Boolean,
+    playerAction: PlayerAction,
     onPlayPress: () -> Unit,
     onPausePress: () -> Unit,
     onAdvanceBy: (Duration) -> Unit,
@@ -646,8 +658,8 @@ private fun PlayerButtons(
             contentScale = ContentScale.Inside,
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant),
             modifier = sideButtonsModifier
-                .clickable(enabled = isPlaying, onClick = onPrevious)
-                .alpha(if (isPlaying) 1f else 0.25f)
+                .clickable(enabled = playerAction.isPlaying(), onClick = onPrevious)
+                .alpha(if (playerAction.isPlaying()) 1f else 0.25f)
         )
         Image(
             imageVector = Icons.Filled.Replay10,
@@ -659,30 +671,42 @@ private fun PlayerButtons(
                     onRewindBy(Duration.ofSeconds(10))
                 }
         )
-        if (isPlaying) {
-            Image(
-                imageVector = Icons.Outlined.Pause,
-                contentDescription = stringResource(R.string.cd_pause),
-                contentScale = ContentScale.Fit,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
-                modifier = primaryButtonModifier
-                    .padding(8.dp)
-                    .clickable {
-                        onPausePress()
-                    }
+        when (playerAction) {
+            is PlayerAction.LOADING -> PlayerActionLoading(
+                modifier = primaryButtonModifier,
             )
-        } else {
-            Image(
-                imageVector = Icons.Outlined.PlayArrow,
-                contentDescription = stringResource(R.string.cd_play),
-                contentScale = ContentScale.Fit,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
-                modifier = primaryButtonModifier
-                    .padding(8.dp)
-                    .clickable {
-                        onPlayPress()
-                    }
-            )
+
+            is PlayerAction.PLAYING ->
+                Image(
+                    imageVector = Icons.Outlined.Pause,
+                    contentDescription = stringResource(R.string.cd_pause),
+                    contentScale = ContentScale.Fit,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
+                    modifier = primaryButtonModifier
+                        .padding(8.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = rememberRipple(bounded = false, radius = playerButtonSize / 2)
+                        ) {
+                            onPausePress()
+                        }
+                )
+
+            else ->
+                Image(
+                    imageVector = Icons.Outlined.PlayArrow,
+                    contentDescription = stringResource(R.string.cd_play),
+                    contentScale = ContentScale.Fit,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
+                    modifier = primaryButtonModifier
+                        .padding(8.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = rememberRipple(bounded = false, radius = playerButtonSize / 2)
+                        ) {
+                            onPlayPress()
+                        }
+                )
         }
         Image(
             imageVector = Icons.Filled.Forward10,
@@ -758,4 +782,29 @@ private fun FullScreenLoading(modifier: Modifier = Modifier) {
     ) {
         CircularProgressIndicator()
     }
+}
+
+@Composable
+private fun PlayerActionLoading(
+    modifier: Modifier
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+    val rotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = -360f,
+        animationSpec = infiniteRepeatable(
+            tween(durationMillis = 1000, easing = LinearEasing),
+            RepeatMode.Restart
+        ), label = ""
+    )
+    Image(
+        imageVector = Icons.Outlined.ChangeCircle,
+        contentDescription = "Loading",
+        contentScale = ContentScale.Fit,
+        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimaryContainer),
+        modifier = modifier
+            .graphicsLayer {
+                rotationZ = rotation
+            }
+    )
 }

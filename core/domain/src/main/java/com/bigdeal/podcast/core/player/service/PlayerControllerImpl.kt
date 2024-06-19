@@ -172,9 +172,9 @@ class PlayerControllerImpl(
             super.onPlaybackStateChanged(playbackState)
             playerState.value = PlayerEvent.PlaybackStateChanged(playbackState)
             when(playbackState) {
-                Player.STATE_READY -> Timber.tag("mockplayer").d("ready")
-                Player.STATE_IDLE -> Timber.tag("mockplayer").d("idle")
-                Player.STATE_ENDED -> Timber.tag("mockplayer").d("end")
+                Player.STATE_READY -> Timber.d("mockplayer: ready")
+                Player.STATE_IDLE -> Timber.d("mockplayer: idle")
+                Player.STATE_ENDED -> Timber.d("mockplayer: end")
                 else -> {}
             }
         }
