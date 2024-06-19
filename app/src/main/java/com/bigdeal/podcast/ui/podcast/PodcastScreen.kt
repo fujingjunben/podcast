@@ -33,6 +33,7 @@ fun PodcastScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
+    val playState = viewModel.episodePlayerState.collectAsState()
 
     val appBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.87f)
     Column {
@@ -49,7 +50,7 @@ fun PodcastScreen(
 
             is PodcastUiState.Ready -> {
                 EpisodeList(
-                    episodePlayerState = state.episodePlayerState,
+                    episodePlayerState = playState.value,
                     episodeWithPodcastsPagingItems = state.episodes.collectAsLazyPagingItems(),
                     navigateToEpisode = navigateToEpisode,
                     showPodcastImage = false,

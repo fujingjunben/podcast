@@ -75,7 +75,7 @@ fun Favourite(
         EpisodeList(
             episodePlayerState = playState.value,
             episodeWithPodcastsPagingItems = followedEpisodes,
-            navigateToEpisode,
+            navigateToEpisode = navigateToEpisode,
             showSummary = false,
             episodeActions = EpisodeActions(
                 onPlay = { playerEpisode ->

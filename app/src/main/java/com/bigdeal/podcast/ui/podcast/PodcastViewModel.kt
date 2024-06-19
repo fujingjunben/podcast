@@ -26,7 +26,6 @@ sealed interface PodcastUiState {
     data class Ready(
         val podcast: Podcast,
         val episodes: Flow<PagingData<EpisodeWithPodcast>>,
-        val episodePlayerState: EpisodePlayerState
     ) : PodcastUiState
 }
 
@@ -48,13 +47,10 @@ class PodcastViewModel @Inject constructor(
             val podcast = podcastStore.podcastWithId(podcastId).first()
             val episodesPagingData: Flow<PagingData<EpisodeWithPodcast>> =
                 episodeStore.episodesInPodcastPagingData(podcastId).cachedIn(viewModelScope)
-            episodePlayer.playerState.collect { playerState ->
-                _uiState.value = PodcastUiState.Ready(
-                    podcast = podcast,
-                    episodes = episodesPagingData,
-                    episodePlayerState = playerState
-                )
-            }
+            _uiState.value = PodcastUiState.Ready(
+                podcast = podcast,
+                episodes = episodesPagingData,
+            )
         }
     }
 }

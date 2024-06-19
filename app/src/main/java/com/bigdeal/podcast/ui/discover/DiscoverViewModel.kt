@@ -41,7 +41,6 @@ class DiscoverViewModel @Inject constructor(
             podcastFollowedStateList.map { it.podcastId }
         }
 
-    val episodePlayerState = episodePlayer.playerState
     val uiState: StateFlow<DiscoverUi> = _uiState
 
     init {

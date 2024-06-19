@@ -41,7 +41,6 @@ class FavouriteViewModel @Inject constructor(
 
     val followedEpisodes: Flow<PagingData<EpisodeWithPodcast>> =
         episodeStore.followedEpisodesPagingData().cachedIn(viewModelScope)
-    val episodePlayerState = episodePlayer.playerState
 
     var followedPodcasts: MutableStateFlow<List<Podcast>> = MutableStateFlow<List<Podcast>>(
         emptyList()

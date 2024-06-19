@@ -30,6 +30,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,7 +64,8 @@ fun EpisodeScreen(
     viewModel: EpisodeScreenViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState
-    val playerEpisode = uiState.episodePlayerState.currentEpisode
+    val playState = viewModel.episodePlayerState.collectAsState()
+    val playerEpisode = uiState.episode
     Column {
         AppBar(
             modifier = Modifier.fillMaxWidth(),
@@ -77,7 +79,7 @@ fun EpisodeScreen(
 
 
             EpisodeCard(
-                episodePlayerState = viewModel.uiState.episodePlayerState,
+                episodePlayerState = playState.value,
                 playerEpisode = playerEpisode,
                 onClick = { podcastId, _ -> navigateToPodcast(podcastId) },
                 onPlay = {

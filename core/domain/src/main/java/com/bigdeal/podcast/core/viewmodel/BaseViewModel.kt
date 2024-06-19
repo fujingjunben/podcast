@@ -10,6 +10,7 @@ abstract class BaseViewModel(
     private val podcastDownloader: PodcastDownloader
 
 ): ViewModel() {
+    val episodePlayerState = episodePlayer.playerState
     fun play(playerEpisode: PlayerEpisode) {
         episodePlayer.play(playerEpisode)
     }
