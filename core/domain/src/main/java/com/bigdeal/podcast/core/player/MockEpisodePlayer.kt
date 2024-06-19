@@ -67,10 +67,10 @@ class MockEpisodePlayer(
                     is PlayerEvent.IsPlayingChanged -> {
                         if (playerEvent.isPlaying) {
                             // playing
-                            isPlaying.value = PlayerAction.PLAYING
+                            updatePlayerAction(PlayerAction.PLAYING)
                         } else {
                             // pause
-                            isPlaying.value = PlayerAction.PAUSE
+                            updatePlayerAction(PlayerAction.PAUSE)
                         }
                     }
                     is PlayerEvent.InitState -> {Timber.d("mockplayer: init")
@@ -139,6 +139,8 @@ class MockEpisodePlayer(
                 }
             }
 
+            timeElapsed.value = Duration.ZERO
+            isPlaying.value = PlayerAction.STOP
             // Once done playing, see if
 
             if (hasNext()) {
@@ -226,6 +228,7 @@ class MockEpisodePlayer(
     override fun onSeekingStarted() {
         // Need to pause the player so that it doesn't compete with timeline progression.
         pause()
+        isPlaying.value = PlayerAction.LOADING
     }
 
     override fun onSeekingFinished(duration: Duration) {
@@ -269,6 +272,17 @@ class MockEpisodePlayer(
 
     private fun hasNext(): Boolean {
         return queue.value.isNotEmpty()
+    }
+
+    private fun updatePlayerAction(nextAction: PlayerAction) {
+        when(nextAction) {
+            is PlayerAction.PAUSE -> {
+                if (isPlaying.value is PlayerAction.PLAYING) {
+                    isPlaying.value = nextAction
+                }
+            }
+            else -> isPlaying.value = nextAction
+        }
     }
 }
 
