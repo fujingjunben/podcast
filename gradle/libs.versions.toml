@@ -77,6 +77,7 @@ constraintlayout = "2.1.4"
 uiToolingPreviewAndroid = "1.6.7"
 workRuntimeKtx = "2.9.0"
 paging-version = "3.3.0"
+monitor = "1.6.1"
 
 [libraries]
 accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive", version.ref = "accompanist" }
@@ -201,6 +202,7 @@ hilt-ext-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hi
 androidx-paging = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging-version"}
 androidx-paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging-version"}
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room"}
+androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

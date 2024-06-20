@@ -36,7 +36,8 @@ android {
 
 dependencies {
 
-dependencies {
+testImplementation("junit:junit:4.12")
+    dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(project(":core:designsystem"))
     implementation(libs.androidx.work.runtime.ktx)

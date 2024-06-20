@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.monitor)
     ksp(libs.hilt.ext.compiler)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.android)
