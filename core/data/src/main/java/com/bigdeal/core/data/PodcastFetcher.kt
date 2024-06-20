@@ -2,6 +2,7 @@
 
 package com.bigdeal.core.data
 
+import android.media.MediaMetadataRetriever
 import coil.network.HttpException
 import com.bigdeal.core.Dispatcher
 import com.bigdeal.core.PodcastDispatchers
@@ -12,6 +13,7 @@ import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.io.SyndFeedInput
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
@@ -21,6 +23,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.IOException
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
@@ -143,8 +146,27 @@ private fun SyndEntry.toEpisode(podcastUri: String): EpisodeEntity {
         summary = entryInformation?.summary ?: description?.value,
         subtitle = entryInformation?.subtitle,
         published = Instant.ofEpochMilli(publishedDate.time).atOffset(ZoneOffset.UTC),
-        duration = entryInformation?.duration?.milliseconds?.let { Duration.ofMillis(it) } ?: Duration.ZERO
+        duration = entryInformation?.duration?.milliseconds?.let { Duration.ofMillis(it) } ?: Duration.ofMillis(getMp3Duration(uri))
     )
+}
+
+private fun getMp3Duration(url: String): Long {
+    if (url.isEmpty()) {
+        return 0L
+    }
+    val retriever = MediaMetadataRetriever()
+    return try {
+        retriever.setDataSource(url, HashMap<String, String>())
+        val durationString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+        retriever.release()
+        durationString?.toLong() ?: 0L
+    } catch (e: IllegalArgumentException) {
+        e.printStackTrace()
+        0L
+    } catch (e: IOException) {
+        e.printStackTrace()
+        0L
+    }
 }
 
 /**
