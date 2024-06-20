@@ -82,11 +82,11 @@ class MockEpisodePlayer(
                             Player.STATE_ENDED -> {
                                 Timber.d("mockplayer: end")
                                 timeElapsed.value = Duration.ZERO
-                                isPlaying.value = PlayerAction.STOP
+                                updatePlayerAction(PlayerAction.STOP)
                             }
                             Player.STATE_BUFFERING -> {
                                 Timber.d("mockplayer: buffering")
-                                isPlaying.value = PlayerAction.LOADING
+                                updatePlayerAction(PlayerAction.LOADING)
                             }
 
                         }
@@ -123,7 +123,6 @@ class MockEpisodePlayer(
 
         val episode = _currentEpisode.value ?: return
 
-        Timber.d("mockplayer play(): ${episode.title}")
         if (isContinuePlaying) {
             playerController.continuePlay()
         } else {
@@ -139,8 +138,8 @@ class MockEpisodePlayer(
                 }
             }
 
-            timeElapsed.value = Duration.ZERO
-            isPlaying.value = PlayerAction.STOP
+//            timeElapsed.value = Duration.ZERO
+//            updatePlayerAction(PlayerAction.STOP)
             // Once done playing, see if
 
             if (hasNext()) {
@@ -154,13 +153,17 @@ class MockEpisodePlayer(
     }
 
     override fun play(playerEpisode: PlayerEpisode) {
-        Timber.d("mockplayer: current episode: ${_currentEpisode.value}")
+        Timber.d("mockplayer: current episode: ${_currentEpisode.value?.title}")
         if (_currentEpisode.value?.id != playerEpisode.id) {
-            Timber.d("mockplayer: play different episode")
-            pause()
+            Timber.d("mockplayer: play different episode: $playerEpisode")
+            if (isPlaying.value.isPlaying()) {
+                playerController.pause()
+            }
+            timerJob?.cancel()
+            timerJob = null
             _currentEpisode.value = playerEpisode
             timeElapsed.value = Duration.ZERO
-            isPlaying.value = PlayerAction.LOADING
+            updatePlayerAction(PlayerAction.LOADING)
             play()
         } else {
             continuePlay()
@@ -197,7 +200,7 @@ class MockEpisodePlayer(
 
     override fun pause() {
         if (isPlaying.value.isPlaying()) {
-            isPlaying.value = PlayerAction.PAUSE
+            updatePlayerAction(PlayerAction.PAUSE)
             playerController.pause()
         }
 
@@ -228,7 +231,7 @@ class MockEpisodePlayer(
     override fun onSeekingStarted() {
         // Need to pause the player so that it doesn't compete with timeline progression.
         pause()
-        isPlaying.value = PlayerAction.LOADING
+        updatePlayerAction(PlayerAction.LOADING)
     }
 
     override fun onSeekingFinished(duration: Duration) {
@@ -265,7 +268,7 @@ class MockEpisodePlayer(
 
     override fun previous() {
         timeElapsed.value = Duration.ZERO
-        isPlaying.value = PlayerAction.STOP
+        updatePlayerAction(PlayerAction.STOP)
         timerJob?.cancel()
         timerJob = null
     }
@@ -275,6 +278,7 @@ class MockEpisodePlayer(
     }
 
     private fun updatePlayerAction(nextAction: PlayerAction) {
+        Timber.d("mockplayer update player action, ${isPlaying.value} to $nextAction")
         when(nextAction) {
             is PlayerAction.PAUSE -> {
                 if (isPlaying.value is PlayerAction.PLAYING) {
