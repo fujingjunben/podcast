@@ -36,3 +36,12 @@
 -dontwarn org.jaxen.DefaultNavigator
 -dontwarn org.jaxen.NamespaceContext
 -dontwarn org.jaxen.VariableContext
+
+# Keep SLF4J Logger
+-dontwarn org.slf4j.impl.StaticLoggerBinder
+-keep class org.slf4j.** { *; }
+-keep class ch.qos.logback.** { *; }
+
+# For SLF4J Simple
+-keep class org.slf4j.impl.** { *; }
+
