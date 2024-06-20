@@ -30,18 +30,21 @@ class LibraryViewModel @Inject constructor(
         viewModelScope.launch {
             uri.path?.let {
                 val inputStream = contentResolver.openInputStream(uri)
-                inputStream?.let {
-                    val opmlImporter = OpmlImporter()
-                    val feedEntries = opmlImporter.parse(it)
-                    feedEntries.forEach {
-                        Timber.d("feedEntry: $feedEntries")
-                        val feedEntity = async { feedRepository.addFeed(it.url) }.await()
-                        awaitAll(
-                            async { podcastsRepository.fetchPodcasts(listOf(it.url)) },
-                            async { podcastStore.followPodcast(feedEntity.id) }
-                        )
+                async {
+                    inputStream?.let {
+                        val opmlImporter = OpmlImporter()
+                        val feedEntries = opmlImporter.parse(it)
+                        feedEntries.forEach {feedEntry ->
+                            Timber.d("feedEntry: $feedEntries")
+                            feedRepository.addFeed(feedEntry.url)
+//                        awaitAll(
+//                            async { podcastsRepository.fetchPodcasts(listOf(it.url)) },
+//                            async { podcastStore.followPodcast(feedEntity.id) }
+//                        )
+                        }
                     }
-                }
+                }.await()
+                podcastsRepository.sync()
             }
         }
     }

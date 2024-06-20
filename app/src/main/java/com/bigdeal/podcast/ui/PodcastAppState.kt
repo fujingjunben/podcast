@@ -13,7 +13,7 @@ import androidx.navigation.compose.rememberNavController
  * List of screens for podcastApp
  */
 sealed class Screen(val route: String) {
-    object Home : Screen("home")
+    object Discover : Screen("discover")
     object Player : Screen("player/{episodeId}") {
         fun createRoute(episodeId: String) = "player/$episodeId"
     }
@@ -49,6 +49,12 @@ class PodcastAppState(
         isOnline = checkIfOnline()
     }
 
+    fun navigateToDiscover(from: NavBackStackEntry) {
+        // In order to discard duplicated navigation events, we check the Lifecycle
+        if (from.lifecycleIsResumed()) {
+            navController.navigate(Screen.Discover.route)
+        }
+    }
     fun navigateToPlayer(episodeId: String, from: NavBackStackEntry) {
         // In order to discard duplicated navigation events, we check the Lifecycle
         if (from.lifecycleIsResumed()) {

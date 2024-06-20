@@ -1,5 +1,6 @@
 package com.bigdeal.podcast.ui.library
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -7,30 +8,65 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.bigdeal.podcast.ui.common.RequestPermissionScreen
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun Library(
     modifier: Modifier = Modifier,
+    navigateToDiscover: () -> Unit,
     viewModel: LibraryViewModel = hiltViewModel()
 ) {
     val contentResolver = LocalContext.current.contentResolver
-    FilePickerScreen(
-        onSelectFile = { uri ->
-            viewModel.importOpml(contentResolver, uri)
+    var showPicker by remember {
+        mutableStateOf(false)
+    }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+    ) { paddingValue ->
+        Box(
+            modifier = Modifier
+                .padding(paddingValue)
+                .fillMaxSize()
+                .clickable {
+                    showPicker = true
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            if (showPicker) {
+                FilePickerScreen(
+                    onSelectFile = { uri ->
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Load opml document success.")
+                        }
+                        navigateToDiscover()
+                        viewModel.importOpml(contentResolver, uri)
+                    }
+                )
+            } else {
+                Text(text = "Click to pick opml file")
+            }
         }
-    )
+    }
 }
 
 @Composable
@@ -57,14 +93,12 @@ fun FilePickerScreen(
         filePickerLauncher.launch(intent)
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .clickable {
-                openFilePicker()
-            },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "Click to pick opml file")
+    RequestPermissionScreen(permission = Manifest.permission.READ_EXTERNAL_STORAGE) {
+        Button(onClick = {
+            openFilePicker()
+        }) {
+            Text("Choose Document")
+        }
     }
+
 }

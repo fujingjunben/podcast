@@ -22,7 +22,7 @@ fun NavGraph(
     onPlay: (String) -> Unit,
     appState: PodcastAppState = rememberPodcastAppState(navController = navController)
 ) {
-    NavHost(navController = navController, startDestination = Destination.FAVOURITE_ROUTE) {
+    NavHost(navController = navController, startDestination = Destination.DISCOVER_ROUTE) {
         composable(Destination.FAVOURITE_ROUTE) { backStackEntry ->
             Favourite(
                 modifier = modifier,
@@ -73,8 +73,12 @@ fun NavGraph(
                 },
             )
         }
-        composable(Destination.LIBRARY_ROUTE) {
-            Library()
+        composable(Destination.LIBRARY_ROUTE) {backStackEntry ->
+            Library(
+                navigateToDiscover = {
+                    appState.navigateToDiscover(backStackEntry)
+                }
+            )
         }
     }
 }

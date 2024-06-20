@@ -83,17 +83,17 @@ class MainActivity : ComponentActivity() {
 
         Timber.d("registerReceiver")
 
-        // Check if the READ_EXTERNAL_STORAGE permission is already available.
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // You can directly ask for the permission.
-            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-        } else {
-            // Permission is already available. Perform your file reading task.
-        }
+//        // Check if the READ_EXTERNAL_STORAGE permission is already available.
+//        if (ContextCompat.checkSelfPermission(
+//                this,
+//                Manifest.permission.READ_EXTERNAL_STORAGE
+//            ) != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            // You can directly ask for the permission.
+//            requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+//        } else {
+//            // Permission is already available. Perform your file reading task.
+//        }
 
     }
 
