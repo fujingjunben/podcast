@@ -382,7 +382,7 @@ fun EpisodeList(
             when {
                 loadState.refresh is LoadState.Loading -> {
                     item {
-                        CircularProgressIndicator(modifier = Modifier.fillParentMaxSize())
+                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
                     }
                 }
                 loadState.append is LoadState.Loading -> {
