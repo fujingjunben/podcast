@@ -54,6 +54,7 @@ import com.bigdeal.podcast.core.player.model.PlayerEpisode
 import com.bigdeal.podcast.ui.common.EpisodeListItem
 import com.bigdeal.podcast.ui.common.EpisodeListItemFooter
 import com.bigdeal.podcast.ui.common.PodcastTitleCard
+import com.bigdeal.podcast.ui.common.ScrollableText
 import timber.log.Timber
 
 @Composable
@@ -102,12 +103,14 @@ fun EpisodeScreen(
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    HtmlTextContainer(text = playerEpisode.summary) {
-                        Text(
-                            text = it,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = LocalContentColor.current
-                        )
+                    ScrollableText {
+                        HtmlTextContainer(text = playerEpisode.summary) {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = LocalContentColor.current
+                            )
+                        }
                     }
                 }
             }
