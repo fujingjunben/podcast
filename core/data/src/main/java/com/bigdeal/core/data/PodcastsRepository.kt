@@ -34,6 +34,7 @@ class PodcastsRepository(
         feedDao.insertAll(SampleFeeds.map { url ->
             FeedEntity(id = url.toSHA256(), url = url)
         })
+        Timber.d("fetch feeds")
         return true
     }
 

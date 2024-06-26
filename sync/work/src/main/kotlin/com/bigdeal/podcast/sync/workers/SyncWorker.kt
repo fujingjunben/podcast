@@ -34,6 +34,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -54,22 +55,14 @@ internal class SyncWorker @AssistedInject constructor(
         appContext.syncForegroundInfo()
 
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
-            syncSubscriber.subscribe()
+        syncSubscriber.subscribe()
 
         Timber.d("sync doWork")
-            // First sync the repositories in parallel
-            val syncedSuccessfully = awaitAll(
-                async { podcastRepository.fetchFeeds() },
-                async { podcastRepository.sync() },
-            ).all { it }
-
-
-            if (syncedSuccessfully) {
-                Result.success()
-            } else {
-                Result.retry()
-            }
-        }
+        podcastRepository.fetchFeeds()
+        delay(500)
+        podcastRepository.sync()
+        Result.success()
+    }
 
     companion object {
         /**
