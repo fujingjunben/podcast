@@ -1,3 +1,5 @@
+import java.util.Properties
+
 /*
  * Copyright 2020 The Android Open Source Project
  *
@@ -37,11 +39,26 @@ android {
     signingConfigs {
         // We use a bundled debug keystore, to allow debug builds from CI to be upgradable
         named("debug") {
-            storeFile = rootProject.file("debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
+            val localProperties = Properties().apply {
+                load(rootProject.file("local.properties").inputStream())
+            }
+
+            storeFile = file(localProperties["storeFile"] as String)
+            storePassword = localProperties["storePassword"] as String
+            keyAlias = localProperties["keyAlias"] as String
+            keyPassword = localProperties["keyPassword"] as String
         }
+
+//        named("release") {
+//            val localProperties = Properties().apply {
+//                load(rootProject.file("local.properties").inputStream())
+//            }
+//
+//            storeFile = file(localProperties["storeFile"] as String)
+//            storePassword = localProperties["storePassword"] as String
+//            keyAlias = localProperties["keyAlias"] as String
+//            keyPassword = localProperties["keyPassword"] as String
+//        }
     }
 
     buildTypes {

@@ -23,3 +23,5 @@ gradle.xml
 # General
 .DS_Store
 .externalNativeBuild
+app/release/app-release.apk
+/app/release
