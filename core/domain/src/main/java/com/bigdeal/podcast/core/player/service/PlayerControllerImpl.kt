@@ -163,20 +163,22 @@ class PlayerControllerImpl(
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
-            playerState.value = PlayerEvent.IsPlayingChanged(isPlaying)
-            if (isPlaying) {
+            Timber.d("IsPlayingChanged($isPlaying)")
+            if (playerState.value != PlayerEvent.PlaybackStateChanged(Player.STATE_ENDED)) {
+                playerState.value = PlayerEvent.IsPlayingChanged(isPlaying)
             }
         }
 
         override fun onPlaybackStateChanged(playbackState: Int) {
             super.onPlaybackStateChanged(playbackState)
-            playerState.value = PlayerEvent.PlaybackStateChanged(playbackState)
             when(playbackState) {
-                Player.STATE_READY -> Timber.d("mockplayer: ready")
-                Player.STATE_IDLE -> Timber.d("mockplayer: idle")
-                Player.STATE_ENDED -> Timber.d("mockplayer: end")
-                else -> {}
+                Player.STATE_READY -> Timber.d("player: ready")
+                Player.STATE_IDLE -> Timber.d("player: idle")
+                Player.STATE_ENDED -> Timber.d("player: end")
+                Player.STATE_BUFFERING -> Timber.d("player: buffering")
+                else -> Timber.d("player: playerbackState: $playbackState")
             }
+            playerState.value = PlayerEvent.PlaybackStateChanged(playbackState)
         }
 
         override fun onEvents(player: Player, events: Player.Events) {

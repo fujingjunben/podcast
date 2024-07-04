@@ -32,6 +32,7 @@ class MockEpisodePlayer(
     private val timeElapsed = MutableStateFlow(Duration.ZERO)
     private val _playerSpeed = MutableStateFlow(DefaultPlaybackSpeed)
     private val coroutineScope = CoroutineScope(mainDispatcher)
+    private var _playerRepeatMode = Player.REPEAT_MODE_OFF
 
     private var timerJob: Job? = null
 
@@ -43,7 +44,7 @@ class MockEpisodePlayer(
                 queue,
                 isPlaying,
                 timeElapsed,
-                _playerSpeed
+                _playerSpeed,
             ) { currentEpisode, queue, isPlaying, timeElapsed, playerSpeed ->
                 EpisodePlayerState(
                     currentEpisode = currentEpisode,
@@ -77,12 +78,23 @@ class MockEpisodePlayer(
                     }
                     is PlayerEvent.PlaybackStateChanged -> {
                         when(playerEvent.state) {
-                            Player.STATE_READY -> Timber.d("mockplayer: ready")
+                            Player.STATE_READY -> {
+                                Timber.d("mockplayer: ready")
+                                updatePlayerAction(PlayerAction.PLAYING)
+                            }
                             Player.STATE_IDLE -> Timber.d("mockplayer: idle")
                             Player.STATE_ENDED -> {
                                 Timber.d("mockplayer: end")
                                 timeElapsed.value = Duration.ZERO
                                 updatePlayerAction(PlayerAction.STOP)
+                                if (_playerRepeatMode == Player.REPEAT_MODE_ONE) {
+                                    play()
+                                } else {
+                                    if (hasNext()) {
+                                        next()
+                                    }
+                                }
+
                             }
                             Player.STATE_BUFFERING -> {
                                 Timber.d("mockplayer: buffering")
@@ -118,6 +130,7 @@ class MockEpisodePlayer(
     private fun play(isContinuePlaying: Boolean = false) {
         // Do nothing if already playing
         if (isPlaying.value.isPlaying()) {
+            Timber.d("mockplayer isplaying")
             return
         }
 
@@ -137,15 +150,7 @@ class MockEpisodePlayer(
                     timeElapsed.update { Duration.ofMillis(controller.currentPosition) }
                 }
             }
-
-//            timeElapsed.value = Duration.ZERO
-//            updatePlayerAction(PlayerAction.STOP)
-            // Once done playing, see if
-
-            if (hasNext()) {
-                next()
-            }
-        }
+       }
     }
 
     override fun continuePlay() {
@@ -249,8 +254,9 @@ class MockEpisodePlayer(
         _playerSpeed.value -= speed
     }
 
-    override fun setRepeatMode(mode: Int) {
-        playerController.setRepeatMode(mode)
+    override fun setRepeatMode(@Player.RepeatMode mode: Int) {
+        Timber.d("mockplayer: setRepeatMode: $mode")
+        _playerRepeatMode = mode
     }
 
     override fun next() {
