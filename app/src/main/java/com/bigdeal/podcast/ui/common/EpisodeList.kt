@@ -24,6 +24,7 @@ data class EpisodeActions(
     val onDownload: (playerEpisode: PlayerEpisode) -> Unit,
     val onCancelDownload: (playerEpisode: PlayerEpisode) -> Unit,
     val onDeleteDownload: (playerEpisode: PlayerEpisode) -> Unit,
+    val onSaveAs: (playerEpisode: PlayerEpisode) -> Unit,
 )
 
 @Composable

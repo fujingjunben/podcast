@@ -35,4 +35,8 @@ abstract class BaseViewModel(
     fun deleteDownload(episode: PlayerEpisode) {
         podcastDownloader.cancelDownload(episode)
     }
+
+    fun saveAs(episode: PlayerEpisode) {
+        podcastDownloader.saveAs(episode)
+    }
 }

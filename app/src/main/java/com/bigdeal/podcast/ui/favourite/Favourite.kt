@@ -93,6 +93,7 @@ fun Favourite(
                 onDownload = viewModel::download,
                 onCancelDownload = viewModel::cancelDownload,
                 onDeleteDownload = viewModel::deleteDownload,
+                onSaveAs = viewModel::saveAs,
             )
         ) {
             FollowedPodcasts(

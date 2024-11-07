@@ -81,4 +81,8 @@ class PodcastDownloader (
 
         }
     }
+
+    fun saveAs(episode: PlayerEpisode) {
+        val file = File(episode.)
+    }
 }
